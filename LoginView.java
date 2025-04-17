@@ -3,12 +3,7 @@ import java.util.Scanner;
 public class LoginView {
     private final LoginController loginController;
     private final Scanner scanner;
-    private boolean exitRequested = false;
-    
 
-    public boolean isExitRequested() {
-        return exitRequested;
-    }
 
     public LoginView(LoginController loginController) {
         this.loginController = loginController;

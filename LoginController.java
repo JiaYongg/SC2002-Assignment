@@ -1,7 +1,7 @@
 import java.util.HashMap;
 import java.util.Map;
 
-public class LoginController implements AuthService {
+public class LoginController implements iAuthService {
     private Map<String, User> users = new HashMap<>();
     private User loggedInUser;
 
