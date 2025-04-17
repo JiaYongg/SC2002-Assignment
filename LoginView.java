@@ -27,7 +27,7 @@ public class LoginView {
         return isAuthenticated;
     }
 
-    public void changePasswordFlow() {
+    public void changePasswordPrompt() {
 
         System.out.print("Enter your current password: ");
         String oldPassword = scanner.nextLine().trim();
@@ -48,6 +48,43 @@ public class LoginView {
             System.out.println("\nPassword change failed. Please try again.");
         }
     }
+
+
+
+
+
+
+    public void showMenu() {
+        boolean running = true;
+        while (running) {
+            printMenuOptions();
+            try {
+                int choice = Integer.parseInt(scanner.nextLine().trim());
+                switch (choice) {
+                    case 9:
+                        changePasswordPrompt();
+                        break;
+                    case 0:
+                        System.out.println("Exiting program... Goodbye!");
+                        running = false;
+                        break;
+                    default:
+                        System.out.println("Invalid option. Please try again.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a valid number.");
+            }
+        }
+    }
+
+    private void printMenuOptions() {
+        System.out.println("\nOptions:");
+        System.out.println("9 - Change Password");
+        System.out.println("0 - Quit");
+        System.out.print("Enter your choice: ");
+    }
+
+
 
     public void closeScanner() {
         scanner.close();
