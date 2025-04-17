@@ -49,11 +49,6 @@ public class LoginView {
         }
     }
 
-
-
-
-
-
     public void showMenu() {
         boolean running = true;
         while (running) {

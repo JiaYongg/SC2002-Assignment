@@ -35,4 +35,32 @@ public class LoginController implements AuthService {
         System.out.println("Password changed successfully!");
         return true;
     }
+    public String getUserRole() {
+        if (loggedInUser == null) {
+            return null;
+        }
+        
+        if (loggedInUser instanceof Manager) {
+            return "MANAGER";
+        // } else if (loggedInUser instanceof Officer) {
+        //     return "OFFICER";
+        } else {
+            return "APPLICANT";
+        }
+    }
+    
+    /**
+     * Gets the currently logged-in user
+     * @return The logged-in user object or null if no user is logged in
+     */
+    public User getLoggedInUser() {
+        return loggedInUser;
+    }
+    
+    /**
+     * Logs out the current user
+     */
+    public void logout() {
+        loggedInUser = null;
+    }
 }
