@@ -63,4 +63,5 @@ public class LoginController implements AuthService {
     public void logout() {
         loggedInUser = null;
     }
+    
 }

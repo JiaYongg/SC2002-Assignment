@@ -14,22 +14,10 @@ public class ManagerView {
         this.scanner = new Scanner(System.in);
     }
     
-    public void displayManagerMenu() {
+    public boolean displayManagerMenu() {
         boolean running = true;
         while (running) {
-            System.out.println("\n===== Manager Menu =====");
-            System.out.println("1. Create New Project");
-            System.out.println("2. View All Projects");
-            System.out.println("3. View My Projects");
-            System.out.println("4. Edit Project");
-            System.out.println("5. Delete Project");
-            System.out.println("6. Toggle Project Visibility");
-            System.out.println("7. Pending Officer Registrations");
-            System.out.println("8. Pending Applications");
-            System.out.println("9. Pending Withdrawal Requests");
-            System.out.println("10. Generate Booking Report");
-            System.out.println("0. Logout");
-            System.out.print("Enter your choice: ");
+            printMenuOptions();
             
             try {
                 int choice = Integer.parseInt(scanner.nextLine().trim());
@@ -76,8 +64,26 @@ public class ManagerView {
                 System.out.println("Please enter a valid number.");
             }
         }
+        return true;
     }
     
+    public void printMenuOptions(){
+        System.out.println("\n===== Manager Menu =====");
+        System.out.println("1. Create New Project");
+        System.out.println("2. View All Projects");
+        System.out.println("3. View My Projects");
+        System.out.println("4. Edit Project");
+        System.out.println("5. Delete Project");
+        System.out.println("6. Toggle Project Visibility");
+        System.out.println("7. Pending Officer Registrations");
+        System.out.println("8. Pending Applications");
+        System.out.println("9. Pending Withdrawal Requests");
+        System.out.println("10. Generate Booking Report");
+        System.out.println("0. Logout");
+        System.out.print("Enter your choice: ");
+    }
+
+
     // Menu methods for each operation
     private void createProjectMenu() {
         // Implementation for creating a project

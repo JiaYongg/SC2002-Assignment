@@ -14,7 +14,7 @@ public class ApplicantFileReader extends FileReader {
     @Override
     protected void processLine(String line, Map<String, User> users) {
         String[] data = line.split(",");
-        User applicant = new Applicant();
+        User applicant = new User();
         applicant.setName(data[0].trim());
         applicant.setNric(data[1].trim());
         applicant.setAge(Integer.parseInt(data[2].trim()));

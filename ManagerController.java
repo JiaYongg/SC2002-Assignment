@@ -10,7 +10,7 @@ public class ManagerController {
     public ManagerController(Manager manager) {
         this.currentManager = manager;
         // this.allProjects = loadProjects();
-    }
+    } 
     
     // // Project management methods
     // public Project createProject(String name, String neighborhood, List<FlatType> flatTypes, 
