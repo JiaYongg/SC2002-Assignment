@@ -1,27 +1,74 @@
+import java.util.Scanner;
+import java.util.Map;
+
 public class Main {
     public static void main(String[] args) {
-        // Initialize authentication service
-        AuthService authService = new LoginController();
+        LoginController loginController = new LoginController(); // Create LoginController
+        
+        readAndAddUsersFromFile(loginController); // Pass it to function
 
-        // Create and add users
-        User alice = new User();
-        alice.setName("Alice");
-        alice.setAge(25);
-        alice.setMaritalStatus("Single");
-        alice.setNric("t1234567m");
+        // Initialize UI
+        LoginUI loginUI = new LoginUI(loginController);
+        Scanner scanner = new Scanner(System.in);
 
-        User bob = new User();
-        bob.setName("Bob");
+        // Loop login until successful
+        boolean isAuthenticated = false;
+        while (!isAuthenticated) {
+            isAuthenticated = loginUI.showLoginPrompt();
+        }
 
-        ((LoginController) authService).addUser("Alice", alice);
-        ((LoginController) authService).addUser("Bob", bob);
+        // Handle user actions
+        while (true) {
+            printMenu();
 
-        // Attempt login
-        authService.login("Alice", "password");
+            int choice = scanner.nextInt();
+            scanner.nextLine();
 
-        // Change password
-        authService.changePassword("Alice", "password", "newAlicePass");
+            switch (choice) {
+                case 9:
+                    loginUI.changePasswordFlow();
+                    break;
+                case 0:
+                    System.out.println("Exiting program... Goodbye!");
+                    scanner.close();
+                    return;
+                default:
+                    System.out.println("Invalid option. Please try again.");
+            }
+        }
+    }
 
-        System.out.println(alice.getPassword());
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public static void readAndAddUsersFromFile(LoginController loginController) {
+        String filePath = "ApplicantList.csv"; // CSV file name
+
+        // Read users from CSV file
+        Map<String, User> users = CSVReader.readUsersFromCSV(filePath);
+
+        // Add users to login controller
+        users.values().forEach(loginController::addUser);
+    }
+
+    public static void printMenu(){
+        System.out.println("\nOptions:");
+        System.out.println("9 - Change Password");
+        System.out.println("0 - Quit");
+        System.out.print("Enter your choice: ");
     }
 }
