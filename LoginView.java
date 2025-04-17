@@ -1,10 +1,10 @@
 import java.util.Scanner;
 
-public class LoginUI {
+public class LoginView {
     private final LoginController loginController;
     private final Scanner scanner;
 
-    public LoginUI(LoginController loginController) {
+    public LoginView(LoginController loginController) {
         this.loginController = loginController;
         this.scanner = new Scanner(System.in);
     }

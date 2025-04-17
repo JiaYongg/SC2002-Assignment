@@ -8,13 +8,13 @@ public class Main {
         readAndAddUsersFromFile(loginController); // Pass it to function
 
         // Initialize UI
-        LoginUI loginUI = new LoginUI(loginController);
+        LoginView loginView = new LoginView(loginController);
         Scanner scanner = new Scanner(System.in);
 
         // Loop login until successful
         boolean isAuthenticated = false;
         while (!isAuthenticated) {
-            isAuthenticated = loginUI.showLoginPrompt();
+            isAuthenticated = loginView.showLoginPrompt();
         }
 
         // Handle user actions
@@ -26,7 +26,7 @@ public class Main {
 
             switch (choice) {
                 case 9:
-                    loginUI.changePasswordFlow();
+                    loginView.changePasswordFlow();
                     break;
                 case 0:
                     System.out.println("Exiting program... Goodbye!");
