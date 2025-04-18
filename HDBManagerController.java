@@ -28,7 +28,7 @@ public class HDBManagerController {
      */
     public HDBManagerController(Manager manager) {
         this.currentManager = manager;
-        this.allProjects = loadProjects();
+        // this.allProjects = loadProjects();
     }
     
     /**
@@ -42,145 +42,155 @@ public class HDBManagerController {
      * @param officerSlots Number of officer slots (max 10)
      * @return The created Project object, or null if creation failed
      */
-    // public Project createProject(String name, String neighborhood, List<FlatType> flatTypes,
-    //                            String openDateStr, String closeDateStr, int officerSlots) {
-    //     try {
+    public Project createProject(String name, String neighborhood, List<FlatType> flatTypes,
+                               String openDateStr, String closeDateStr, int officerSlots) {
+        try {
 
-    //         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-    //         Date openDate = dateFormat.parse(openDateStr);
-    //         Date closeDate = dateFormat.parse(closeDateStr);
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+            Date openDate = dateFormat.parse(openDateStr);
+            Date closeDate = dateFormat.parse(closeDateStr);
             
  
-    //         if (openDate.after(closeDate)) {
-    //             System.out.println("Error: Opening date must be before closing date.");
-    //             return null;
-    //         }
+            if (openDate.after(closeDate)) {
+                System.out.println("Error: Opening date must be before closing date.");
+                return null;
+            }
             
-    //         // Check if project name is unique
-    //         for (Project existingProject : allProjects) {
-    //             if (existingProject.getProjectName().equals(name)) {
-    //                 System.out.println("Error: A project with this name already exists.");
-    //                 return null;
-    //             }
-    //         }
-            
-
-    //         if (!canHandleProjectInPeriod(openDate, closeDate)) {
-    //             System.out.println("Error: Manager already has a project during this period.");
-    //             return null;
-    //         }
-            
-    //         // Validate officer slots
-    //         if (officerSlots <= 0 || officerSlots > 10) {
-    //             System.out.println("Error: Officer slots must be between 1 and 10.");
-    //             return null;
-    //         }
-            
-
-    //         Project project = new Project(
-    //             name,
-    //             neighborhood,
-    //             openDate,
-    //             closeDate,
-    //             false, // Default visibility is off
-    //             flatTypes,
-    //             currentManager,
-    //             officerSlots
-    //         );
-            
-
-    //         allProjects.add(project);
-    //         currentManager.addManagedProject(project);
-            
-
-    //         saveProjects();
-            
-    //         System.out.println("Project created successfully: " + name);
-    //         return project;
-            
-    //     } catch (ParseException e) {
-    //         System.out.println("Error: Invalid date format. Please use dd/MM/yyyy.");
-    //         return null;
-    //     } catch (Exception e) {
-    //         System.out.println("Error creating project: " + e.getMessage());
-    //         return null;
-    //     }
-    // }
-    
-
-    private List<Project> loadProjects() {
-        List<Project> projects = new ArrayList<>();
-        
-        try (BufferedReader br = new BufferedReader(new FileReader(PROJECT_FILE_PATH))) {
-            String line;
-            boolean headerSkipped = false;
-            
-            while ((line = br.readLine()) != null) {
-                if (!headerSkipped) {
-                    headerSkipped = true;
-                    continue;
-                }
-                
-
-                String[] data = line.split(",");
-                if (data.length < 12) {
-                    System.out.println("Warning: Skipping malformed line in CSV: " + line);
-                    continue;
-                }
-                
-                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-                
-                String projectName = data[0];
-                String neighborhood = data[1];
-                
-
-                List<FlatType> flatTypes = new ArrayList<>();
-                if (!data[2].isEmpty()) {
-                    FlatType type1 = new FlatType(data[2], Integer.parseInt(data[3]), Double.parseDouble(data[4]));
-                    flatTypes.add(type1);
-                }
-                
-                if (!data[5].isEmpty()) {
-                    FlatType type2 = new FlatType(data[5], Integer.parseInt(data[6]), Double.parseDouble(data[7]));
-                    flatTypes.add(type2);
-                }
-                
-                // Parse dates
-                Date openDate = dateFormat.parse(data[8]);
-                Date closeDate = dateFormat.parse(data[9]);
-                
-                // Parse manager
-                String managerNric = data[10];
-                Manager manager = findManagerByNric(managerNric);
-                
-                // Parse officer slots
-                int officerSlots = Integer.parseInt(data[11]);
-                
-                // Create project without projectID
-                Project project = new Project(
-                    projectName,
-                    neighborhood,
-                    openDate,
-                    closeDate,
-                    true, // Default visibility to true for loaded projects
-                    flatTypes,
-                    manager,
-                    officerSlots
-                );
-                
-                projects.add(project);
-                
-                // Add to manager's projects if it's the current manager
-                if (manager != null && manager.equals(currentManager)) {
-                    currentManager.addManagedProject(project);
+            // Check if project name is unique
+            for (Project existingProject : allProjects) {
+                if (existingProject.getProjectName().equals(name)) {
+                    System.out.println("Error: A project with this name already exists.");
+                    return null;
                 }
             }
-        } catch (IOException | ParseException e) {
-            System.out.println("Error reading ProjectList.csv: " + e.getMessage());
+            
+
+            if (!canHandleProjectInPeriod(openDate, closeDate)) {
+                System.out.println("Error: Manager already has a project during this period.");
+                return null;
+            }
+            
+            // Validate officer slots
+            if (officerSlots <= 0 || officerSlots > 10) {
+                System.out.println("Error: Officer slots must be between 1 and 10.");
+                return null;
+            }
+            
+
+            Project project = new Project(
+                name,
+                neighborhood,
+                openDate,
+                closeDate,
+                false, // Default visibility is off
+                flatTypes,
+                currentManager,
+                officerSlots
+            );
+            
+
+            allProjects.add(project);
+            currentManager.addManagedProject(project);
+            
+
+            saveProjects();
+            
+            System.out.println("Project created successfully: " + name);
+            return project;
+            
+        } catch (ParseException e) {
+            System.out.println("Error: Invalid date format. Please use dd/MM/yyyy.");
+            return null;
+        } catch (Exception e) {
+            System.out.println("Error creating project: " + e.getMessage());
+            return null;
         }
-        
-        return projects;
     }
+    
+
+    // private List<Project> loadProjects() {
+    //     List<Project> projects = new ArrayList<>();
+        
+    //     try (BufferedReader br = new BufferedReader(new FileReader(PROJECT_FILE_PATH))) {
+    //         String line;
+    //         boolean headerSkipped = false;
+            
+    //         while ((line = br.readLine()) != null) {
+    //             if (!headerSkipped) {
+    //                 headerSkipped = true;
+    //                 continue;
+    //             }
+                
+
+    //             String[] data = line.split(",");
+    //             if (data.length < 12) {
+    //                 System.out.println("Warning: Skipping malformed line in CSV: " + line);
+    //                 continue;
+    //             }
+                
+    //             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                
+    //             String projectName = data[0];
+    //             String neighborhood = data[1];
+                
+
+    //             List<FlatType> flatTypes = new ArrayList<>();
+    //             if (!data[2].isEmpty()) {
+    //                 FlatType type1 = new FlatType(data[2], Integer.parseInt(data[3]), Double.parseDouble(data[4]));
+    //                 flatTypes.add(type1);
+    //             }
+                
+    //             if (!data[5].isEmpty()) {
+    //                 FlatType type2 = new FlatType(data[5], Integer.parseInt(data[6]), Double.parseDouble(data[7]));
+    //                 flatTypes.add(type2);
+    //             }
+                
+    //             // Parse dates
+    //             Date openDate = dateFormat.parse(data[8]);
+    //             Date closeDate = dateFormat.parse(data[9]);
+                
+    //             // Parse manager
+    //             String managerName = data[10];
+    //             // Manager manager = findManagerByNric(managerNric);
+                
+    //             // Parse officer slots
+    //             int officerSlots = Integer.parseInt(data[11]);
+                
+    //             // Create project without projectID
+    //             Project project = new Project(
+    //                 projectName,
+    //                 neighborhood,
+    //                 openDate,
+    //                 closeDate,
+    //                 true, // Default visibility to true for loaded projects
+    //                 flatTypes,
+    //                 manager,
+    //                 officerSlots
+    //             );
+                
+    //             projects.add(project);
+                
+    //             // Add to manager's projects if it's the current manager
+    //             if (manager != null && manager.equals(currentManager)) {
+    //                 currentManager.addManagedProject(project);
+    //             }
+    //         }
+    //     } catch (IOException | ParseException e) {
+    //         System.out.println("Error reading ProjectList.csv: " + e.getMessage());
+    //     }
+        
+    //     return projects;
+    // }
+
+
+
+
+
+
+
+
+
+
 
     
     /**
@@ -769,18 +779,7 @@ public class HDBManagerController {
         return nric.charAt(0) + "****" + nric.substring(nric.length() - 3);
     }
     
-    private Manager findManagerByNric(String nric) {
-        // This would require access to the user repository
-        // For now, if it matches the current manager's NRIC, return the current manager
-        if (currentManager.getNric().equals(nric)) {
-            return currentManager;
-        }
-        
-        // Otherwise, create a placeholder manager
-        Manager manager = new Manager();
-        manager.setNric(nric);
-        return manager;
-    }
+
     
     
     

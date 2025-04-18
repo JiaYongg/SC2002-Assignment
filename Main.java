@@ -29,6 +29,11 @@ public class Main {
             
             String userRole = loginController.getUserRole();
             User currentUser = loginController.getLoggedInUser();
+
+            
+
+
+
             boolean exitProgram = false;
             
             // Process based on user role

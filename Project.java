@@ -27,7 +27,7 @@ public class Project {
                     this.officerSlots = officerSlots;
                     this.assignedOfficers = new ArrayList<>();
                     this.registrationRequests = new ArrayList<>();
-                    this.enquiries = new ArrayList<>();
+                    // this.enquiries = new ArrayList<>();
     }
 
     public String getProjectName (){

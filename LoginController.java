@@ -49,8 +49,8 @@ public class LoginController implements iAuthService {
         
         if (loggedInUser instanceof Manager) {
             return "MANAGER";
-        // } else if (loggedInUser instanceof Officer) {
-        //     return "OFFICER";
+        } else if (loggedInUser instanceof HDBOfficer) {
+            return "OFFICER";
         } else {
             return "APPLICANT";
         }
