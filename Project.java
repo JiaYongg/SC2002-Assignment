@@ -34,7 +34,7 @@ public class Project {
 
    
     public boolean isOpen() {
-        Date now = new Date(); // Get current date
+        Date now = new Date(); 
         return now.after(applicationOpenDate) && now.before(applicationCloseDate);
     }
     public FlatType getFlatTypeByName(String name) {
