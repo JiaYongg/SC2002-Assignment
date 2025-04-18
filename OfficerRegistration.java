@@ -18,7 +18,7 @@ public class OfficerRegistration {
     }
 
     public OfficerRegistrationStatus GetRegistrationStatus(){
-        return status
+        return status;
     }
     public HDBOfficer getOfficer(){
         return officer;
