@@ -5,11 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class ManagerView {
-    private ManagerController controller;
+public class HDBManagerView {
+    private HDBManagerController controller;
     private Scanner scanner;
     
-    public ManagerView(ManagerController controller) {
+    public HDBManagerView(HDBManagerController controller) {
         this.controller = controller;
         this.scanner = new Scanner(System.in);
     }

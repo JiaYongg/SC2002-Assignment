@@ -35,9 +35,9 @@ public class Main {
             switch (userRole) {
                 case "MANAGER":
                     Manager manager = (Manager) currentUser;
-                    ManagerController managerController = new ManagerController(manager);
-                    ManagerView managerView = new ManagerView(managerController);
-                    exitProgram = managerView.displayManagerMenu();
+                    HDBManagerController HDBmanagerController = new HDBManagerController(manager);
+                    HDBManagerView HDBmanagerView = new HDBManagerView(HDBmanagerController);
+                    exitProgram = HDBmanagerView.displayManagerMenu();
                     break;
                     
                 // case "OFFICER":

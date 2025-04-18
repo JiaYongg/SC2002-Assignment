@@ -4,6 +4,12 @@ import java.util.Map;
 public class LoginController implements iAuthService {
     private Map<String, User> users = new HashMap<>();
     private User loggedInUser;
+    private HDBManagerFileWriter HDBmanagerFileWriter;
+
+    public LoginController() {
+        this.HDBmanagerFileWriter = new HDBManagerFileWriter();
+        // Initialize other file writers
+    }
 
     // Add user to the system
     public void addUser(User user) {
@@ -33,6 +39,7 @@ public class LoginController implements iAuthService {
 
         loggedInUser.setPassword(newPassword);
         System.out.println("Password changed successfully!");
+        updateUserFile();
         return true;
     }
     public String getUserRole() {
@@ -48,6 +55,19 @@ public class LoginController implements iAuthService {
             return "APPLICANT";
         }
     }
+    private void updateUserFile() {
+        if (loggedInUser instanceof Manager) {
+            // Filter only Manager users
+            Map<String, User> managers = new HashMap<>();
+            for (User user : users.values()) {
+                if (user instanceof Manager) {
+                    managers.put(user.getNric(), user);
+                }
+            }
+            HDBmanagerFileWriter.writeToFile(managers);
+        }
+        // Add similar blocks for Officer and Applicant when implemented
+    }
     
     /**
      * Gets the currently logged-in user
@@ -57,11 +77,11 @@ public class LoginController implements iAuthService {
         return loggedInUser;
     }
     
-    /**
-     * Logs out the current user
-     */
     public void logout() {
         loggedInUser = null;
     }
     
 }
+
+
+

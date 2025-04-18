@@ -3,11 +3,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.io.*;
 
-public class ManagerController {
+public class HDBManagerController {
     private Manager currentManager;
     // private List<Project> allProjects;
     
-    public ManagerController(Manager manager) {
+    public HDBManagerController(Manager manager) {
         this.currentManager = manager;
         // this.allProjects = loadProjects();
     } 
