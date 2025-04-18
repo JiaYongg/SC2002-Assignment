@@ -14,7 +14,7 @@ public class Project {
     private List<Enquiry> enquiries;
 
    
-    public Project(int projectID, String projectName, String neighborhood, Date applicationOpenDate,
+    public Project(String projectName, String neighborhood, Date applicationOpenDate,
                    Date applicationCloseDate, boolean visibility, List<FlatType> flatTypes,
                    Manager managerInCharge, int officerSlots) {
                     this.projectName = projectName;
