@@ -1,8 +1,6 @@
 import java.util.*;
 
-// Represents a public housing project
 public class Project {
-    // Basic project info
     private int projectID;
     private String projectName;
     private String neighborhood;
