@@ -1,6 +1,6 @@
 import java.util.List;
 
-public class HDBOfficer {
+public class HDBOfficer extends User{
 
     private List<Project> handledProject;
     private OfficerRegistrationStatus registrationStatus;
