@@ -1,7 +1,6 @@
 import java.util.*;
 
 public class Project {
-    private int projectID;
     private String projectName;
     private String neighborhood;
     private Date applicationOpenDate;
@@ -18,18 +17,17 @@ public class Project {
     public Project(int projectID, String projectName, String neighborhood, Date applicationOpenDate,
                    Date applicationCloseDate, boolean visibility, List<FlatType> flatTypes,
                    Manager managerInCharge, int officerSlots) {
-        this.projectID = projectID;
-        this.projectName = projectName;
-        this.neighborhood = neighborhood;
-        this.applicationOpenDate = applicationOpenDate;
-        this.applicationCloseDate = applicationCloseDate;
-        this.visibility = visibility;
-        this.flatTypes = flatTypes;
-        this.managerInCharge = managerInCharge;
-        this.officerSlots = officerSlots;
-        this.assignedOfficers = new ArrayList<>();
-        this.registrationRequests = new ArrayList<>();
-        this.enquiries = new ArrayList<>();
+                    this.projectName = projectName;
+                    this.neighborhood = neighborhood;
+                    this.applicationOpenDate = applicationOpenDate;
+                    this.applicationCloseDate = applicationCloseDate;
+                    this.visibility = visibility;
+                    this.flatTypes = flatTypes;
+                    this.managerInCharge = managerInCharge;
+                    this.officerSlots = officerSlots;
+                    this.assignedOfficers = new ArrayList<>();
+                    this.registrationRequests = new ArrayList<>();
+                    this.enquiries = new ArrayList<>();
     }
 
    
@@ -65,7 +63,7 @@ public class Project {
         }
     }
     public boolean isOverlappingWith(Date startDate, Date endDate) {
-        return );
+        
     }
     public boolean isOverlappingWith(Project otherProject) {
         return isOverlappingWith(otherProject.applicationOpenDate, otherProject.applicationCloseDate);
