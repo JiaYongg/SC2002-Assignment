@@ -30,7 +30,11 @@ public class Project {
                     this.enquiries = new ArrayList<>();
     }
 
-   
+    public String getProjectName (){
+        return this.projectName;
+    }
+
+
     public boolean isOpen() {
         Date now = new Date(); 
         return now.after(applicationOpenDate) && now.before(applicationCloseDate);
