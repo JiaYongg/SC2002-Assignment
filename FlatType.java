@@ -2,6 +2,8 @@ public class FlatType {
     private String typeName;
     private int basePrice;
     private int availableUnits;
+    public static final FlatType TWO_ROOM = new FlatType("2-Room", 0, 0);
+    public static final FlatType THREE_ROOM = new FlatType("3-Room", 0, 0);
     
     public FlatType(String typeName, int availableUnits, double basePrice) {
         this.typeName = typeName;
