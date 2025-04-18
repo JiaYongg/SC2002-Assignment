@@ -34,6 +34,74 @@ public class Project {
         return this.projectName;
     }
 
+    public boolean isVisible () {
+        return this.visibility;
+    }
+
+    public Manager getManagerInCharge (){
+        return this.managerInCharge;
+    }
+
+    public Date getApplicationOpenDate() {
+        return applicationOpenDate;
+    }
+    
+    public Date getApplicationCloseDate() {
+        return applicationCloseDate;
+    }
+
+    public List<HDBOfficer> getAssignedOfficers(){
+        return assignedOfficers;
+    }
+    
+
+
+
+
+
+
+
+
+
+    public void setVisibility(boolean newVisibility){
+        this.visibility = newVisibility;
+    }
+
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
+    }
+    
+    public void setNeighborhood(String neighborhood) {
+        this.neighborhood = neighborhood;
+    }
+
+    public void setFlatTypes(List<FlatType> flatTypes) {
+        this.flatTypes = flatTypes;
+    }
+
+    public void setApplicationOpenDate(Date applicationOpenDate) {
+        this.applicationOpenDate = applicationOpenDate;
+    }
+
+    public void setApplicationCloseDate(Date applicationCloseDate) {
+        this.applicationCloseDate = applicationCloseDate;
+    }
+
+    public void setOfficerSlots(int officerSlots) {
+        if (officerSlots <= 0 || officerSlots > 10) {
+            throw new IllegalArgumentException("Officer slots must be between 1 and 10");
+        }
+        this.officerSlots = officerSlots;
+    }
+
+
+
+
+
+
+
+
+
 
     public boolean isOpen() {
         Date now = new Date(); 
@@ -67,7 +135,8 @@ public class Project {
         }
     }
     public boolean isOverlappingWith(Date startDate, Date endDate) {
-        
+        // Check if either of the date ranges is completely before or after the other
+        return !(applicationCloseDate.before(startDate) || applicationOpenDate.after(endDate));
     }
     public boolean isOverlappingWith(Project otherProject) {
         return isOverlappingWith(otherProject.applicationOpenDate, otherProject.applicationCloseDate);
@@ -75,12 +144,6 @@ public class Project {
     public void addEnquiry(Enquiry enquiry) {
         enquiries.add(enquiry);
     }
-    public Date getApplicationOpenDate() {
-        return applicationOpenDate;
-    }
-    
-    public Date getApplicationCloseDate() {
-        return applicationCloseDate;
-    }
+
     
 }
