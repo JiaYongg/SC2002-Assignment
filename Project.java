@@ -53,6 +53,17 @@ public class Project {
     public List<HDBOfficer> getAssignedOfficers(){
         return assignedOfficers;
     }
+    public List<FlatType> getFlatTypes(){
+        return flatTypes;
+    }
+    public String getNeighborhood (){
+        return this.neighborhood;
+    }
+    
+    public int getOfficerSlots(){
+        return this.officerSlots;
+    }
+
     
 
 
@@ -93,6 +104,8 @@ public class Project {
         }
         this.officerSlots = officerSlots;
     }
+
+    
 
 
 
