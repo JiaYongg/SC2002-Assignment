@@ -13,4 +13,9 @@ public class HDBOfficer {
         this.registrationStatus = registrationStatus;
         this.registrationRequests = registrationRequests;
     }
+    public void addHandledProject(Project project){
+        if(!handledProject.contains(project)){
+            handledProject.add(project);
+        }
+    }
 }
