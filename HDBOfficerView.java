@@ -41,10 +41,10 @@ public class HDBOfficerView {
                         registerForProject();
                         break;
                     case 4:
-                        // viewRegistrationStatus();
+                        viewRegistrationStatus();
                         break;
                     case 5:
-                        // viewAssignedProject();
+                        viewAssignedProject();
                         break;
                     case 6:
                         viewProjectEnquiries();
@@ -92,53 +92,53 @@ public class HDBOfficerView {
         scanner.nextLine();
     }
     
-    // private void viewRegistrationStatus() {
-    //     System.out.println("\n===== Registration Status =====");
-    //     List<OfficerRegistration> registrations = controller.getRegistrations();
+    private void viewRegistrationStatus() {
+        System.out.println("\n===== Registration Status =====");
+        List<OfficerRegistration> registrations = controller.getRegistrations();
         
-    //     if (registrations.isEmpty()) {
-    //         System.out.println("You have not registered for any projects yet.");
-    //     } else {
-    //         System.out.println("ID | Project Name | Status");
-    //         System.out.println("-------------------------");
+        if (registrations.isEmpty()) {
+            System.out.println("You have not registered for any projects yet.");
+        } else {
+            System.out.println("ID | Project Name | Status");
+            System.out.println("-------------------------");
             
-    //         int index = 1;
-    //         for (OfficerRegistration reg : registrations) {
-    //             System.out.printf("%2d | %-20s | %s\n", 
-    //                              index++, 
-    //                              reg.getProject().getProjectName(), 
-    //                              reg.getStatus());
-    //         }
-    //     }
+            int index = 1;
+            for (OfficerRegistration reg : registrations) {
+                System.out.printf("%2d | %-20s | %s\n", 
+                                 index++, 
+                                 reg.getProject().getProjectName(), 
+                                 reg.getStatus());
+            }
+        }
         
-    //     System.out.println("Press Enter to continue...");
-    //     scanner.nextLine();
-    // }
+        System.out.println("Press Enter to continue...");
+        scanner.nextLine();
+    }
     
-    // private void viewAssignedProject() {
-    //     System.out.println("\n===== Assigned Project =====");
-    //     Project assignedProject = controller.getAssignedProject();
+    private void viewAssignedProject() {
+        System.out.println("\n===== Assigned Project =====");
+        Project assignedProject = controller.getAssignedProject();
         
-    //     if (assignedProject == null) {
-    //         System.out.println("You are not assigned to any project yet.");
-    //     } else {
-    //         System.out.println("Project Name: " + assignedProject.getProjectName());
-    //         System.out.println("Neighborhood: " + assignedProject.getNeighborhood());
-    //         System.out.println("Application Period: " + 
-    //                          assignedProject.getApplicationOpenDate() + " to " + 
-    //                          assignedProject.getApplicationCloseDate());
+        if (assignedProject == null) {
+            System.out.println("You are not assigned to any project yet.");
+        } else {
+            System.out.println("Project Name: " + assignedProject.getProjectName());
+            System.out.println("Neighborhood: " + assignedProject.getNeighborhood());
+            System.out.println("Application Period: " + 
+                             assignedProject.getApplicationOpenDate() + " to " + 
+                             assignedProject.getApplicationCloseDate());
             
-    //         System.out.println("\nFlat Types:");
-    //         for (FlatType flatType : assignedProject.getFlatTypes()) {
-    //             System.out.println(flatType.getName() + " - " + 
-    //                               flatType.getUnitCount() + " units available - $" + 
-    //                               flatType.getPrice());
-    //         }
-    //     }
+            System.out.println("\nFlat Types:");
+            for (FlatType flatType : assignedProject.getFlatTypes()) {
+                System.out.println(flatType.getName() + " - " + 
+                                  flatType.getUnitCount() + " units available - $" + 
+                                  flatType.getPrice());
+            }
+        }
         
-    //     System.out.println("Press Enter to continue...");
-    //     scanner.nextLine();
-    // }
+        System.out.println("Press Enter to continue...");
+        scanner.nextLine();
+    }
     
     private void viewProjectEnquiries() {
         System.out.println("\n===== Project Enquiries =====");
