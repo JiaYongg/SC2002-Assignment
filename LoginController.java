@@ -4,21 +4,15 @@ import java.util.Map;
 public class LoginController implements iAuthService {
     private Map<String, User> users = new HashMap<>();
     private User loggedInUser;
-    private HDBManagerFileWriter HDBmanagerFileWriter;
-    private HDBOfficerFileWriter HDBofficerFileWriter;
+    private HDBManagerFileWriter managerFileWriter; // Fix variable name
+    private HDBOfficerFileWriter officerFileWriter; // Fix variable name
+    private ApplicantFileWriter applicantFileWriter;
 
     public LoginController() {
         // Initialize file writers
-        HDBmanagerFileWriter = new HDBManagerFileWriter();
-        HDBofficerFileWriter = new HDBOfficerFileWriter();
-        
-        // Add similar blocks for Officer and Applicant when implemented
-        // Add similar blocks for Officer and Applicant when implemented
-        // Add similar blocks for Officer and Applicant when implemented
-        // Add similar blocks for Officer and Applicant when implemented
-        // Add similar blocks for Officer and Applicant when implemented
-
-
+        managerFileWriter = new HDBManagerFileWriter();
+        officerFileWriter = new HDBOfficerFileWriter();
+        applicantFileWriter = new ApplicantFileWriter();
 
         // Load all users from files
         loadUsers();
@@ -34,16 +28,12 @@ public class LoginController implements iAuthService {
         Map<String, User> officers = officerReader.readFromFile();
         officers.values().forEach(this::addUser);
 
-        // Read officers and applicants similarly
-        // Read officers and applicants similarly
-        // Read officers and applicants similarly
-        // Read officers and applicants similarly
-        // Read officers and applicants similarly
-        // Read officers and applicants similarly
+        ApplicantFileReader applicantReader = new ApplicantFileReader();
+        Map<String, User> applicants = applicantReader.readFromFile();
+        applicants.values().forEach(this::addUser);
 
     }
 
-    // In LoginController.java
     public Object getControllerForUser(User user) {
         if (user instanceof Manager) {
             return new HDBManagerController((Manager) user);
@@ -53,7 +43,6 @@ public class LoginController implements iAuthService {
             return new ApplicantController((Applicant) user);
         }
     }
-    
 
     // Add user to the system
     public void addUser(User user) {
@@ -63,13 +52,11 @@ public class LoginController implements iAuthService {
     public boolean login(String nric, String password) {
         User user = users.get(nric);
         if (user != null && user.getPassword().equals(password)) {
-            loggedInUser = user; // Store authenticated user
+            loggedInUser = user;
             return true;
         }
         return false;
     }
-
-
 
     public String getUserRole() {
         if (loggedInUser == null) {
@@ -94,9 +81,8 @@ public class LoginController implements iAuthService {
                     managers.put(user.getNric(), user);
                 }
             }
-            HDBmanagerFileWriter.writeToFile(managers);
-        }
-        if (loggedInUser instanceof HDBOfficer) {
+            managerFileWriter.writeToFile(managers);
+        } else if (loggedInUser instanceof HDBOfficer) {
             // Filter only Officer users
             Map<String, User> officers = new HashMap<>();
             for (User user : users.values()) {
@@ -104,17 +90,19 @@ public class LoginController implements iAuthService {
                     officers.put(user.getNric(), user);
                 }
             }
-            HDBofficerFileWriter.writeToFile(officers);
+            officerFileWriter.writeToFile(officers);
+        } else if (loggedInUser instanceof Applicant) {
+            // Filter only Applicant users (excluding HDBOfficers)
+            Map<String, User> applicants = new HashMap<>();
+            for (User user : users.values()) {
+                if (user instanceof Applicant && !(user instanceof HDBOfficer)) {
+                    applicants.put(user.getNric(), user);
+                }
+            }
+            applicantFileWriter.writeToFile(applicants);
         }
-        // Add similar blocks for Officer and Applicant when implemented
-        // Add similar blocks for Officer and Applicant when implemented
-        // Add similar blocks for Officer and Applicant when implemented
-        // Add similar blocks for Officer and Applicant when implemented
-        // Add similar blocks for Officer and Applicant when implemented
-        // Add similar blocks for Officer and Applicant when implemented
-        // Add similar blocks for Officer and Applicant when implemented
-    }
 
+    }
 
     public User getLoggedInUser() {
         return loggedInUser;
@@ -123,7 +111,6 @@ public class LoginController implements iAuthService {
     public void logout() {
         loggedInUser = null;
     }
-
 
     @Override
     public boolean changePassword(String oldPassword, String newPassword) {
