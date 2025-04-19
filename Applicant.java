@@ -1,16 +1,16 @@
 import java.util.List;
 
 public class Applicant extends User {
-    private Application applicantion;
+    private Application application;
     private List<Enquiry> enquiries;
 
     public Applicant() {}
 
     public Application getApplication() {
-        return applicantion;
+        return application;
     }
 
-    public void setApplication() {
+    public void setApplication(Application application) {
         this.application = application;
     }
 

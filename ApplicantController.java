@@ -10,26 +10,28 @@ public class ApplicantController {
         this.applicantView = applicantView;
     }
 
-    //additional methods
     public Applicant getApplicant() {
         return currentApplicant;
     }
 
-    //following class diagram
     public void showEligibleProjects(Applicant applicant) {
         List<Project> eligibleProjects = getEligibleProjects(applicant);
         applicantView.displayEligibleProjects(eligibleProjects);
     }
 
     public void submitApplication(Applicant applicant, Project project, FlatType flatType) {
-        Application app = applicant.getApplication();
-        if (app != null) {
-            applicantView.displayAppliedProject(app.getProject(), app.getFlatType(), app.getStatus());
-        }
+        Application app = new Application(applicant,project,flatType, "SUBMITTED"); //incomplete
+        applicant.setApplication(app);
     }
 
-    public void viewApplicationStatus(String status) {
-        applicantView.viewApplicationStatus(status);
+    public void viewApplicationStatus(Applicant applicant) {
+        Application app = applicant.getApplication();
+        if (app != null) {
+            applicantView.viewApplicationStatus(app.getStatus());
+        }
+        else {
+            applicantView.viewApplicationStatus("No application found.");
+        }
     }
 
     public void viewAppliedProject(Applicant applicant) {

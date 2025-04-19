@@ -47,8 +47,8 @@ public class Main {
 
                 case "APPLICANT":
                 default:
-                    ApplicantController applicantController = new
-                    ApplicantController(currentUser);
+                    Applicant applicant = (Applicant) currentUser;
+                    ApplicantController applicantController = new ApplicantController(applicant);
                     ApplicantView applicantView = new ApplicantView(applicantController);
                     exitProgram = applicantView.displayApplicantMenu();
                     break;

@@ -31,14 +31,41 @@ public class ApplicantView {
                     case 1: 
                         controller.showEligibleProjects(controller.getApplicant());
                         break;
-                    case 2: //incomplete
+                    case 2: 
                         System.out.println("===== Submit Application =====");
+                        System.out.print("Enter Project Name: ");
+                        String projName = scanner.nextLine().trim();
+
+                        List<Project> projects = controller.getEligibleProjects(controller.getApplicant());
+                        Project selected = null;
+                        for (Project p : projects) {
+                            if (p.getProjectName().equalsIgnoreCase(projName)) {
+                                selected = p;
+                                break;
+                            }
+                        }
+
+                        if (selected == null) {
+                            System.out.println("Project not found or not eligible.");
+                            break;
+                        }
+
+                        System.out.print("Enter Flat Type: ");
+                        String flatTypeName = scanner.nextLine().trim();
+                        FlatType flatType = selected.getFlatTypeByName(flatTypeName);
+
+                        if (flatType == null || !controller.checkEligibility(controller.getApplicant(), flatType)) {
+                            System.out.println("Invalid flat type or not eligible.");
+                            break;
+                        }
+
+                        controller.submitApplication(controller.getApplicant(), selected, flatType);
                         break;
                     case 3: 
                         controller.viewAppliedProject(controller.getApplicant());
                         break;
                     case 4: 
-                        controller.viewApplicationStatus(controller.getApplicant().getApplication().getStatus());
+                        controller.viewApplicationStatus(controller.getApplicant());
                         break;
                     case 5: 
                         //withdraw;
