@@ -39,11 +39,17 @@ public class HDBManagerController {
         // Associate projects with current manager
         for (Project project : allProjects) {
             if (project.getManagerInCharge() != null && 
-                project.getManagerInCharge().equals(currentManager)) {
+                project.getManagerInCharge().getName().equals(currentManager.getName())) {
                 currentManager.addManagedProject(project);
+                System.out.println("Associated project: " + project.getProjectName() + " with manager: " + currentManager.getName());
             }
         }
+        
+        // Debug output
+        System.out.println("Total projects loaded: " + allProjects.size());
+        System.out.println("Projects managed by current manager: " + currentManager.getManagedProjects().size());
     }
+    
     
     /**
      * Saves projects to the CSV file using ProjectFileWriter
@@ -360,8 +366,14 @@ public class HDBManagerController {
      * @return true if project is managed by current manager, false otherwise
      */
     private boolean isProjectManagedByCurrentManager(Project project) {
-        return project != null && project.getManagerInCharge().equals(currentManager);
+        if (project == null || project.getManagerInCharge() == null) {
+            return false;
+        }
+        
+        // Compare by name rather than object reference
+        return project.getManagerInCharge().getName().equals(currentManager.getName());
     }
+    
     
     /**
      * Checks if the current manager can handle a project in the specified period

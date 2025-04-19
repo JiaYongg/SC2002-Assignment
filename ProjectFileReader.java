@@ -58,8 +58,6 @@ public class ProjectFileReader extends FileReader<Project> {
             
             // Parse manager
             String managerName = data[10].trim();
-            
-            // Find or create manager
             Manager manager = findOrCreateManager(managerName);
             
             // Parse officer slots
@@ -77,16 +75,6 @@ public class ProjectFileReader extends FileReader<Project> {
                 officerSlots
             );
             
-            // Parse and add officers if present
-            if (data.length > 12 && !data[12].isEmpty()) {
-                String[] officerNames = data[12].split(";");
-                for (String officerName : officerNames) {
-                    // In a real implementation, you would find or create HDBOfficer objects
-                    // and add them to the project using project.assignOfficer()
-                    System.out.println("Found officer: " + officerName.trim() + " for project: " + projectName);
-                }
-            }
-            
             // Add project to the map with project name as key
             projects.put(projectName, project);
             
@@ -95,6 +83,7 @@ public class ProjectFileReader extends FileReader<Project> {
             System.out.println("Error details: " + e.getMessage());
         }
     }
+    
     
     // Helper method to find or create a Manager object
     private Manager findOrCreateManager(String managerName) {
