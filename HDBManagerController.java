@@ -422,21 +422,4 @@ public class HDBManagerController {
         return true;
     }
     
-    /**
-     * Checks if the current manager can handle a project in the specified period,
-     * excluding a specific project from the check
-     * 
-     * @param openDate Project opening date
-     * @param closeDate Project closing date
-     * @param excludedProject Project to exclude from the check
-     * @return true if manager can handle the project, false otherwise
-     */
-    private boolean canHandleProjectInPeriodExcluding(Date openDate, Date closeDate, Project excludedProject) {
-        for (Project project : currentManager.getManagedProjects()) {
-            if (!project.equals(excludedProject) && project.isOverlappingWith(openDate, closeDate)) {
-                return false;
-            }
-        }
-        return true;
-    }
 }

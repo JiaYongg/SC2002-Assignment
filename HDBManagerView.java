@@ -732,14 +732,5 @@ public class HDBManagerView {
         }
     }
 
-    private boolean hasAvailableFlats(Project project) {
-        for (FlatType flatType : project.getFlatTypes()) {
-            if (flatType.getUnitCount() > 0) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
 
 }
