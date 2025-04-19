@@ -2,10 +2,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class Manager extends User {
+public class HDBManager extends User {
     private List<Project> managedProjects;
     
-    public Manager() {
+    public HDBManager() {
         super();
         this.managedProjects = new ArrayList<>();
     }

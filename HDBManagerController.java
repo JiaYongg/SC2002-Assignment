@@ -12,7 +12,7 @@ import java.util.Map;
  * and report generation functionalities.
  */
 public class HDBManagerController {
-    private Manager currentManager;
+    private HDBManager currentManager;
     private List<Project> allProjects;
     private ProjectFileReader projectReader;
     private ProjectFileWriter projectWriter;
@@ -23,7 +23,7 @@ public class HDBManagerController {
      * 
      * @param manager The currently logged-in manager
      */
-    public HDBManagerController(Manager manager) {
+    public HDBManagerController(HDBManager manager) {
         this.currentManager = manager;
         this.projectReader = new ProjectFileReader();
         this.projectWriter = new ProjectFileWriter();

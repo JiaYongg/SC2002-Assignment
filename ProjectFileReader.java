@@ -2,7 +2,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -58,7 +57,7 @@ public class ProjectFileReader extends FileReader<Project> {
             
             // Parse manager
             String managerName = data[10].trim();
-            Manager manager = findOrCreateManager(managerName);
+            HDBManager manager = findOrCreateManager(managerName);
             
             // Parse officer slots
             int officerSlots = Integer.parseInt(data[11].trim());
@@ -90,10 +89,10 @@ public class ProjectFileReader extends FileReader<Project> {
     
     
     // Helper method to find or create a Manager object
-    private Manager findOrCreateManager(String managerName) {
+    private HDBManager findOrCreateManager(String managerName) {
         // In a real implementation, you would look up the manager in a repository
         // For now, create a placeholder manager with a valid NRIC
-        Manager manager = new Manager();
+        HDBManager manager = new HDBManager();
         manager.setName(managerName);
         
         // Set a valid NRIC format to avoid validation errors

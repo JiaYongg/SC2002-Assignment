@@ -14,7 +14,7 @@ public class ManagerFileReader extends FileReader<User> {
     @Override
     protected void processLine(String line, Map<String, User> users) {
         String[] data = line.split(",");
-        Manager manager = new Manager();
+        HDBManager manager = new HDBManager();
         manager.setName(data[0].trim());
         manager.setNric(data[1].trim());
         manager.setAge(Integer.parseInt(data[2].trim()));
