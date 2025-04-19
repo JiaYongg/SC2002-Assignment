@@ -45,13 +45,13 @@ public class Main {
                     exitProgram = officerView.displayOfficerMenu();
                     break;
 
-                // case "APPLICANT":
-                // default:
-                // ApplicantController applicantController = new
-                // ApplicantController(currentUser);
-                // ApplicantView applicantView = new ApplicantView(applicantController);
-                // exitProgram = applicantView.displayApplicantMenu();
-                // break;
+                case "APPLICANT":
+                default:
+                    ApplicantController applicantController = new
+                    ApplicantController(currentUser);
+                    ApplicantView applicantView = new ApplicantView(applicantController);
+                    exitProgram = applicantView.displayApplicantMenu();
+                    break;
             }
 
             // If user logged out (not staying logged in), reset the login controller
