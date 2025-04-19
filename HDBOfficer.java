@@ -31,7 +31,7 @@ public class HDBOfficer extends Applicant {
     }
     
     // public boolean canRegisterForProject(Project project) {
-    //     // Cannot register if already assigned to a project
+    //      Cannot register if already assigned to a project
     //     if (isAssignedToProject()) {
     //         return false;
     //     }
