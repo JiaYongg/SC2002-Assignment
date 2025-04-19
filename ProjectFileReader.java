@@ -75,6 +75,10 @@ public class ProjectFileReader extends FileReader<Project> {
                 officerSlots
             );
             
+            // Check if visibility should be updated based on dates and flat availability
+            ProjectController projectController = new ProjectController();
+            projectController.updateProjectVisibility(project);
+            
             // Add project to the map with project name as key
             projects.put(projectName, project);
             

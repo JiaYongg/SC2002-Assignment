@@ -5,6 +5,8 @@ public class Main {
         LoginController loginController = new LoginController();
         readAndAddUsersFromFile(loginController);
         LoginView loginView = new LoginView(loginController);
+
+        
         
         boolean programRunning = true;
         

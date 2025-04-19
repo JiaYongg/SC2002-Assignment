@@ -91,6 +91,11 @@ public class HDBManagerView {
 
         List<Project> projects = controller.viewAllProjects();
 
+        for (Project project : projects) {
+            projectController.updateProjectVisibility(project);
+        }
+
+
         if (projects.isEmpty()) {
             System.out.println("No projects found in the system.");
             System.out.println("Press Enter to continue...");
@@ -162,30 +167,31 @@ public class HDBManagerView {
 
     private void displayProjectDetails(Project project) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        
+
         System.out.println("\n===== Project Details =====");
         System.out.println("Project Name: " + project.getProjectName());
         System.out.println("Neighborhood: " + project.getNeighborhood());
-        System.out.println("Application Period: " + 
-                         dateFormat.format(project.getApplicationOpenDate()) + " to " + 
-                         dateFormat.format(project.getApplicationCloseDate()));
+        System.out.println("Application Period: " +
+                dateFormat.format(project.getApplicationOpenDate()) + " to " +
+                dateFormat.format(project.getApplicationCloseDate()));
         System.out.println("Visibility: " + (project.isVisible() ? "Visible to applicants" : "Hidden from applicants"));
         System.out.println("Manager: " + project.getManagerInCharge().getName());
         System.out.println("Officer Slots: " + project.getOfficerSlots());
-        System.out.println("Assigned Officers: " + project.getAssignedOfficers().size() + "/" + project.getOfficerSlots());
-        
+        System.out.println(
+                "Assigned Officers: " + project.getAssignedOfficers().size() + "/" + project.getOfficerSlots());
+
         // Display flat types
         System.out.println("\nFlat Types:");
         System.out.println("Type | Units | Price");
         System.out.println("------------------------");
-        
+
         for (FlatType flatType : project.getFlatTypes()) {
-            System.out.printf("%-6s | %5d | $%,.2f\n", 
-                            flatType.getName(), 
-                            flatType.getUnitCount(), 
-                            flatType.getPrice());
+            System.out.printf("%-6s | %5d | $%,.2f\n",
+                    flatType.getName(),
+                    flatType.getUnitCount(),
+                    flatType.getPrice());
         }
-        
+
         // Get project status from ProjectController
         ProjectController.ProjectStatus status = projectController.getProjectStatus(project);
         System.out.println("\nStatus: " + status.getStatusMessage());
@@ -193,8 +199,13 @@ public class HDBManagerView {
 
     private void viewOwnProjectsMenu() {
         System.out.println("\n===== My BTO Projects =====");
-
+    
         List<Project> projects = controller.viewOwnProjects();
+        
+        // Check visibility for all projects before displaying
+        for (Project project : projects) {
+            projectController.updateProjectVisibility(project);
+        }
 
         if (projects.isEmpty()) {
             System.out.println("You don't have any projects to manage.");
@@ -537,11 +548,15 @@ public class HDBManagerView {
 
     private void toggleVisibilityMenu() {
         System.out.println("\n===== Toggle Project Visibility =====");
-        System.out.println(
-                "As a manager, you have full control over your projects' visibility regardless of application dates.");
-
+        System.out.println("As a manager, you have full control over your projects' visibility regardless of application dates.");
+        
         // Get projects managed by the current manager
         List<Project> ownProjects = controller.viewOwnProjects();
+        
+        // Check visibility for all projects before displaying
+        for (Project project : ownProjects) {
+            projectController.updateProjectVisibility(project);
+        }
 
         if (ownProjects.isEmpty()) {
             System.out.println("You don't have any projects to manage.");
@@ -674,13 +689,17 @@ public class HDBManagerView {
 
     private void createProjectMenu() {
         // Check if current manager already has a project he's handling
-        if (controller.viewOwnProjects().size() >= 1) {
-            System.out.println("You already have a project. Cannot create another.");
+        // Check if manager already has active projects
+        if (!controller.canCreateNewProject()) {
+            System.out.println("You already have an active project. Cannot create another.");
+            System.out.println("A project is considered inactive when its application period has ended");
+            System.out.println("AND it is hidden from applicants.");
             System.out.println("Press Enter to continue...");
             scanner.nextLine();
             return;
         }
 
+        // If we get here, the manager can create a new project
         System.out.println("\n===== Create New Project =====");
 
         // Collect project information
@@ -731,6 +750,5 @@ public class HDBManagerView {
             System.out.println("Error creating project: " + e.getMessage());
         }
     }
-
 
 }
