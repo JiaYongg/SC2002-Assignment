@@ -76,7 +76,6 @@ public class Receipt {
         // Project details
         sb.append("PROJECT DETAILS\n");
         sb.append("-----------------------------------------------------\n");
-        sb.append("Project ID: ").append(project.getProjectID()).append("\n");
         sb.append("Project Name: ").append(project.getProjectName()).append("\n");
         sb.append("Neighborhood: ").append(project.getNeighborhood()).append("\n");
         sb.append("Flat Type: ").append(flatType.getName()).append("\n");
@@ -155,8 +154,10 @@ public class Receipt {
      * @return true if the receipt is for the specified project, false otherwise
      */
     public boolean matches(Project project) {
-        return application.getProject().getProjectID() == project.getProjectID();
+        // Change from ID comparison to name comparison
+        return application.getProject().getProjectName().equals(project.getProjectName());
     }
+    
     
     // Getters
     
