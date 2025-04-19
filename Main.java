@@ -32,7 +32,7 @@ public class Main {
             // Process based on user role
             switch (userRole) {
                 case "MANAGER":
-                    Manager manager = (Manager) currentUser;
+                    HDBManager manager = (HDBManager) currentUser;
                     HDBManagerController HDBmanagerController = new HDBManagerController(manager);
                     HDBManagerView HDBmanagerView = new HDBManagerView(HDBmanagerController);
                     exitProgram = HDBmanagerView.displayManagerMenu();

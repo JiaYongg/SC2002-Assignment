@@ -35,8 +35,8 @@ public class LoginController implements iAuthService {
     }
 
     public Object getControllerForUser(User user) {
-        if (user instanceof Manager) {
-            return new HDBManagerController((Manager) user);
+        if (user instanceof HDBManager) {
+            return new HDBManagerController((HDBManager) user);
         } else if (user instanceof HDBOfficer) {
             return new HDBOfficerController((HDBOfficer) user);
         } else {
@@ -63,7 +63,7 @@ public class LoginController implements iAuthService {
             return null;
         }
 
-        if (loggedInUser instanceof Manager) {
+        if (loggedInUser instanceof HDBManager) {
             return "MANAGER";
         } else if (loggedInUser instanceof HDBOfficer) {
             return "OFFICER";
@@ -73,11 +73,11 @@ public class LoginController implements iAuthService {
     }
 
     private void updateUserFile() {
-        if (loggedInUser instanceof Manager) {
+        if (loggedInUser instanceof HDBManager) {
             // Filter only Manager users
             Map<String, User> managers = new HashMap<>();
             for (User user : users.values()) {
-                if (user instanceof Manager) {
+                if (user instanceof HDBManager) {
                     managers.put(user.getNric(), user);
                 }
             }

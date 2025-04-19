@@ -7,7 +7,7 @@ public class Project {
     private Date applicationCloseDate;
     private boolean visibility;
     private List<FlatType> flatTypes;
-    private Manager managerInCharge;
+    private HDBManager managerInCharge;
     private int officerSlots;
     private List<HDBOfficer> assignedOfficers;
     private List<OfficerRegistration> registrationRequests;
@@ -16,7 +16,7 @@ public class Project {
    
     public Project(String projectName, String neighborhood, Date applicationOpenDate,
                    Date applicationCloseDate, boolean visibility, List<FlatType> flatTypes,
-                   Manager managerInCharge, int officerSlots) {
+                   HDBManager managerInCharge, int officerSlots) {
                     this.projectName = projectName;
                     this.neighborhood = neighborhood;
                     this.applicationOpenDate = applicationOpenDate;
@@ -38,7 +38,7 @@ public class Project {
         return this.visibility;
     }
 
-    public Manager getManagerInCharge (){
+    public HDBManager getManagerInCharge (){
         return this.managerInCharge;
     }
 

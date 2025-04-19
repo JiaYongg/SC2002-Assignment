@@ -18,8 +18,8 @@ public class HDBManagerFileWriter extends FileWriter<User> {
     
     @Override
     protected String formatLine(User user) {
-        if (user instanceof Manager) {
-            Manager manager = (Manager) user;
+        if (user instanceof HDBManager) {
+            HDBManager manager = (HDBManager) user;
             return String.format("%s,%s,%d,%s,%s",
                 manager.getName(),
                 manager.getNric(),
