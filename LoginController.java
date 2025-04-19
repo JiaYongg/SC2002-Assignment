@@ -5,11 +5,21 @@ public class LoginController implements iAuthService {
     private Map<String, User> users = new HashMap<>();
     private User loggedInUser;
     private HDBManagerFileWriter HDBmanagerFileWriter;
+    private HDBOfficerFileWriter HDBofficerFileWriter;
 
     public LoginController() {
         // Initialize file writers
         HDBmanagerFileWriter = new HDBManagerFileWriter();
+        HDBofficerFileWriter = new HDBOfficerFileWriter();
         
+        // Add similar blocks for Officer and Applicant when implemented
+        // Add similar blocks for Officer and Applicant when implemented
+        // Add similar blocks for Officer and Applicant when implemented
+        // Add similar blocks for Officer and Applicant when implemented
+        // Add similar blocks for Officer and Applicant when implemented
+
+
+
         // Load all users from files
         loadUsers();
     }
@@ -37,8 +47,8 @@ public class LoginController implements iAuthService {
     public Object getControllerForUser(User user) {
         if (user instanceof Manager) {
             return new HDBManagerController((Manager) user);
-        // } else if (user instanceof HDBOfficer) {
-        //     return new OfficerController((HDBOfficer) user);
+        } else if (user instanceof HDBOfficer) {
+            return new HDBOfficerController((HDBOfficer) user);
         } else {
             return new ApplicantController((Applicant) user);
         }
@@ -59,23 +69,7 @@ public class LoginController implements iAuthService {
         return false;
     }
 
-    @Override
-    public boolean changePassword(String oldPassword, String newPassword) {
-        if (loggedInUser == null) {
-            System.out.println("No user is logged in. Please log in first.");
-            return false;
-        }
 
-        if (!loggedInUser.getPassword().equals(oldPassword)) {
-            System.out.println("Incorrect old password.");
-            return false;
-        }
-
-        loggedInUser.setPassword(newPassword);
-        System.out.println("Password changed successfully!");
-        updateUserFile();
-        return true;
-    }
 
     public String getUserRole() {
         if (loggedInUser == null) {
@@ -102,14 +96,26 @@ public class LoginController implements iAuthService {
             }
             HDBmanagerFileWriter.writeToFile(managers);
         }
+        if (loggedInUser instanceof HDBOfficer) {
+            // Filter only Officer users
+            Map<String, User> officers = new HashMap<>();
+            for (User user : users.values()) {
+                if (user instanceof HDBOfficer) {
+                    officers.put(user.getNric(), user);
+                }
+            }
+            HDBofficerFileWriter.writeToFile(officers);
+        }
+        // Add similar blocks for Officer and Applicant when implemented
+        // Add similar blocks for Officer and Applicant when implemented
+        // Add similar blocks for Officer and Applicant when implemented
+        // Add similar blocks for Officer and Applicant when implemented
+        // Add similar blocks for Officer and Applicant when implemented
+        // Add similar blocks for Officer and Applicant when implemented
         // Add similar blocks for Officer and Applicant when implemented
     }
 
-    /**
-     * Gets the currently logged-in user
-     * 
-     * @return The logged-in user object or null if no user is logged in
-     */
+
     public User getLoggedInUser() {
         return loggedInUser;
     }
@@ -118,4 +124,22 @@ public class LoginController implements iAuthService {
         loggedInUser = null;
     }
 
+
+    @Override
+    public boolean changePassword(String oldPassword, String newPassword) {
+        if (loggedInUser == null) {
+            System.out.println("No user is logged in. Please log in first.");
+            return false;
+        }
+
+        if (!loggedInUser.getPassword().equals(oldPassword)) {
+            System.out.println("Incorrect old password.");
+            return false;
+        }
+
+        loggedInUser.setPassword(newPassword);
+        System.out.println("Password changed successfully!");
+        updateUserFile();
+        return true;
+    }
 }
