@@ -1,6 +1,6 @@
 import java.util.Map;
 
-public class HDBManagerFileWriter extends FileWriter {
+public class HDBManagerFileWriter extends FileWriter<User> {
     
     public HDBManagerFileWriter() {
         super("ManagerList.csv");

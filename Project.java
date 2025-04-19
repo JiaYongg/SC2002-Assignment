@@ -11,7 +11,7 @@ public class Project {
     private int officerSlots;
     private List<HDBOfficer> assignedOfficers;
     private List<OfficerRegistration> registrationRequests;
-    private List<Enquiry> enquiries;
+    // private List<Enquiry> enquiries;
 
    
     public Project(String projectName, String neighborhood, Date applicationOpenDate,
@@ -154,9 +154,9 @@ public class Project {
     public boolean isOverlappingWith(Project otherProject) {
         return isOverlappingWith(otherProject.applicationOpenDate, otherProject.applicationCloseDate);
     }
-    public void addEnquiry(Enquiry enquiry) {
-        enquiries.add(enquiry);
-    }
+    // public void addEnquiry(Enquiry enquiry) {
+    //     enquiries.add(enquiry);
+    // }
 
     
 }

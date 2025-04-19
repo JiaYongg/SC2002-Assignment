@@ -1,6 +1,6 @@
 import java.util.Map;
 
-public class ApplicantFileReader extends FileReader {
+public class ApplicantFileReader extends FileReader<User> {
     
     public ApplicantFileReader() {
         super("ApplicantList.csv");

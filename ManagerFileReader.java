@@ -1,6 +1,6 @@
 import java.util.Map;
 
-public class ManagerFileReader extends FileReader {
+public class ManagerFileReader extends FileReader<User> {
     
     public ManagerFileReader() {
         super("ManagerList.csv");

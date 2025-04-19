@@ -2,7 +2,7 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class FileReader {
+public abstract class FileReader<T> {
     protected String filePath;
     
     public FileReader(String filePath) {
@@ -10,11 +10,11 @@ public abstract class FileReader {
     }
     
     // Abstract method to be implemented by child classes
-    public abstract Map<String, User> readFromFile();
+    public abstract Map<String, T> readFromFile();
     
     // Common method to read CSV files
-    protected Map<String, User> readCSV() {
-        Map<String, User> users = new HashMap<>();
+    protected Map<String, T> readCSV() {
+        Map<String, T> items = new HashMap<>();
         try (BufferedReader br = new BufferedReader(new java.io.FileReader(filePath))) {
             String line;
             boolean headerSkipped = false;
@@ -25,14 +25,14 @@ public abstract class FileReader {
                     continue;
                 }
                 
-                processLine(line, users);
+                processLine(line, items);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return users;
+        return items;
     }
     
     // Abstract method for processing each line based on file type
-    protected abstract void processLine(String line, Map<String, User> users);
+    protected abstract void processLine(String line, Map<String, T> items);
 }
