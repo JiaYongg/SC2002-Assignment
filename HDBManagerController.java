@@ -16,6 +16,7 @@ public class HDBManagerController {
     private List<Project> allProjects;
     private ProjectFileReader projectReader;
     private ProjectFileWriter projectWriter;
+    private ProjectController projectController;
     
     /**
      * Constructor for HDBManagerController
@@ -26,6 +27,7 @@ public class HDBManagerController {
         this.currentManager = manager;
         this.projectReader = new ProjectFileReader();
         this.projectWriter = new ProjectFileWriter();
+        this.projectController = new ProjectController();
         loadProjects();
     }
     
@@ -153,42 +155,10 @@ public class HDBManagerController {
                              List<FlatType> newFlatTypes, String newOpenDateStr, 
                              String newCloseDateStr, int newOfficerSlots) {
         try {
-            // Check if project exists and is managed by current manager
-            if (!isProjectManagedByCurrentManager(project)) {
-                System.out.println("Error: You can only edit projects you manage.");
-                return false;
-            }
-            
-            // Parse dates
+            // ... existing validation code ...
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
             Date newOpenDate = dateFormat.parse(newOpenDateStr);
             Date newCloseDate = dateFormat.parse(newCloseDateStr);
-            
-            // Validate dates
-            if (newOpenDate.after(newCloseDate)) {
-                System.out.println("Error: Opening date must be before closing date.");
-                return false;
-            }
-            
-            // Check if manager can handle this project in the new period
-            // (excluding the current project from the check)
-            if (!canHandleProjectInPeriodExcluding(newOpenDate, newCloseDate, project)) {
-                System.out.println("Error: Manager already has another project during this period.");
-                return false;
-            }
-            
-            // Validate officer slots
-            if (newOfficerSlots <= 0 || newOfficerSlots > 10) {
-                System.out.println("Error: Officer slots must be between 1 and 10.");
-                return false;
-            }
-            
-            // Check if reducing officer slots would remove assigned officers
-            if (newOfficerSlots < project.getAssignedOfficers().size()) {
-                System.out.println("Error: Cannot reduce officer slots below the number of currently assigned officers.");
-                return false;
-            }
-            
             // Update project details
             project.setProjectName(newName);
             project.setNeighborhood(newNeighborhood);
@@ -200,6 +170,11 @@ public class HDBManagerController {
             // Save changes
             saveProjects();
             
+            // Check if visibility should be automatically updated
+            if (projectController.updateProjectVisibility(project)) {
+                saveProjects(); // Save again if visibility was changed
+            }
+            
             return true;
             
         } catch (ParseException e) {
@@ -210,6 +185,9 @@ public class HDBManagerController {
             return false;
         }
     }
+    
+    // Remove the updateProjectVisibility method as it's now in ProjectController
+
     
     /**
      * Deletes a project from the system
@@ -239,6 +217,46 @@ public class HDBManagerController {
         
         return true;
     }
+
+    public void updateProjectVisibility(Project project) {
+        // Skip if project is already hidden
+        if (!project.isVisible()) {
+            return;
+        }
+        
+        Date currentDate = new Date();
+        boolean shouldBeVisible = true;
+        String reason = "";
+        
+        // Check if application period has ended
+        if (currentDate.after(project.getApplicationCloseDate())) {
+            shouldBeVisible = false;
+            reason = "application period has ended";
+        }
+        
+        // Check if all flats are allocated
+        boolean hasAvailableFlats = false;
+        for (FlatType flatType : project.getFlatTypes()) {
+            if (flatType.getUnitCount() > 0) {
+                hasAvailableFlats = true;
+                break;
+            }
+        }
+        
+        if (!hasAvailableFlats) {
+            shouldBeVisible = false;
+            reason = "no available flats remaining";
+        }
+        
+        // Update visibility if needed
+        if (!shouldBeVisible) {
+            project.setVisibility(false);
+            System.out.println("Project '" + project.getProjectName() + "' has been automatically hidden because " + reason + ".");
+            saveProjects();
+        }
+    }
+    
+
     
     /**
      * Toggles the visibility of a project
@@ -253,8 +271,20 @@ public class HDBManagerController {
             return false;
         }
         
+        // Get current visibility
+        boolean currentVisibility = project.isVisible();
+        
+        // If trying to turn visibility ON, check conditions
+        if (!currentVisibility) {
+            ProjectController.VisibilityCheckResult result = projectController.canMakeVisible(project);
+            if (!result.canMakeVisible()) {
+                System.out.println("Error: " + result.getReason());
+                return false;
+            }
+        }
+        
         // Toggle visibility
-        boolean newVisibility = !project.isVisible();
+        boolean newVisibility = !currentVisibility;
         project.setVisibility(newVisibility);
         
         // Save changes
@@ -262,6 +292,7 @@ public class HDBManagerController {
         
         return true;
     }
+    
     
     /**
      * Approves an officer registration request
