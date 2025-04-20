@@ -1,17 +1,18 @@
+import java.util.ArrayList;
 import java.util.List;
 
 public class ApplicantController {
-    private Applicant currentApplicant;
+    private Applicant applicant;
     private ApplicantView applicantView;
 
 
     public ApplicantController(Applicant applicant, ApplicantView applicantView) {
-        this.currentApplicant = applicant;
+        this.applicant = applicant;
         this.applicantView = applicantView;
     }
 
     public Applicant getApplicant() {
-        return currentApplicant;
+        return applicant;
     }
 
     public void showEligibleProjects(Applicant applicant) {
@@ -20,14 +21,14 @@ public class ApplicantController {
     }
 
     public void submitApplication(Applicant applicant, Project project, FlatType flatType) {
-        Application app = new Application(applicant,project,flatType, "SUBMITTED"); //incomplete
+        Application app = new Application(applicant,project,flatType, "Pending"); //incomplete
         applicant.setApplication(app);
     }
 
     public void viewApplicationStatus(Applicant applicant) {
         Application app = applicant.getApplication();
         if (app != null) {
-            applicantView.viewApplicationStatus(app.getStatus());
+            applicantView.viewApplicationStatus(app.getStatus()); 
         }
         else {
             applicantView.viewApplicationStatus("No application found.");
@@ -42,11 +43,20 @@ public class ApplicantController {
     }
     
     public List<Project> getEligibleProjects(Applicant applicant) {
-        return ProjectController.getAllProjects(); // Assumes static method exists
+        //INCOMPLETE
     }
 
     public boolean checkEligibility(Applicant applicant, FlatType flatType) {
-        return flatType.isAvail();
+        int age = applicant.getAge();
+        String martialStatus = applicant.getMaritalStatus();
+
+        if (martialStatus.equalsIgnoreCase("Single")) {
+            return age >= 35 && flatType.getName().equalsIgnoreCase("2-Room");
+        }
+        else if (martialStatus.equalsIgnoreCase("Married")) {
+            return age >= 21 && (flatType.getName().equalsIgnoreCase("2-Room") || flatType.getName().equalsIgnoreCase("3-Room"));
+        }
+        return false;
     }
 
     public void apply(Applicant applicant, Project project, FlatType flatType) {

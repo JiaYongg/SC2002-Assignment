@@ -1,10 +1,13 @@
+import java.util.ArrayList;
 import java.util.List;
 
 public class Applicant extends User {
     private Application application;
     private List<Enquiry> enquiries;
 
-    public Applicant() {}
+    public Applicant() {
+        this.enquiries = new ArrayList<>();
+    }
 
     public Application getApplication() {
         return application;

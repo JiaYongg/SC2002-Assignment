@@ -68,7 +68,7 @@ public class ApplicantView {
                         controller.viewApplicationStatus(controller.getApplicant());
                         break;
                     case 5: 
-                        //withdraw;
+                        //withdraw; INCOMPLETE
                         break;
                     case 0:
                         logout = false;
