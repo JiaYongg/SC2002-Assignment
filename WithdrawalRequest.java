@@ -5,10 +5,10 @@ public class WithdrawalRequest {
     private Date dateRequested;
     private WithdrawalStatus status;
 
-    public WithdrawalRequest(Application application, Date dateRequested, WithdrawalStatus status) {
+    public WithdrawalRequest(Application application) {
         this.application = application;
-        this.dateRequested = dateRequested;
-        this.status = status;
+        this.dateRequested = new Date();
+        this.status = WithdrawalStatus.PENDING;
     }
 
     public Application getApplication() {

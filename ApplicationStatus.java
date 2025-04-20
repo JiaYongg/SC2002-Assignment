@@ -1,6 +1,6 @@
 public enum ApplicationStatus {
-    SUBMITTED,
-    WITHDRAWN,
-    APPROVED,
-    REJECTED,
+    PENDING,
+    SUCCESSFUL,
+    UNSUCCESSFUL,
+    BOOKED,
 }

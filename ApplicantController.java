@@ -3,67 +3,59 @@ import java.util.List;
 
 public class ApplicantController {
     private Applicant applicant;
-    private ApplicantView applicantView;
+    private List<Project> allProjects;
+    private ProjectFileReader projectReader;
 
-
-    public ApplicantController(Applicant applicant, ApplicantView applicantView) {
+    public ApplicantController(Applicant applicant) {
         this.applicant = applicant;
-        this.applicantView = applicantView;
+        this.projectReader = new ProjectFileReader();
+        this.allProjects = new ArrayList<>(projectReader.readFromFile().values());
     }
 
     public Applicant getApplicant() {
         return applicant;
     }
 
-    public void showEligibleProjects(Applicant applicant) {
-        List<Project> eligibleProjects = getEligibleProjects(applicant);
-        applicantView.displayEligibleProjects(eligibleProjects);
-    }
-
     public void submitApplication(Applicant applicant, Project project, FlatType flatType) {
-        Application app = new Application(applicant,project,flatType, "Pending"); //incomplete
+        Application app = new Application(applicant,project,flatType); 
         applicant.setApplication(app);
-    }
-
-    public void viewApplicationStatus(Applicant applicant) {
-        Application app = applicant.getApplication();
-        if (app != null) {
-            applicantView.viewApplicationStatus(app.getStatus()); 
-        }
-        else {
-            applicantView.viewApplicationStatus("No application found.");
-        }
-    }
-
-    public void viewAppliedProject(Applicant applicant) {
-        Application app = applicant.getApplication();
-        if (app != null) {
-            applicantView.displayAppliedProject(app.getProject(), app.getFlatType(), app.getStatus());
-        }
     }
     
     public List<Project> getEligibleProjects(Applicant applicant) {
-        //INCOMPLETE
+        List<Project> eligibleProjects = new ArrayList<>();
+
+        for (Project p : allProjects) {
+            if (!p.isVisible()) continue;
+
+            for (FlatType ft : p.getFlatTypes()) {
+                if (ft.getUnitCount() > 0 && checkEligibility(applicant, ft)) {
+                    eligibleProjects.add(p);
+                    break;
+                }
+            }
+        }
+        return eligibleProjects;
     }
 
     public boolean checkEligibility(Applicant applicant, FlatType flatType) {
         int age = applicant.getAge();
-        String martialStatus = applicant.getMaritalStatus();
+        String maritalStatus = applicant.getMaritalStatus();
 
-        if (martialStatus.equalsIgnoreCase("Single")) {
+        if (maritalStatus.equalsIgnoreCase("Single")) {
             return age >= 35 && flatType.getName().equalsIgnoreCase("2-Room");
         }
-        else if (martialStatus.equalsIgnoreCase("Married")) {
+        else if (maritalStatus.equalsIgnoreCase("Married")) {
             return age >= 21 && (flatType.getName().equalsIgnoreCase("2-Room") || flatType.getName().equalsIgnoreCase("3-Room"));
         }
         return false;
     }
 
-    public void apply(Applicant applicant, Project project, FlatType flatType) {
-        submitApplication(applicant, project, flatType);
-    }
-
     public void withdraw(Application app) {
-        app.setStatus("Withdrawn");
-    }
+        if (app != null) {
+            app.setStatus(ApplicationStatus.PENDING);
+            WithdrawalRequest req = new WithdrawalRequest(app);
+            System.out.println("Withdrawal request submitted. Pending approval.");
+        } else {
+            System.out.println("No application found.");
+        }    }
 }

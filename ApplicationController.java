@@ -1,31 +1,28 @@
 public class ApplicationController {
-    private ApplicationView view;
+    private Application application;
 
-    public ApplicationController(ApplicationView view) {
-        this.view = view;
+    public ApplicationController(Application application) {
+        this.application = application;
     }
 
     public void applyForProject(Applicant applicant, Project project, FlatType flatType) {
-        view.promptProjectApplication();
-        Application application = new Application(applicant, project, flatType, ApplicationStatus.SUBMITTED);
-        applicant.setApplication(application);
-        view.displayAppliedProject(project, flatType, application.getStatus().name());
+        Application app = new Application(applicant, project, flatType);
+        applicant.setApplication(app);
     }
 
     public void withdrawApplication(Applicant applicant) {
         Application app = applicant.getApplication();
-        if (app != null && app.getStatus() != ApplicationStatus.BOOKED) {
-            app.addWithdrawalRequest(new java.util.Date(), WithdrawalStatus.PENDING);
-            System.out.println("Withdrawal request submitted. Pending manager approval.");
+        if (app != null) {
+            WithdrawalRequest req = new WithdrawalRequest(app);
+            System.out.println("Withdrawal request submitted. Pending approval.");
         } else {
-            System.out.println("No active application or already booked. Cannot withdraw.");
+            System.out.println("No application found.");
         }
     }
 
     public ApplicationStatus getApplicationStatus(Applicant applicant) {
         Application app = applicant.getApplication();
         if (app != null) {
-            view.displayApplicationStatus(app.getStatus().name());
             return app.getStatus();
         } else {
             System.out.println("No application found.");

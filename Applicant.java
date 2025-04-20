@@ -21,7 +21,7 @@ public class Applicant extends User {
         return enquiries;
     }
 
-    public void setEnquiries(List<Enquiry> enquiries) {
-        this.enquiries = enquiries;
+    public void addEnquiries(Enquiry enquiry) {
+        enquiries.add(enquiry);
     }
 }

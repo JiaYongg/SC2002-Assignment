@@ -1,7 +1,11 @@
 import java.util.List;
 
 public class WithdrawalRequestView {
-    public WithdrawalRequestView() {}
+    private WithdrawalRequestController controller; 
+
+    public WithdrawalRequestView(WithdrawalRequestController controller) {
+        this.controller = controller;
+    }
 
     public void displayPendingWithdrawals(List<WithdrawalRequest> requests) {
         System.out.println("=== Withdrawl Requests ===");

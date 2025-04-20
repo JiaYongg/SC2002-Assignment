@@ -1,4 +1,7 @@
 public class WithdrawalRequestController {
-    private WithdrawalRequestView view;
-    
+    private WithdrawalRequest request;
+
+    public WithdrawalRequestController(WithdrawalRequest request) {
+        this.request = request;
+    }
 }

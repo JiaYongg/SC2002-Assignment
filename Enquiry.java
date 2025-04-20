@@ -7,12 +7,12 @@ public class Enquiry {
     private String content;
     private String response;
 
-    public Enquiry(Applicant applicant, Project project, String content, String response) {
+    public Enquiry(Applicant applicant, Project project, String content) {
         this.enquiryID = counter++;
         this.applicant = applicant;
         this.project = project;
         this.content = content;
-        this.response = response;
+        this.response = "";
     }
 
     public int getEnquiryID() {
