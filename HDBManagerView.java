@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
-
 public class HDBManagerView {
     private HDBManagerController controller;
     private ProjectController projectController;
@@ -165,7 +164,6 @@ public class HDBManagerView {
 
         List<Project> projects = controller.viewAllProjects();
 
-
         if (projects.isEmpty()) {
             System.out.println("No projects found in the system.");
             System.out.println("Press Enter to continue...");
@@ -271,7 +269,6 @@ public class HDBManagerView {
         System.out.println("\n===== My BTO Projects =====");
 
         List<Project> projects = controller.viewOwnProjects();
-
 
         if (projects.isEmpty()) {
             System.out.println("You don't have any projects to manage.");
@@ -739,59 +736,61 @@ public class HDBManagerView {
 
     private void manageWithdrawalRequestsMenu() {
         System.out.println("\n===== Manage Withdrawal Requests =====");
-        
+
         List<WithdrawalRequest> pendingRequests = controller.getPendingWithdrawalRequests();
-        
+
         if (pendingRequests.isEmpty()) {
             System.out.println("No pending withdrawal requests.");
             System.out.println("Press Enter to continue...");
             scanner.nextLine();
             return;
         }
-        
+
         System.out.println("Pending Withdrawal Requests:");
         System.out.println("ID | Project | Flat Type | Applicant | Date Requested");
         System.out.println("--------------------------------------------------");
-        
+
         for (int i = 0; i < pendingRequests.size(); i++) {
             WithdrawalRequest req = pendingRequests.get(i);
             Application app = req.getApplication();
-            
+
             System.out.printf("%2d | %-15s | %-8s | %-15s | %s\n",
-                             (i+1),
-                             app.getProject().getProjectName(),
-                             app.getFlatType().getName(),
-                             app.getApplicant().getName(),
-                             new SimpleDateFormat("dd/MM/yyyy").format(req.getDateRequested()));
+                    (i + 1),
+                    app.getProject().getProjectName(),
+                    app.getFlatType().getName(),
+                    app.getApplicant().getName(),
+                    new SimpleDateFormat("dd/MM/yyyy").format(req.getDateRequested()));
         }
-        
+
         System.out.print("\nEnter request number to process (0 to cancel): ");
         try {
             int choice = Integer.parseInt(scanner.nextLine().trim());
-            
+
             if (choice == 0 || choice > pendingRequests.size()) {
                 return;
             }
-            
+
             WithdrawalRequest selectedRequest = pendingRequests.get(choice - 1);
             Application app = selectedRequest.getApplication();
-            
+
             System.out.println("\n===== Withdrawal Request Details =====");
             System.out.println("Request ID: " + selectedRequest.getRequestId());
             System.out.println("Project: " + app.getProject().getProjectName());
             System.out.println("Flat Type: " + app.getFlatType().getName());
-            System.out.println("Applicant: " + app.getApplicant().getName() + " (" + app.getApplicant().getNric() + ")");
-            System.out.println("Date Requested: " + new SimpleDateFormat("dd/MM/yyyy").format(selectedRequest.getDateRequested()));
+            System.out
+                    .println("Applicant: " + app.getApplicant().getName() + " (" + app.getApplicant().getNric() + ")");
+            System.out.println(
+                    "Date Requested: " + new SimpleDateFormat("dd/MM/yyyy").format(selectedRequest.getDateRequested()));
             System.out.println("Status: " + selectedRequest.getStatus());
-            
+
             System.out.println("\nOptions:");
             System.out.println("1. Approve Withdrawal");
             System.out.println("2. Reject Withdrawal");
             System.out.println("0. Cancel");
-            
+
             System.out.print("Enter your choice: ");
             int action = Integer.parseInt(scanner.nextLine().trim());
-            
+
             switch (action) {
                 case 1:
                     boolean approved = controller.approveWithdrawalRequest(selectedRequest);
@@ -811,17 +810,124 @@ public class HDBManagerView {
         } catch (NumberFormatException e) {
             System.out.println("Invalid input. Please enter a number.");
         }
-        
+
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }
-    
-    private void viewAllEnquiriesMenu() {
 
+    // Implement these methods in the HDBManagerView class
+
+    private void viewAllEnquiriesMenu() {
+        controller.viewAllEnquiries();
+        
+        System.out.println("\nPress Enter to continue...");
+        scanner.nextLine();
+    }
+    
+    private void viewAndReplyToMyProjectsEnquiriesMenu() {
+        System.out.println("\n===== Enquiries for My Projects =====");
+        List<Enquiry> managerEnquiries = controller.getManagerEnquiries();
+
+        if (managerEnquiries.isEmpty()) {
+            System.out.println("No enquiries found for your projects.");
+            System.out.println("Press Enter to continue...");
+            scanner.nextLine();
+            return;
+        }
+
+        displayEnquiries(managerEnquiries, true); // Display with reply option
+
+        System.out.println("\nOptions:");
+        System.out.println("1. Reply to an Enquiry");
+        System.out.println("0. Back to Main Menu");
+        System.out.print("Enter your choice: ");
+
+        try {
+            int choice = Integer.parseInt(scanner.nextLine().trim());
+            switch (choice) {
+                case 1:
+                    replyToEnquiryMenu(managerEnquiries);
+                    break;
+                case 0:
+                    return;
+                default:
+                    System.out.println("Invalid option. Returning to main menu.");
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input. Returning to main menu.");
+        }
     }
 
-    private void viewAndReplyToMyProjectsEnquiriesMenu() {
-    
+    private void displayEnquiries(List<Enquiry> enquiries, boolean showIndex) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+        System.out.println("\n" + (showIndex ? "ID | " : "") + "Project | Applicant | Content | Response");
+        System.out.println("----------------------------------------------------------");
+
+        for (int i = 0; i < enquiries.size(); i++) {
+            Enquiry enquiry = enquiries.get(i);
+            String content = enquiry.getContent().length() > 30 ? enquiry.getContent().substring(0, 27) + "..."
+                    : enquiry.getContent();
+            String response = enquiry.getResponse().isEmpty() ? "No reply yet"
+                    : (enquiry.getResponse().length() > 30 ? enquiry.getResponse().substring(0, 27) + "..."
+                            : enquiry.getResponse());
+
+            if (showIndex) {
+                System.out.printf("%2d | %-15s | %-15s | %-30s | %s\n",
+                        (i + 1),
+                        enquiry.getProject().getProjectName(),
+                        enquiry.getApplicant().getName(),
+                        content,
+                        response);
+            } else {
+                System.out.printf("%-15s | %-15s | %-30s | %s\n",
+                        enquiry.getProject().getProjectName(),
+                        enquiry.getApplicant().getName(),
+                        content,
+                        response);
+            }
+        }
+    }
+
+    private void replyToEnquiryMenu(List<Enquiry> enquiries) {
+        System.out.print("\nEnter enquiry number to reply to: ");
+
+        try {
+            int enquiryIndex = Integer.parseInt(scanner.nextLine().trim()) - 1;
+
+            if (enquiryIndex >= 0 && enquiryIndex < enquiries.size()) {
+                Enquiry selectedEnquiry = enquiries.get(enquiryIndex);
+
+                System.out.println("\n===== Reply to Enquiry =====");
+                System.out.println("Project: " + selectedEnquiry.getProject().getProjectName());
+                System.out.println("Applicant: " + selectedEnquiry.getApplicant().getName());
+                System.out.println("Content: " + selectedEnquiry.getContent());
+                System.out.println("Current Response: " +
+                        (selectedEnquiry.getResponse().isEmpty() ? "No reply yet" : selectedEnquiry.getResponse()));
+
+                System.out.print("\nEnter your reply: ");
+                String reply = scanner.nextLine().trim();
+
+                if (!reply.isEmpty()) {
+                    boolean success = controller.replyToEnquiry(selectedEnquiry.getEnquiryID(), reply);
+
+                    if (success) {
+                        System.out.println("Reply sent successfully!");
+                    } else {
+                        System.out.println("Failed to send reply. Please try again later.");
+                    }
+                } else {
+                    System.out.println("Reply cannot be empty. Operation cancelled.");
+                }
+            } else {
+                System.out.println("Invalid enquiry number.");
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input. Please enter a number.");
+        }
+
+        System.out.println("\nPress Enter to continue...");
+        scanner.nextLine();
     }
 
     private void viewPendingApplicationsMenu() {
@@ -883,12 +989,12 @@ public class HDBManagerView {
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }
-    
+
     private void viewApplicationDetailsMenu(List<Application> pendingApplications) {
         System.out.print("\nEnter application number to view details: ");
         try {
             int appIndex = Integer.parseInt(scanner.nextLine().trim()) - 1;
-    
+
             if (appIndex >= 0 && appIndex < pendingApplications.size()) {
                 Application selectedApp = pendingApplications.get(appIndex);
                 displayApplicationDetails(selectedApp);
@@ -899,7 +1005,7 @@ public class HDBManagerView {
             System.out.println("Invalid input. Please enter a number.");
         }
     }
-    
+
     private void displayApplicationDetails(Application application) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         System.out.println("\n===== Application Details =====");
@@ -910,16 +1016,17 @@ public class HDBManagerView {
         System.out.println("Status: " + application.getStatus());
         System.out.println("Application ID: " + application.getApplicationID());
     }
-    
+
     private void approveApplicationMenu(List<Application> pendingApplications) {
         System.out.print("\nEnter application number to approve: ");
         ApplicationController applicationController = new ApplicationController();
         try {
             int appIndex = Integer.parseInt(scanner.nextLine().trim()) - 1;
-    
+
             if (appIndex >= 0 && appIndex < pendingApplications.size()) {
                 Application selectedApp = pendingApplications.get(appIndex);
-                boolean success = applicationController.updateApplicationStatus(selectedApp, ApplicationStatus.SUCCESSFUL);
+                boolean success = applicationController.updateApplicationStatus(selectedApp,
+                        ApplicationStatus.SUCCESSFUL);
                 if (success) {
                     System.out.println("Application approved successfully.");
                 } else {
@@ -932,16 +1039,17 @@ public class HDBManagerView {
             System.out.println("Invalid input. Please enter a number.");
         }
     }
-    
+
     private void rejectApplicationMenu(List<Application> pendingApplications) {
         System.out.print("\nEnter application number to reject: ");
         ApplicationController applicationController = new ApplicationController();
         try {
             int appIndex = Integer.parseInt(scanner.nextLine().trim()) - 1;
-    
+
             if (appIndex >= 0 && appIndex < pendingApplications.size()) {
                 Application selectedApp = pendingApplications.get(appIndex);
-                boolean success = applicationController.updateApplicationStatus(selectedApp, ApplicationStatus.UNSUCCESSFUL);
+                boolean success = applicationController.updateApplicationStatus(selectedApp,
+                        ApplicationStatus.UNSUCCESSFUL);
                 if (success) {
                     System.out.println("Application rejected successfully.");
                 } else {
@@ -954,9 +1062,7 @@ public class HDBManagerView {
             System.out.println("Invalid input. Please enter a number.");
         }
     }
-    
 
-    
     public void closeScanner() {
         scanner.close();
     }
