@@ -13,13 +13,17 @@ public class Application {
 
     // Constructor for new applications
     public Application(int applicationID, Applicant applicant, Project project, FlatType flatType) {
-        this.applicationID = applicationID;
+        this.applicationID = applicationID == 0 ? counter++ : applicationID;
         this.applicant = applicant;
         this.project = project;
         this.flatType = flatType;
         this.status = ApplicationStatus.PENDING;
         this.dateApplied = new Date(); // Set application date to current date (April 23, 2025)
         this.dateBooked = null;
+
+        if (this.applicationID >= counter) {
+            counter = this.applicationID + 1;
+        }  
     }
 
     // Constructor for loading from file with dateApplied

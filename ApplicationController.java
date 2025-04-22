@@ -106,32 +106,40 @@ public class ApplicationController {
     }
 
     public boolean applyForProject(Applicant applicant, Project project, FlatType flatType) {
-        // Check if applicant already has an application
-        Application existingApp = getApplicationByApplicant(applicant);
-        if (existingApp != null) {
-            System.out.println("Applicant already has an active application. Cannot apply for multiple projects.");
-            return false;
-        }
+        //Load existing applications to prevent overwrite
+        Map<String, Application> existingApps = new ApplicationFileReader(projectMap, applicantMap).readFromFile();
         
-        // Check eligibility
+        //Eligibility check (unchanged)
         if (!checkEligibility(applicant, project, flatType)) {
             System.out.println("Applicant is not eligible for this flat type in this project.");
             return false;
         }
         
-        // Create new application
-        Application app = new Application(0,applicant, project, flatType);
+        //Duplicate check (now checks both memory and file data)
+        if (getApplicationByApplicant(applicant) != null) {
+            System.out.println("Applicant already has an active application.");
+            return false;
+        }
+        
+        //Fixed ID generation (handles new/existing applications)
+        int newId = existingApps.isEmpty() ? 1000 : 
+                   existingApps.keySet().stream()
+                              .mapToInt(Integer::parseInt)
+                              .max().getAsInt() + 1;
+        
+        //Create application with generated ID
+        Application app = new Application(newId, applicant, project, flatType);
         app.setStatus(ApplicationStatus.PENDING);
         
-        // Add to list and associate with applicant
+        //Memory update (unchanged)
         allApplications.add(app);
         applicant.setApplication(app);
-        
-        // Reduce available units
         flatType.setUnitCount(flatType.getUnitCount() - 1);
         
-        // Save to CSV
-        saveApplications();
+        //File writing (merges new app with existing ones)
+        existingApps.put(String.valueOf(newId), app);
+        applicationWriter.writeToFile(existingApps);
+        
         return true;
     }
 
