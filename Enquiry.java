@@ -15,6 +15,16 @@ public class Enquiry {
         this.response = "";
     }
 
+    public void setEnquiryID(int enquiryID) {
+        this.enquiryID = enquiryID;
+        // Update the counter if needed to prevent duplicate IDs
+        if (enquiryID >= counter) {
+            counter = enquiryID + 1;
+        }
+    }
+    
+
+
     public int getEnquiryID() {
         return enquiryID;
     }

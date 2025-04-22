@@ -6,14 +6,6 @@ import java.util.Date;
  */
 public class ProjectController {
 
-    /**
-     * Updates project visibility based on business rules:
-     * - Automatically hides projects when application period ends
-     * - Automatically hides projects when all flats are allocated
-     * 
-     * @param project The project to update
-     * @return true if visibility was changed, false otherwise
-     */
     public boolean updateProjectVisibility(Project project) {
         // Skip if project is already hidden
         if (!project.isVisible()) {
@@ -22,12 +14,10 @@ public class ProjectController {
         
         Date currentDate = new Date();
         boolean shouldBeVisible = true;
-        String reason = "";
         
         // Check if application period has ended
         if (currentDate.after(project.getApplicationCloseDate())) {
             shouldBeVisible = false;
-            reason = "application period has ended";
         }
         
         // Check if all flats are allocated
@@ -41,13 +31,11 @@ public class ProjectController {
         
         if (!hasAvailableFlats) {
             shouldBeVisible = false;
-            reason = "no available flats remaining";
         }
         
         // Update visibility if needed
         if (!shouldBeVisible) {
             project.setVisibility(false);
-            System.out.println("Project '" + project.getProjectName() + "' has been automatically hidden because " + reason + ".");
             return true;
         }
         
