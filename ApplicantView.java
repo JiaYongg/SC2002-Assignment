@@ -34,7 +34,7 @@ public class ApplicantView {
 
                 switch (choice) {
                     case 1:
-                        showEligibleProjects(controller.getApplicant());
+                        displayEligibleProjects();
                         break;
                     case 2:
                         submitApplicationMenu();
@@ -73,11 +73,47 @@ public class ApplicantView {
         return logout;
     }
 
-    public void displayEligibleProjects(List<Project> projects) {
-        for (Project project : projects) {
-            System.out.println("Project: " + project.getProjectName());
+    public void displayEligibleProjects() {
+        List<Project> eligibleProjects = controller.getEligibleProjects(controller.getApplicant());
+        
+        if (eligibleProjects.isEmpty()) {
+            System.out.println("No eligible projects found.");
+            return;
         }
+        
+        System.out.println("\n===== Eligible Projects =====");
+        System.out.println("------------------------------------------------------");
+        System.out.printf("%-20s %-15s %-15s %-10s\n", "Project Name", "Flat Type", "Units Left", "Price (SGD)");
+        System.out.println("------------------------------------------------------");
+        
+        for (Project project : eligibleProjects) {
+            boolean hasEligibleFlatTypes = false;
+            
+            for (FlatType flatType : project.getFlatTypes()) {
+                if (flatType.getUnitCount() > 0 && 
+                    controller.checkEligibility(controller.getApplicant(), project, flatType)) {
+                    
+                    System.out.printf("%-20s %-15s %-15d $%-10.2f\n", 
+                        project.getProjectName(),
+                        flatType.getName(),
+                        flatType.getUnitCount(),
+                        flatType.getPrice());
+                    
+                    hasEligibleFlatTypes = true;
+                }
+            }
+            
+            if (!hasEligibleFlatTypes) {
+                System.out.printf("%-20s %-15s %-15s %-10s\n", 
+                    project.getProjectName(),
+                    "No eligible flat types available",
+                    "-",
+                    "-");
+            }
+        }
+        System.out.println("------------------------------------------------------");
     }
+    
 
     public void displayAppliedProject(Project project, FlatType flatType, ApplicationStatus status) {
         System.out.println("Applied Project: " + project.getProjectName());
@@ -89,6 +125,8 @@ public class ApplicantView {
         System.out.println("Application Status: " + status);
     }
 
+
+    
     public void viewAppliedProject(Applicant applicant) {
         Application app = applicant.getApplication();
         if (app != null) {
@@ -107,10 +145,6 @@ public class ApplicantView {
         }
     }
 
-    public void showEligibleProjects(Applicant applicant) {
-        List<Project> eligibleProjects = controller.getEligibleProjects(applicant);
-        displayEligibleProjects(eligibleProjects);
-    }
 
     private void submitApplicationMenu() {
         System.out.println("\n===== Submit Application =====");

@@ -300,31 +300,6 @@ public class HDBManagerController {
         return true; // All projects are inactive, can create a new one
     }
 
-    public void viewAllEnquiries() {
-        enquiryController.viewAllEnquiries();
-    }
-
-    public void viewEnquiriesForManager() {
-        enquiryController.viewEnquiryByManager(currentManager);
-    }
-
-    public List<Enquiry> getEnquiriesForProject(Project project) {
-        return project.getEnquiries();
-    }
-
-    public boolean replyToEnquiry(Project project, int enquiryId, String reply) {
-        // Verify the manager is authorized to reply to this project's enquiries
-        if (!isProjectManagedByCurrentManager(project)) {
-            System.out.println("Error: You can only reply to enquiries for projects you manage.");
-            return false;
-        }
-
-        // Delegate to enquiry controller
-        enquiryController.replyToEnquiry(project, enquiryId, reply);
-        return true;
-    }
-
-    // In HDBManagerController.java
 
     public List<WithdrawalRequest> getPendingWithdrawalRequests() {
         WithdrawalRequestController withdrawalController = new WithdrawalRequestController();
