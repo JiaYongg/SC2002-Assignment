@@ -58,4 +58,33 @@ public class ApplicantController {
         } else {
             System.out.println("No application found.");
         }    }
+
+        public List<Project> getVisibleProjects() {
+            List<Project> visibleProjects = new ArrayList<>();
+            for (Project p : allProjects) {
+                if (p.isVisible()) {
+                    visibleProjects.add(p);
+                }
+            }
+            return visibleProjects;
+        }
+        
+        public void submitEnquiry(Project project, String content) {
+            Enquiry enquiry = new Enquiry(applicant, project, content);
+            applicant.addEnquiry(enquiry);
+            project.addEnquiry(enquiry);
+        }
+        
+        public List<Enquiry> getApplicantEnquiries() {
+            return applicant.getEnquiries();
+        }
+        
+        public void editEnquiry(Enquiry enquiry, String newContent) {
+            enquiry.updateContent(newContent);
+        }
+        
+        public void deleteEnquiry(Enquiry enquiry) {
+            applicant.getEnquiries().remove(enquiry);
+            enquiry.getProject().getEnquiries().remove(enquiry);
+        }
 }

@@ -20,28 +20,44 @@ public class ApplicantView {
             System.out.println("3. View Applied Project");
             System.out.println("4. View Application Status");
             System.out.println("5. Withdraw Application");
+            System.out.println("6. Submit Enquiry");
+            System.out.println("7. View My Enquiries");
+            System.out.println("8. Edit Enquiry");
+            System.out.println("9. Delete Enquiry");
             System.out.println("0. Logout");
-    
+
             System.out.print("Enter your choice: ");
 
-            try {  
+            try {
                 int choice = Integer.parseInt(scanner.nextLine().trim());
 
                 switch (choice) {
-                    case 1: 
+                    case 1:
                         showEligibleProjects(controller.getApplicant());
                         break;
-                    case 2: 
+                    case 2:
                         apply(controller.getApplicant());
                         break;
-                    case 3: 
+                    case 3:
                         viewAppliedProject(controller.getApplicant());
                         break;
-                    case 4: 
+                    case 4:
                         viewApplicationStatus(controller.getApplicant());
                         break;
-                    case 5: 
+                    case 5:
                         controller.withdraw(controller.getApplicant().getApplication());
+                        break;
+                    case 6:
+                        submitEnquiry();
+                        break;
+                    case 7:
+                        viewEnquiries();
+                        break;
+                    case 8:
+                        editEnquiry();
+                        break;
+                    case 9:
+                        deleteEnquiry();
                         break;
                     case 0:
                         logout = true;
@@ -49,7 +65,7 @@ public class ApplicantView {
                     default:
                         System.out.println("Invalid option. Please try again.");
                 }
-            }catch (NumberFormatException e) {
+            } catch (NumberFormatException e) {
                 System.out.println("Invalid input. Please enter a number.");
             }
         }
@@ -84,9 +100,8 @@ public class ApplicantView {
     public void viewApplicationStatus(Applicant applicant) {
         Application app = applicant.getApplication();
         if (app != null) {
-            viewApplicationStatus(app.getStatus()); 
-        }
-        else {
+            viewApplicationStatus(app.getStatus());
+        } else {
             System.out.println("No application made yet.");
         }
     }
@@ -124,5 +139,310 @@ public class ApplicantView {
             return;
         }
 
-        controller.submitApplication(controller.getApplicant(), selected, flatType);    }
+        controller.submitApplication(controller.getApplicant(), selected, flatType);
+    }
+
+    private void submitEnquiry() {
+        System.out.println("\n===== Submit Enquiry =====");
+
+        // Display all visible projects
+        List<Project> visibleProjects = controller.getVisibleProjects();
+
+        if (visibleProjects.isEmpty()) {
+            System.out.println("No projects available for enquiry.");
+            System.out.println("Press Enter to continue...");
+            scanner.nextLine();
+            return;
+        }
+
+        // Display project list
+        System.out.println("Available Projects:");
+        System.out.println("ID | Project Name | Neighborhood");
+        System.out.println("--------------------------------");
+
+        int index = 1;
+        for (Project project : visibleProjects) {
+            System.out.printf("%2d | %-20s | %-15s\n",
+                    index++,
+                    project.getProjectName(),
+                    project.getNeighborhood());
+        }
+
+        // Get project selection
+        System.out.print("\nEnter project ID to enquire about (0 to cancel): ");
+        try {
+            int projectId = Integer.parseInt(scanner.nextLine().trim());
+
+            if (projectId == 0) {
+                return; // User canceled
+            }
+
+            if (projectId < 1 || projectId > visibleProjects.size()) {
+                System.out.println("Invalid project ID. Please try again.");
+                System.out.println("Press Enter to continue...");
+                scanner.nextLine();
+                return;
+            }
+
+            // Get the selected project
+            Project selectedProject = visibleProjects.get(projectId - 1);
+
+            // Get enquiry content
+            System.out.println("\nEnter your enquiry about " + selectedProject.getProjectName() + ":");
+            String content = scanner.nextLine().trim();
+
+            if (content.isEmpty()) {
+                System.out.println("Enquiry cannot be empty. Operation cancelled.");
+                System.out.println("Press Enter to continue...");
+                scanner.nextLine();
+                return;
+            }
+
+            // Submit the enquiry
+            controller.submitEnquiry(selectedProject, content);
+            System.out.println("Enquiry submitted successfully!");
+
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input. Please enter a number.");
+        }
+
+        System.out.println("Press Enter to continue...");
+        scanner.nextLine();
+    }
+
+    private void viewEnquiries() {
+        System.out.println("\n===== My Enquiries =====");
+        
+        List<Enquiry> enquiries = controller.getApplicantEnquiries();
+        
+        if (enquiries.isEmpty()) {
+            System.out.println("You have not submitted any enquiries yet.");
+            System.out.println("Press Enter to continue...");
+            scanner.nextLine();
+            return;
+        }
+        
+        System.out.println("ID | Project | Content | Response");
+        System.out.println("----------------------------------");
+        
+        for (Enquiry enquiry : enquiries) {
+            String responseStatus = enquiry.getResponse().isEmpty() ? "No response yet" : "Responded";
+            System.out.printf("%2d | %-15s | %-30s | %s\n", 
+                             enquiry.getEnquiryID(), 
+                             enquiry.getProject().getProjectName(),
+                             (enquiry.getContent().length() > 30 ? 
+                                 enquiry.getContent().substring(0, 27) + "..." : 
+                                 enquiry.getContent()),
+                             responseStatus);
+        }
+        
+        // View detailed enquiry
+        System.out.print("\nEnter enquiry ID to view details (0 to cancel): ");
+        try {
+            int enquiryId = Integer.parseInt(scanner.nextLine().trim());
+            
+            if (enquiryId == 0) {
+                return; // User canceled
+            }
+            
+            // Find the enquiry with the given ID
+            Enquiry selectedEnquiry = null;
+            for (Enquiry enquiry : enquiries) {
+                if (enquiry.getEnquiryID() == enquiryId) {
+                    selectedEnquiry = enquiry;
+                    break;
+                }
+            }
+            
+            if (selectedEnquiry == null) {
+                System.out.println("Enquiry not found. Please try again.");
+                System.out.println("Press Enter to continue...");
+                scanner.nextLine();
+                return;
+            }
+            
+            // Display full enquiry details
+            System.out.println("\n===== Enquiry Details =====");
+            System.out.println("Enquiry ID: " + selectedEnquiry.getEnquiryID());
+            System.out.println("Project: " + selectedEnquiry.getProject().getProjectName());
+            System.out.println("Content: " + selectedEnquiry.getContent());
+            System.out.println("Response: " + 
+                             (selectedEnquiry.getResponse().isEmpty() ? 
+                                 "No response yet" : 
+                                 selectedEnquiry.getResponse()));
+            
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input. Please enter a number.");
+        }
+        
+        System.out.println("\nPress Enter to continue...");
+        scanner.nextLine();
+    }
+
+    private void editEnquiry() {
+        System.out.println("\n===== Edit Enquiry =====");
+        
+        List<Enquiry> enquiries = controller.getApplicantEnquiries();
+        
+        if (enquiries.isEmpty()) {
+            System.out.println("You have not submitted any enquiries yet.");
+            System.out.println("Press Enter to continue...");
+            scanner.nextLine();
+            return;
+        }
+        
+        System.out.println("Your Enquiries:");
+        System.out.println("ID | Project | Content | Response");
+        System.out.println("----------------------------------");
+        
+        for (Enquiry enquiry : enquiries) {
+            String responseStatus = enquiry.getResponse().isEmpty() ? "No response yet" : "Responded";
+            System.out.printf("%2d | %-15s | %-30s | %s\n", 
+                             enquiry.getEnquiryID(), 
+                             enquiry.getProject().getProjectName(),
+                             (enquiry.getContent().length() > 30 ? 
+                                 enquiry.getContent().substring(0, 27) + "..." : 
+                                 enquiry.getContent()),
+                             responseStatus);
+        }
+        
+        // Select enquiry to edit
+        System.out.print("\nEnter enquiry ID to edit (0 to cancel): ");
+        try {
+            int enquiryId = Integer.parseInt(scanner.nextLine().trim());
+            
+            if (enquiryId == 0) {
+                return; // User canceled
+            }
+            
+            // Find the enquiry with the given ID
+            Enquiry selectedEnquiry = null;
+            for (Enquiry enquiry : enquiries) {
+                if (enquiry.getEnquiryID() == enquiryId) {
+                    selectedEnquiry = enquiry;
+                    break;
+                }
+            }
+            
+            if (selectedEnquiry == null) {
+                System.out.println("Enquiry not found. Please try again.");
+                System.out.println("Press Enter to continue...");
+                scanner.nextLine();
+                return;
+            }
+            
+            // Check if the enquiry has already been responded to
+            if (!selectedEnquiry.getResponse().isEmpty()) {
+                System.out.println("Cannot edit an enquiry that has already been responded to.");
+                System.out.println("Press Enter to continue...");
+                scanner.nextLine();
+                return;
+            }
+            
+            // Display current content and get new content
+            System.out.println("\nCurrent content: " + selectedEnquiry.getContent());
+            System.out.print("Enter new content: ");
+            String newContent = scanner.nextLine().trim();
+            
+            if (newContent.isEmpty()) {
+                System.out.println("Enquiry content cannot be empty. Operation cancelled.");
+                System.out.println("Press Enter to continue...");
+                scanner.nextLine();
+                return;
+            }
+            
+            // Update the enquiry
+            controller.editEnquiry(selectedEnquiry, newContent);
+            System.out.println("Enquiry updated successfully!");
+            
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input. Please enter a number.");
+        }
+        
+        System.out.println("\nPress Enter to continue...");
+        scanner.nextLine();
+    }
+
+    
+    private void deleteEnquiry() {
+        System.out.println("\n===== Delete Enquiry =====");
+        
+        List<Enquiry> enquiries = controller.getApplicantEnquiries();
+        
+        if (enquiries.isEmpty()) {
+            System.out.println("You have not submitted any enquiries yet.");
+            System.out.println("Press Enter to continue...");
+            scanner.nextLine();
+            return;
+        }
+        
+        System.out.println("Your Enquiries:");
+        System.out.println("ID | Project | Content | Response");
+        System.out.println("----------------------------------");
+        
+        for (Enquiry enquiry : enquiries) {
+            String responseStatus = enquiry.getResponse().isEmpty() ? "No response yet" : "Responded";
+            System.out.printf("%2d | %-15s | %-30s | %s\n", 
+                             enquiry.getEnquiryID(), 
+                             enquiry.getProject().getProjectName(),
+                             (enquiry.getContent().length() > 30 ? 
+                                 enquiry.getContent().substring(0, 27) + "..." : 
+                                 enquiry.getContent()),
+                             responseStatus);
+        }
+        
+        // Select enquiry to delete
+        System.out.print("\nEnter enquiry ID to delete (0 to cancel): ");
+        try {
+            int enquiryId = Integer.parseInt(scanner.nextLine().trim());
+            
+            if (enquiryId == 0) {
+                return; // User canceled
+            }
+            
+            // Find the enquiry with the given ID
+            Enquiry selectedEnquiry = null;
+            for (Enquiry enquiry : enquiries) {
+                if (enquiry.getEnquiryID() == enquiryId) {
+                    selectedEnquiry = enquiry;
+                    break;
+                }
+            }
+            
+            if (selectedEnquiry == null) {
+                System.out.println("Enquiry not found. Please try again.");
+                System.out.println("Press Enter to continue...");
+                scanner.nextLine();
+                return;
+            }
+            
+            // Check if the enquiry has already been responded to
+            if (!selectedEnquiry.getResponse().isEmpty()) {
+                System.out.println("Cannot delete an enquiry that has already been responded to.");
+                System.out.println("Press Enter to continue...");
+                scanner.nextLine();
+                return;
+            }
+            
+            // Confirm deletion
+            System.out.print("\nAre you sure you want to delete this enquiry? (y/n): ");
+            String confirmation = scanner.nextLine().trim().toLowerCase();
+            
+            if (confirmation.equals("y") || confirmation.equals("yes")) {
+                // Delete the enquiry
+                controller.deleteEnquiry(selectedEnquiry);
+                System.out.println("Enquiry deleted successfully!");
+            } else {
+                System.out.println("Deletion cancelled.");
+            }
+            
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input. Please enter a number.");
+        }
+        
+        System.out.println("\nPress Enter to continue...");
+        scanner.nextLine();
+    }
+    
+
 }
