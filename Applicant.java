@@ -21,7 +21,7 @@ public class Applicant extends User {
         return enquiries;
     }
 
-    public void addEnquiries(Enquiry enquiry) {
+    public void addEnquiry(Enquiry enquiry) {
         enquiries.add(enquiry);
     }
 }

@@ -95,4 +95,32 @@ public class EnquiryController {
             }
         }
     }
+
+    public void viewAllEnquiries() {
+        System.out.println("===== All Enquiries in the System =====");
+        boolean hasEnquiries = false;
+        
+        for (Project project : allProjects) {
+            List<Enquiry> enquiries = project.getEnquiries();
+            if (enquiries == null || enquiries.isEmpty()) continue;
+            
+            hasEnquiries = true;
+            System.out.println("\nProject: " + project.getProjectName());
+            System.out.println("Manager: " + project.getManagerInCharge().getName());
+            System.out.println("------------------------");
+            
+            for (Enquiry enq : enquiries) {
+                System.out.println("Enquiry ID: " + enq.getEnquiryID());
+                System.out.println("Applicant: " + enq.getApplicant().getName());
+                System.out.println("Content: " + enq.getContent());
+                System.out.println("Reply: " + (enq.getResponse().isEmpty() ? "No reply yet" : enq.getResponse()));
+                System.out.println("------------------------");
+            }
+        }
+        
+        if (!hasEnquiries) {
+            System.out.println("No enquiries found in the system.");
+        }
+    }
+    
 }

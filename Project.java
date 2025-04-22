@@ -11,7 +11,7 @@ public class Project {
     private int officerSlots;
     private List<HDBOfficer> assignedOfficers;
     private List<OfficerRegistration> registrationRequests;
-    // private List<Enquiry> enquiries;
+    private List<Enquiry> enquiries;
 
    
     public Project(String projectName, String neighborhood, Date applicationOpenDate,
@@ -27,7 +27,7 @@ public class Project {
                     this.officerSlots = officerSlots;
                     this.assignedOfficers = new ArrayList<>();
                     this.registrationRequests = new ArrayList<>();
-                    // this.enquiries = new ArrayList<>();
+                    this.enquiries = new ArrayList<>();
     }
 
     public String getProjectName (){
@@ -64,7 +64,9 @@ public class Project {
         return this.officerSlots;
     }
 
-    
+    public List<Enquiry> getEnquiries() {
+        return enquiries;
+    }   
 
 
 
@@ -154,9 +156,9 @@ public class Project {
     public boolean isOverlappingWith(Project otherProject) {
         return isOverlappingWith(otherProject.applicationOpenDate, otherProject.applicationCloseDate);
     }
-    // public void addEnquiry(Enquiry enquiry) {
-    //     enquiries.add(enquiry);
-    // }
+    public void addEnquiry(Enquiry enquiry) {
+        enquiries.add(enquiry);
+    }
 
     
 }

@@ -6,28 +6,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Controller class for HDB Manager operations in the BTO Management System.
- * Handles project management, officer registration, application approval,
- * and report generation functionalities.
- */
 public class HDBManagerController {
     private HDBManager currentManager;
     private List<Project> allProjects;
     private ProjectFileReader projectReader;
     private ProjectFileWriter projectWriter;
     private ProjectController projectController;
+    private EnquiryController enquiryController;
 
-    /**
-     * Constructor for HDBManagerController
-     * 
-     * @param manager The currently logged-in manager
-     */
     public HDBManagerController(HDBManager manager) {
         this.currentManager = manager;
         this.projectReader = new ProjectFileReader();
         this.projectWriter = new ProjectFileWriter();
         this.projectController = new ProjectController();
+        this.enquiryController = new EnquiryController();
         loadProjects();
 
         // Check visibility for all projects after loading
@@ -72,17 +64,6 @@ public class HDBManagerController {
         projectWriter.writeToFile(projectMap);
     }
 
-    /**
-     * Creates a new BTO project with the specified details
-     * 
-     * @param name         Project name
-     * @param neighborhood Project neighborhood
-     * @param flatTypes    List of flat types available in the project
-     * @param openDateStr  Application opening date (dd/MM/yyyy)
-     * @param closeDateStr Application closing date (dd/MM/yyyy)
-     * @param officerSlots Number of officer slots (max 10)
-     * @return The created Project object, or null if creation failed
-     */
     public Project createProject(String name, String neighborhood, List<FlatType> flatTypes,
             String openDateStr, String closeDateStr, int officerSlots) {
         try {
@@ -146,18 +127,6 @@ public class HDBManagerController {
         }
     }
 
-    /**
-     * Edits an existing project with new details
-     * 
-     * @param project         The project to edit
-     * @param newName         New project name
-     * @param newNeighborhood New neighborhood
-     * @param newFlatTypes    New list of flat types
-     * @param newOpenDateStr  New opening date (dd/MM/yyyy)
-     * @param newCloseDateStr New closing date (dd/MM/yyyy)
-     * @param newOfficerSlots New number of officer slots
-     * @return true if edit was successful, false otherwise
-     */
     public boolean editProject(Project project, String newName, String newNeighborhood,
             List<FlatType> newFlatTypes, String newOpenDateStr,
             String newCloseDateStr, int newOfficerSlots) {
@@ -193,14 +162,6 @@ public class HDBManagerController {
         }
     }
 
-    // Remove the updateProjectVisibility method as it's now in ProjectController
-
-    /**
-     * Deletes a project from the system
-     * 
-     * @param project The project to delete
-     * @return true if deletion was successful, false otherwise
-     */
     public boolean deleteProject(Project project) {
         // Check if project exists and is managed by current manager
         if (!isProjectManagedByCurrentManager(project)) {
@@ -263,12 +224,6 @@ public class HDBManagerController {
         }
     }
 
-    /**
-     * Toggles the visibility of a project
-     * 
-     * @param project The project to toggle visibility for
-     * @return true if toggle was successful, false otherwise
-     */
     public boolean toggleVisibility(Project project) {
         // Check if project exists and is managed by current manager
         if (!isProjectManagedByCurrentManager(project)) {
@@ -298,12 +253,6 @@ public class HDBManagerController {
         return true;
     }
 
-    /**
-     * Approves an officer registration request
-     * 
-     * @param registration The registration request to approve
-     * @return true if approval was successful, false otherwise
-     */
     // public boolean approveOfficerRegistration(OfficerRegistration registration) {
     // Project project = registration.getProject();
 
@@ -333,12 +282,6 @@ public class HDBManagerController {
     // return true;
     // }
 
-    /**
-     * Rejects an officer registration request
-     * 
-     * @param registration The registration request to reject
-     * @return true if rejection was successful, false otherwise
-     */
     // public boolean rejectOfficerRegistration(OfficerRegistration registration) {
     // Project project = registration.getProject();
 
@@ -358,30 +301,14 @@ public class HDBManagerController {
     // return true;
     // }
 
-    /**
-     * Gets a list of all projects in the system
-     * 
-     * @return List of all projects
-     */
     public List<Project> viewAllProjects() {
         return new ArrayList<>(allProjects);
     }
 
-    /**
-     * Gets a list of projects managed by the current manager
-     * 
-     * @return List of managed projects
-     */
     public List<Project> viewOwnProjects() {
         return currentManager.getManagedProjects();
     }
 
-    // /**
-    // * Gets a list of officer registrations with the specified status
-    // *
-    // * @param status The registration status to filter by
-    // * @return List of matching registration requests
-    // */
     // public List<OfficerRegistration>
     // getOfficerRegistrationsByStatus(OfficerRegistrationStatus status) {
     // List<OfficerRegistration> result = new ArrayList<>();
@@ -397,12 +324,6 @@ public class HDBManagerController {
     // return result;
     // }
 
-    /**
-     * Checks if a project is managed by the current manager
-     * 
-     * @param project The project to check
-     * @return true if project is managed by current manager, false otherwise
-     */
     private boolean isProjectManagedByCurrentManager(Project project) {
         if (project == null || project.getManagerInCharge() == null) {
             return false;
@@ -412,13 +333,6 @@ public class HDBManagerController {
         return project.getManagerInCharge().getName().equals(currentManager.getName());
     }
 
-    /**
-     * Checks if the current manager can handle a project in the specified period
-     * 
-     * @param openDate  Project opening date
-     * @param closeDate Project closing date
-     * @return true if manager can handle the project, false otherwise
-     */
     private boolean canHandleProjectInPeriod(Date openDate, Date closeDate) {
         for (Project project : currentManager.getManagedProjects()) {
             if (project.isOverlappingWith(openDate, closeDate)) {
@@ -444,5 +358,31 @@ public class HDBManagerController {
 
         return true; // All projects are inactive, can create a new one
     }
+
+    public void viewAllEnquiries() {
+        enquiryController.viewAllEnquiries();
+    }
+
+    public void viewEnquiriesForManager() {
+        enquiryController.viewEnquiryByManager(currentManager);
+    }
+
+    public List<Enquiry> getEnquiriesForProject(Project project) {
+        return project.getEnquiries();
+    }
+
+    public boolean replyToEnquiry(Project project, int enquiryId, String reply) {
+        // Verify the manager is authorized to reply to this project's enquiries
+        if (!isProjectManagedByCurrentManager(project)) {
+            System.out.println("Error: You can only reply to enquiries for projects you manage.");
+            return false;
+        }
+
+        // Delegate to enquiry controller
+        enquiryController.replyToEnquiry(project, enquiryId, reply);
+        return true;
+    }
+
+    
 
 }
