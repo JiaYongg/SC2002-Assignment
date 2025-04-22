@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class HDBManagerController {
     private HDBManager currentManager;
@@ -13,13 +14,15 @@ public class HDBManagerController {
     private ProjectFileWriter projectWriter;
     private ProjectController projectController;
     private EnquiryController enquiryController;
+    private ApplicationController applicationController;
+    
 
     public HDBManagerController(HDBManager manager) {
         this.currentManager = manager;
         this.projectReader = new ProjectFileReader();
         this.projectWriter = new ProjectFileWriter();
         this.projectController = new ProjectController();
-        
+        this.applicationController = new ApplicationController();
         loadProjects();
 
         // Check visibility for all projects after loading
@@ -39,21 +42,29 @@ public class HDBManagerController {
     private void loadProjects() {
         Map<String, Project> projectMap = projectReader.readFromFile();
         this.allProjects = new ArrayList<>(projectMap.values());
-
+        
         // Associate projects with current manager
         for (Project project : allProjects) {
             if (project.getManagerInCharge() != null &&
                     project.getManagerInCharge().getName().equals(currentManager.getName())) {
-                currentManager.addManagedProject(project);
-                System.out.println("Associated project: " + project.getProjectName() + " with manager: "
-                        + currentManager.getName());
+                // Check if project is already in manager's list
+                boolean alreadyManaged = false;
+                for (Project managedProject : currentManager.getManagedProjects()) {
+                    if (managedProject.getProjectName().equals(project.getProjectName())) {
+                        alreadyManaged = true;
+                        break;
+                    }
+                }
+                
+                if (!alreadyManaged) {
+                    currentManager.addManagedProject(project);
+                }
             }
         }
-
-        // Debug output
-        System.out.println("Total projects loaded: " + allProjects.size());
-        System.out.println("Projects managed by current manager: " + currentManager.getManagedProjects().size());
     }
+    
+
+
 
     /**
      * Saves projects to the CSV file using ProjectFileWriter
@@ -195,7 +206,6 @@ public class HDBManagerController {
 
         Date currentDate = new Date();
         boolean shouldBeVisible = true;
-
 
         // Check if application period has ended
         if (currentDate.after(project.getApplicationCloseDate())) {
@@ -383,6 +393,42 @@ public class HDBManagerController {
         return true;
     }
 
-    
+    // In HDBManagerController.java
 
+    public List<WithdrawalRequest> getPendingWithdrawalRequests() {
+        WithdrawalRequestController withdrawalController = new WithdrawalRequestController();
+
+        // Get all pending requests and filter for current manager's projects
+        return withdrawalController.getPendingRequests().stream()
+                .filter(req -> isProjectManagedByCurrentManager(req.getApplication().getProject()))
+                .collect(Collectors.toList());
+    }
+
+    public boolean approveWithdrawalRequest(WithdrawalRequest request) {
+        // Check if manager is authorized
+        if (!isProjectManagedByCurrentManager(request.getApplication().getProject())) {
+            System.out.println("Error: You are not authorized to approve this withdrawal request.");
+            return false;
+        }
+
+        WithdrawalRequestController withdrawalController = new WithdrawalRequestController();
+        return withdrawalController.approveRequest(request);
+    }
+
+    public boolean rejectWithdrawalRequest(WithdrawalRequest request) {
+        // Check if manager is authorized
+        if (!isProjectManagedByCurrentManager(request.getApplication().getProject())) {
+            System.out.println("Error: You are not authorized to reject this withdrawal request.");
+            return false;
+        }
+
+        WithdrawalRequestController withdrawalController = new WithdrawalRequestController();
+        return withdrawalController.rejectRequest(request);
+    }
+
+
+    public List<Application> getPendingApplications() {
+        ApplicationController appController = new ApplicationController();
+        return appController.getPendingApplications();
+    }
 }

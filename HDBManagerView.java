@@ -1,4 +1,4 @@
-import java.text.ParseException;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -46,10 +46,10 @@ public class HDBManagerView {
                         handleOfficerRegistrationsMenu();
                         break;
                     case 8:
-                        handleApplicationsMenu();
+                        viewPendingApplicationsMenu();
                         break;
                     case 9:
-                        handleWithdrawalsMenu();
+                        manageWithdrawalRequestsMenu();
                         break;
                     case 10:
                         // controller.generateBookingReport();
@@ -752,10 +752,85 @@ public class HDBManagerView {
         // Implementation for handling applications
     }
 
-    private void handleWithdrawalsMenu() {
-        // Implementation for handling withdrawals
+    private void manageWithdrawalRequestsMenu() {
+        System.out.println("\n===== Manage Withdrawal Requests =====");
+        
+        List<WithdrawalRequest> pendingRequests = controller.getPendingWithdrawalRequests();
+        
+        if (pendingRequests.isEmpty()) {
+            System.out.println("No pending withdrawal requests.");
+            System.out.println("Press Enter to continue...");
+            scanner.nextLine();
+            return;
+        }
+        
+        System.out.println("Pending Withdrawal Requests:");
+        System.out.println("ID | Project | Flat Type | Applicant | Date Requested");
+        System.out.println("--------------------------------------------------");
+        
+        for (int i = 0; i < pendingRequests.size(); i++) {
+            WithdrawalRequest req = pendingRequests.get(i);
+            Application app = req.getApplication();
+            
+            System.out.printf("%2d | %-15s | %-8s | %-15s | %s\n",
+                             (i+1),
+                             app.getProject().getProjectName(),
+                             app.getFlatType().getName(),
+                             app.getApplicant().getName(),
+                             new SimpleDateFormat("dd/MM/yyyy").format(req.getDateRequested()));
+        }
+        
+        System.out.print("\nEnter request number to process (0 to cancel): ");
+        try {
+            int choice = Integer.parseInt(scanner.nextLine().trim());
+            
+            if (choice == 0 || choice > pendingRequests.size()) {
+                return;
+            }
+            
+            WithdrawalRequest selectedRequest = pendingRequests.get(choice - 1);
+            Application app = selectedRequest.getApplication();
+            
+            System.out.println("\n===== Withdrawal Request Details =====");
+            System.out.println("Request ID: " + selectedRequest.getRequestId());
+            System.out.println("Project: " + app.getProject().getProjectName());
+            System.out.println("Flat Type: " + app.getFlatType().getName());
+            System.out.println("Applicant: " + app.getApplicant().getName() + " (" + app.getApplicant().getNric() + ")");
+            System.out.println("Date Requested: " + new SimpleDateFormat("dd/MM/yyyy").format(selectedRequest.getDateRequested()));
+            System.out.println("Status: " + selectedRequest.getStatus());
+            
+            System.out.println("\nOptions:");
+            System.out.println("1. Approve Withdrawal");
+            System.out.println("2. Reject Withdrawal");
+            System.out.println("0. Cancel");
+            
+            System.out.print("Enter your choice: ");
+            int action = Integer.parseInt(scanner.nextLine().trim());
+            
+            switch (action) {
+                case 1:
+                    boolean approved = controller.approveWithdrawalRequest(selectedRequest);
+                    if (approved) {
+                        System.out.println("Withdrawal request approved successfully.");
+                    }
+                    break;
+                case 2:
+                    boolean rejected = controller.rejectWithdrawalRequest(selectedRequest);
+                    if (rejected) {
+                        System.out.println("Withdrawal request rejected successfully.");
+                    }
+                    break;
+                default:
+                    System.out.println("Operation cancelled.");
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input. Please enter a number.");
+        }
+        
+        System.out.println("Press Enter to continue...");
+        scanner.nextLine();
     }
-
+    
     private void viewAllEnquiriesMenu() {
         System.out.println("\n===== All Enquiries =====");
 
@@ -768,22 +843,22 @@ public class HDBManagerView {
 
     private void viewAndReplyToMyProjectsEnquiriesMenu() {
         System.out.println("\n===== My Projects' Enquiries =====");
-    
+
         // Get projects managed by the current manager
         List<Project> ownProjects = controller.viewOwnProjects();
-    
+
         if (ownProjects.isEmpty()) {
             System.out.println("You don't have any projects to manage.");
             System.out.println("Press Enter to continue...");
             scanner.nextLine();
             return;
         }
-    
+
         // Display list of projects
         System.out.println("Select a project to view its enquiries:");
         System.out.println("ID | Project Name | Neighborhood");
         System.out.println("--------------------------------");
-    
+
         int index = 1;
         for (Project project : ownProjects) {
             System.out.printf("%2d | %-20s | %-15s\n",
@@ -791,57 +866,56 @@ public class HDBManagerView {
                     project.getProjectName(),
                     project.getNeighborhood());
         }
-    
+
         System.out.print("\nEnter project ID (0 to cancel): ");
         try {
             int projectId = Integer.parseInt(scanner.nextLine().trim());
-    
+
             if (projectId == 0) {
                 return; // User canceled
             }
-    
+
             if (projectId < 1 || projectId > ownProjects.size()) {
                 System.out.println("Invalid project ID. Please try again.");
                 System.out.println("Press Enter to continue...");
                 scanner.nextLine();
                 return;
             }
-    
+
             // Get the selected project
             Project selectedProject = ownProjects.get(projectId - 1);
-    
+
             // Display enquiries for the selected project
             List<Enquiry> projectEnquiries = controller.getEnquiriesForProject(selectedProject);
-    
+
             if (projectEnquiries == null || projectEnquiries.isEmpty()) {
                 System.out.println("No enquiries found for this project.");
                 System.out.println("Press Enter to continue...");
                 scanner.nextLine();
                 return;
             }
-    
+
             System.out.println("\nEnquiries for project: " + selectedProject.getProjectName());
             System.out.println("ID | Applicant | Content | Response");
             System.out.println("----------------------------------------");
-    
+
             for (Enquiry enquiry : projectEnquiries) {
                 System.out.printf("%2d | %-15s | %-30s | %s\n",
                         enquiry.getEnquiryID(),
                         enquiry.getApplicant().getName(),
-                        enquiry.getContent().length() > 30 ?
-                                enquiry.getContent().substring(0, 27) + "..." :
-                                enquiry.getContent(),
+                        enquiry.getContent().length() > 30 ? enquiry.getContent().substring(0, 27) + "..."
+                                : enquiry.getContent(),
                         enquiry.getResponse().isEmpty() ? "No reply yet" : "Replied");
             }
-    
+
             // Reply to an enquiry
             System.out.print("\nEnter enquiry ID to reply (0 to cancel): ");
             int enquiryId = Integer.parseInt(scanner.nextLine().trim());
-    
+
             if (enquiryId == 0) {
                 return; // User canceled
             }
-    
+
             // Find the enquiry with the given ID
             Enquiry selectedEnquiry = null;
             for (Enquiry enquiry : projectEnquiries) {
@@ -850,14 +924,14 @@ public class HDBManagerView {
                     break;
                 }
             }
-    
+
             if (selectedEnquiry == null) {
                 System.out.println("Enquiry not found. Please try again.");
                 System.out.println("Press Enter to continue...");
                 scanner.nextLine();
                 return;
             }
-    
+
             // Display the full enquiry details
             System.out.println("\n===== Enquiry Details =====");
             System.out.println("Enquiry ID: " + selectedEnquiry.getEnquiryID());
@@ -865,11 +939,11 @@ public class HDBManagerView {
             System.out.println("Content: " + selectedEnquiry.getContent());
             System.out.println("Current Response: " +
                     (selectedEnquiry.getResponse().isEmpty() ? "No reply yet" : selectedEnquiry.getResponse()));
-    
+
             // Get the reply from the manager
             System.out.print("\nEnter your reply: ");
             String reply = scanner.nextLine().trim();
-    
+
             if (!reply.isEmpty()) {
                 // Update the enquiry with the reply
                 boolean success = controller.replyToEnquiry(selectedProject, enquiryId, reply);
@@ -881,16 +955,148 @@ public class HDBManagerView {
             } else {
                 System.out.println("Reply cannot be empty. Operation cancelled.");
             }
-    
+
         } catch (NumberFormatException e) {
             System.out.println("Invalid input. Please enter a number.");
         }
-    
+
         System.out.println("\nPress Enter to continue...");
         scanner.nextLine();
     }
+
+    private void viewPendingApplicationsMenu() {
+        System.out.println("\n===== Pending Applications =====");
+
+        List<Application> pendingApplications = controller.getPendingApplications();
+
+        if (pendingApplications.isEmpty()) {
+            System.out.println("No pending applications found.");
+            System.out.println("Press Enter to continue...");
+            scanner.nextLine();
+            return;
+        }
+
+        System.out.println("Pending Applications:");
+        System.out.println("ID | Applicant | Project | Flat Type | Date Submitted");
+        System.out.println("------------------------------------------------------");
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        for (int i = 0; i < pendingApplications.size(); i++) {
+            Application app = pendingApplications.get(i);
+            System.out.printf("%2d | %-15s | %-15s | %-10s | %s\n",
+                    i + 1,
+                    app.getApplicant().getName(),
+                    app.getProject().getProjectName(),
+                    app.getFlatType().getName(),
+                    dateFormat.format(app.getApplicationDate()));
+        }
+
+        System.out.println("\nOptions:");
+        System.out.println("1. View Application Details");
+        System.out.println("2. Approve Application");
+        System.out.println("3. Reject Application");
+        System.out.println("0. Back to Main Menu");
+        System.out.print("Enter your choice: ");
+
+        try {
+            int choice = Integer.parseInt(scanner.nextLine().trim());
+
+            switch (choice) {
+                case 1:
+                    viewApplicationDetailsMenu(pendingApplications);
+                    break;
+                case 2:
+                    approveApplicationMenu(pendingApplications);
+                    break;
+                case 3:
+                    rejectApplicationMenu(pendingApplications);
+                    break;
+                case 0:
+                    return;
+                default:
+                    System.out.println("Invalid option. Returning to main menu.");
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input. Returning to main menu.");
+        }
+
+        System.out.println("Press Enter to continue...");
+        scanner.nextLine();
+    }
+    
+    private void viewApplicationDetailsMenu(List<Application> pendingApplications) {
+        System.out.print("\nEnter application number to view details: ");
+        try {
+            int appIndex = Integer.parseInt(scanner.nextLine().trim()) - 1;
+    
+            if (appIndex >= 0 && appIndex < pendingApplications.size()) {
+                Application selectedApp = pendingApplications.get(appIndex);
+                displayApplicationDetails(selectedApp);
+            } else {
+                System.out.println("Invalid application number.");
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input. Please enter a number.");
+        }
+    }
+    
+    private void displayApplicationDetails(Application application) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        System.out.println("\n===== Application Details =====");
+        System.out.println("Applicant: " + application.getApplicant().getName());
+        System.out.println("Project: " + application.getProject().getProjectName());
+        System.out.println("Flat Type: " + application.getFlatType().getName());
+        System.out.println("Date Submitted: " + dateFormat.format(application.getApplicationDate()));
+        System.out.println("Status: " + application.getStatus());
+        System.out.println("Application ID: " + application.getApplicationID());
+    }
+    
+    private void approveApplicationMenu(List<Application> pendingApplications) {
+        System.out.print("\nEnter application number to approve: ");
+        ApplicationController applicationController = new ApplicationController();
+        try {
+            int appIndex = Integer.parseInt(scanner.nextLine().trim()) - 1;
+    
+            if (appIndex >= 0 && appIndex < pendingApplications.size()) {
+                Application selectedApp = pendingApplications.get(appIndex);
+                boolean success = applicationController.updateApplicationStatus(selectedApp, ApplicationStatus.SUCCESSFUL);
+                if (success) {
+                    System.out.println("Application approved successfully.");
+                } else {
+                    System.out.println("Failed to approve application. Please try again later.");
+                }
+            } else {
+                System.out.println("Invalid application number.");
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input. Please enter a number.");
+        }
+    }
+    
+    private void rejectApplicationMenu(List<Application> pendingApplications) {
+        System.out.print("\nEnter application number to reject: ");
+        ApplicationController applicationController = new ApplicationController();
+        try {
+            int appIndex = Integer.parseInt(scanner.nextLine().trim()) - 1;
+    
+            if (appIndex >= 0 && appIndex < pendingApplications.size()) {
+                Application selectedApp = pendingApplications.get(appIndex);
+                boolean success = applicationController.updateApplicationStatus(selectedApp, ApplicationStatus.UNSUCCESSFUL);
+                if (success) {
+                    System.out.println("Application rejected successfully.");
+                } else {
+                    System.out.println("Failed to reject application. Please try again later.");
+                }
+            } else {
+                System.out.println("Invalid application number.");
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input. Please enter a number.");
+        }
+    }
     
 
+    
     public void closeScanner() {
         scanner.close();
     }
