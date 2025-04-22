@@ -6,11 +6,13 @@ public class ApplicantController {
     private Applicant applicant;
     private List<Project> allProjects;
     private ProjectFileReader projectReader;
+    private EnquiryController enquiryController;
 
     public ApplicantController(Applicant applicant) {
         this.applicant = applicant;
         this.projectReader = new ProjectFileReader();
         this.allProjects = new ArrayList<>(projectReader.readFromFile().values());
+        this.enquiryController = new EnquiryController();
     }
 
     public Applicant getApplicant() {
@@ -89,9 +91,7 @@ public class ApplicantController {
     }
 
     public void submitEnquiry(Project project, String content) {
-        Enquiry enquiry = new Enquiry(applicant, project, content);
-        applicant.addEnquiry(enquiry);
-        project.addEnquiry(enquiry);
+        enquiryController.submitEnquiry(applicant, project, content);
     }
 
     public List<Enquiry> getApplicantEnquiries() {

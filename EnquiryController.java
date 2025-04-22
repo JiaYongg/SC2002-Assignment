@@ -12,50 +12,57 @@ public class EnquiryController {
     private List<Enquiry> allEnquiries;
 
     public EnquiryController() {
-        // Initialize readers and lists
+        // Initialize readers
         this.projectReader = new ProjectFileReader();
         this.applicantReader = new ApplicantFileReader();
         this.enquiryWriter = new EnquiryFileWriter();
-        this.allEnquiries = new ArrayList<>();
-        this.allProjects = new ArrayList<>();
-        this.allApplicants = new ArrayList<>();
 
-        // Load projects
+        // Load projects first
         this.allProjects = new ArrayList<>(projectReader.readFromFile().values());
 
-        // Load applicants (cast from Map<String, User> to List<Applicant>)
+        // Load applicants second
+        this.allApplicants = new ArrayList<>();
         for (User user : applicantReader.readFromFile().values()) {
             if (user instanceof Applicant) {
                 allApplicants.add((Applicant) user);
             }
         }
-        
-        // Load enquiries after projects and applicants are loaded
+
+        // Initialize enquiries list
+        this.allEnquiries = new ArrayList<>();
+
+        // Load enquiries last (after applicants and projects are loaded)
         loadEnquiries();
     }
 
     private void loadEnquiries() {
-        // Create maps of applicants and projects for the reader
-        Map<String, Applicant> applicantMap = new HashMap<>();
-        for (Applicant applicant : allApplicants) {
-            applicantMap.put(applicant.getName(), applicant);
-        }
-        
-        Map<String, Project> projectMap = new HashMap<>();
-        for (Project project : allProjects) {
-            projectMap.put(project.getProjectName(), project);
-        }
-        
-        // Read enquiries from file
-        EnquiryFileReader reader = new EnquiryFileReader(applicantMap, projectMap);
-        Map<String, Enquiry> enquiryMap = reader.readFromFile();
-        
-        // Add all enquiries to the allEnquiries list
-        if (enquiryMap != null && !enquiryMap.isEmpty()) {
+        try {
+            // Create maps of applicants and projects for the reader
+            Map<String, Applicant> applicantMap = new HashMap<>();
+            for (Applicant applicant : allApplicants) {
+                applicantMap.put(applicant.getNric(), applicant);
+            }
+            
+            Map<String, Project> projectMap = new HashMap<>();
+            for (Project project : allProjects) {
+                projectMap.put(project.getProjectName(), project);
+            }
+            
+            // Read enquiries from file
+            EnquiryFileReader reader = new EnquiryFileReader(applicantMap, projectMap);
+            Map<String, Enquiry> enquiryMap = reader.readFromFile();
+            
+            // Add all enquiries to the list
             allEnquiries.addAll(enquiryMap.values());
+            
+            System.out.println("Successfully loaded " + enquiryMap.size() + " enquiries.");
+        } catch (Exception e) {
+            System.out.println("Error loading enquiries: " + e.getMessage());
+            e.printStackTrace();
         }
     }
     
+
     private void saveEnquiries() {
         // Create a map of all enquiries
         Map<String, Enquiry> enquiryMap = new HashMap<>();
@@ -69,19 +76,13 @@ public class EnquiryController {
 
     public void submitEnquiry(Applicant applicant, Project project, String content) {
         Enquiry enq = new Enquiry(applicant, project, content);
-        
-        // Initialize lists if they are null
-        if (applicant.getEnquiries() == null) {
-            applicant.setEnquiries(new ArrayList<>());
-        }
-        
         applicant.getEnquiries().add(enq);
         project.addEnquiry(enq);
         allEnquiries.add(enq);
-
+        
         System.out.println("Enquiry submitted with ID: " + enq.getEnquiryID());
-
-        // Save the updated enquiries
+        
+        // Save the updated enquiries immediately
         saveEnquiries();
     }
 
@@ -98,7 +99,7 @@ public class EnquiryController {
             System.out.println("Applicant has no enquiries.");
             return;
         }
-        
+
         for (Enquiry enq : applicant.getEnquiries()) {
             if (enq.getEnquiryID() == enquiryId) {
                 enq.updateContent(newContent);
@@ -115,7 +116,7 @@ public class EnquiryController {
             System.out.println("Applicant has no enquiries.");
             return;
         }
-        
+
         Enquiry target = null;
 
         for (Enquiry enq : applicant.getEnquiries()) {
@@ -127,14 +128,14 @@ public class EnquiryController {
 
         if (target != null) {
             applicant.getEnquiries().remove(target);
-            
+
             if (project.getEnquiries() != null) {
                 project.getEnquiries().remove(target);
             }
-            
+
             // Also remove from allEnquiries list
             allEnquiries.remove(target);
-            
+
             System.out.println("Enquiry ID " + enquiryId + " deleted.");
             saveEnquiries();
         } else {
@@ -147,7 +148,7 @@ public class EnquiryController {
             System.out.println("Project has no enquiries.");
             return;
         }
-        
+
         for (Enquiry enq : project.getEnquiries()) {
             if (enq.getEnquiryID() == enquiryId) {
                 enq.setResponse(reply);
@@ -162,7 +163,7 @@ public class EnquiryController {
     public void viewEnquiryByManager(HDBManager manager) {
         System.out.println("===== Enquiries for Manager: " + manager.getName() + " =====");
         boolean hasEnquiries = false;
-        
+
         for (Project project : manager.getManagedProjects()) {
             if (project.getEnquiries() == null || project.getEnquiries().isEmpty())
                 continue;
@@ -177,7 +178,7 @@ public class EnquiryController {
                 System.out.println("------------------------");
             }
         }
-        
+
         if (!hasEnquiries) {
             System.out.println("No enquiries found for this manager.");
         }
