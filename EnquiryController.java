@@ -11,14 +11,14 @@ public class EnquiryController {
     private EnquiryFileWriter enquiryWriter;
     private List<Enquiry> allEnquiries;
 
-    public EnquiryController() {
+    public EnquiryController(List<Project> projects) {
         // Initialize readers
         this.projectReader = new ProjectFileReader();
         this.applicantReader = new ApplicantFileReader();
         this.enquiryWriter = new EnquiryFileWriter();
 
         // Load projects first
-        this.allProjects = new ArrayList<>(projectReader.readFromFile().values());
+        this.allProjects = projects;
 
         // Load applicants second
         this.allApplicants = new ArrayList<>();

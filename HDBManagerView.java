@@ -8,13 +8,11 @@ import java.util.Scanner;
 public class HDBManagerView {
     private HDBManagerController controller;
     private ProjectController projectController;
-    private EnquiryController enquiryController;
     private Scanner scanner;
 
     public HDBManagerView(HDBManagerController controller) {
         this.controller = controller;
         this.projectController = new ProjectController();
-        this.enquiryController = new EnquiryController();
         this.scanner = new Scanner(System.in);
     }
 

@@ -12,7 +12,7 @@ public class ApplicantController {
         this.applicant = applicant;
         this.projectReader = new ProjectFileReader();
         this.allProjects = new ArrayList<>(projectReader.readFromFile().values());
-        this.enquiryController = new EnquiryController();
+        this.enquiryController = new EnquiryController(allProjects);
     }
 
     public Applicant getApplicant() {

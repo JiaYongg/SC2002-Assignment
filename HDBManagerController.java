@@ -19,7 +19,7 @@ public class HDBManagerController {
         this.projectReader = new ProjectFileReader();
         this.projectWriter = new ProjectFileWriter();
         this.projectController = new ProjectController();
-        this.enquiryController = new EnquiryController();
+        
         loadProjects();
 
         // Check visibility for all projects after loading
@@ -29,6 +29,8 @@ public class HDBManagerController {
                 saveProjects();
             }
         }
+
+        this.enquiryController = new EnquiryController(allProjects);
     }
 
     /**
@@ -193,12 +195,12 @@ public class HDBManagerController {
 
         Date currentDate = new Date();
         boolean shouldBeVisible = true;
-        String reason = "";
+
 
         // Check if application period has ended
         if (currentDate.after(project.getApplicationCloseDate())) {
             shouldBeVisible = false;
-            reason = "application period has ended";
+
         }
 
         // Check if all flats are allocated
@@ -212,14 +214,12 @@ public class HDBManagerController {
 
         if (!hasAvailableFlats) {
             shouldBeVisible = false;
-            reason = "no available flats remaining";
         }
 
         // Update visibility if needed
         if (!shouldBeVisible) {
             project.setVisibility(false);
-            System.out.println(
-                    "Project '" + project.getProjectName() + "' has been automatically hidden because " + reason + ".");
+
             saveProjects();
         }
     }
