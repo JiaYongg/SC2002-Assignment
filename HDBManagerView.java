@@ -748,10 +748,6 @@ public class HDBManagerView {
         // Implementation for handling officer registrations
     }
 
-    private void handleApplicationsMenu() {
-        // Implementation for handling applications
-    }
-
     private void manageWithdrawalRequestsMenu() {
         System.out.println("\n===== Manage Withdrawal Requests =====");
         

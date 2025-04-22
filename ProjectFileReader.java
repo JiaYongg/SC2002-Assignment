@@ -68,7 +68,7 @@ public class ProjectFileReader extends FileReader<Project> {
                 neighborhood,
                 openDate,
                 closeDate,
-                true, // Default visibility to true for loaded projects
+                false, // Default visibility to true for loaded projects
                 flatTypes,
                 manager,
                 officerSlots

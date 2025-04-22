@@ -75,4 +75,5 @@ public class Application {
     public void setDateBooked(Date dateBooked) {
         this.dateBooked = dateBooked;
     }
+    
 }
