@@ -184,12 +184,12 @@ public class ApplicantController {
     }
 
     public void editEnquiry(Enquiry enquiry, String newContent) {
-        enquiry.updateContent(newContent);
+        enquiryController.editEnquiry(applicant, enquiry.getEnquiryID(), newContent);
+
     }
 
     public void deleteEnquiry(Enquiry enquiry) {
-        applicant.getEnquiries().remove(enquiry);
-        enquiry.getProject().getEnquiries().remove(enquiry);
+        enquiryController.deleteEnquiry(applicant, enquiry.getProject(), enquiry.getEnquiryID());
     }
 
     public void viewApplicationStatus(Applicant applicant) {
