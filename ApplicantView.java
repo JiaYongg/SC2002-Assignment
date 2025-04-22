@@ -211,7 +211,6 @@ public class ApplicantView {
 
         // Submit application
         controller.submitApplication(controller.getApplicant(), selectedProject, selectedFlatType);
-        System.out.println("Application submitted successfully!");
     }
 
     private void submitEnquiry() {

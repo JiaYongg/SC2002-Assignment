@@ -44,7 +44,7 @@ public class WithdrawalFileReader extends FileReader<WithdrawalRequest> {
                 
                 if (flatType != null) {
                     // Create a new application
-                    Application application = new Application(applicant, project, flatType);
+                    Application application = new Application(0, applicant, project, flatType);
                     
                     // Create the withdrawal request
                     WithdrawalRequest withdrawal = new WithdrawalRequest(

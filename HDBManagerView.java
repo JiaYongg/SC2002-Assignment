@@ -848,7 +848,7 @@ public class HDBManagerView {
                     app.getApplicant().getName(),
                     app.getProject().getProjectName(),
                     app.getFlatType().getName(),
-                    dateFormat.format(app.getApplicationDate()));
+                    dateFormat.format(app.getDateApplied()));
         }
 
         System.out.println("\nOptions:");
@@ -906,7 +906,7 @@ public class HDBManagerView {
         System.out.println("Applicant: " + application.getApplicant().getName());
         System.out.println("Project: " + application.getProject().getProjectName());
         System.out.println("Flat Type: " + application.getFlatType().getName());
-        System.out.println("Date Submitted: " + dateFormat.format(application.getApplicationDate()));
+        System.out.println("Date Submitted: " + dateFormat.format(application.getDateApplied()));
         System.out.println("Status: " + application.getStatus());
         System.out.println("Application ID: " + application.getApplicationID());
     }
