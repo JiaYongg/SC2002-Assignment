@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
+
 public class HDBManagerView {
     private HDBManagerController controller;
     private ProjectController projectController;
@@ -164,9 +165,6 @@ public class HDBManagerView {
 
         List<Project> projects = controller.viewAllProjects();
 
-        for (Project project : projects) {
-            projectController.updateProjectVisibility(project);
-        }
 
         if (projects.isEmpty()) {
             System.out.println("No projects found in the system.");
@@ -274,10 +272,6 @@ public class HDBManagerView {
 
         List<Project> projects = controller.viewOwnProjects();
 
-        // Check visibility for all projects before displaying
-        for (Project project : projects) {
-            projectController.updateProjectVisibility(project);
-        }
 
         if (projects.isEmpty()) {
             System.out.println("You don't have any projects to manage.");
@@ -625,11 +619,6 @@ public class HDBManagerView {
 
         // Get projects managed by the current manager
         List<Project> ownProjects = controller.viewOwnProjects();
-
-        // Check visibility for all projects before displaying
-        for (Project project : ownProjects) {
-            projectController.updateProjectVisibility(project);
-        }
 
         if (ownProjects.isEmpty()) {
             System.out.println("You don't have any projects to manage.");

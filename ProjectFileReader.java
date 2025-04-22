@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+
 public class ProjectFileReader extends FileReader<Project> {
 
     public ProjectFileReader() {
@@ -21,7 +22,7 @@ public class ProjectFileReader extends FileReader<Project> {
         String[] data = line.split(",");
         
         // Skip if line doesn't have enough fields
-        if (data.length < 12) {
+        if (data.length < 13) {
             System.out.println("Warning: Skipping malformed line in CSV: " + line);
             return;
         }
@@ -61,14 +62,16 @@ public class ProjectFileReader extends FileReader<Project> {
             
             // Parse officer slots
             int officerSlots = Integer.parseInt(data[11].trim());
-            
+
+            boolean isVisible = Boolean.parseBoolean(data[data.length - 1].trim());
+
             // Create project
             Project project = new Project(
                 projectName,
                 neighborhood,
                 openDate,
                 closeDate,
-                false, // Default visibility to true for loaded projects
+                isVisible, // Default visibility to true for loaded projects
                 flatTypes,
                 manager,
                 officerSlots

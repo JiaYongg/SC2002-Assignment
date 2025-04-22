@@ -2,10 +2,6 @@ import java.util.Map;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-/**
- * A class for writing Project objects to a CSV file.
- * Extends the abstract FileWriter class.
- */
 public class ProjectFileWriter extends FileWriter <Project> {
 
     /**
@@ -34,7 +30,7 @@ public class ProjectFileWriter extends FileWriter <Project> {
     protected String getHeader() {
         return "Project Name,Neighborhood,Type 1,Number of units for Type 1,Selling price for Type 1," +
                "Type 2,Number of units for Type 2,Selling price for Type 2," +
-               "Application opening date,Application closing date,Manager,Officer Slot,Officer";
+               "Application opening date,Application closing date,Manager,Officer Slot,Officer,Visibility";
     }
 
     /**
@@ -96,6 +92,7 @@ public class ProjectFileWriter extends FileWriter <Project> {
             sb.append(officerList);
         }
 
+        sb.append(",").append(project.isVisible());
         
         return sb.toString();
     }

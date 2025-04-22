@@ -7,60 +7,48 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+
 public class HDBManagerController {
     private HDBManager currentManager;
+    private Map<String, Project> projectMap;
     private List<Project> allProjects;
     private ProjectFileReader projectReader;
     private ProjectFileWriter projectWriter;
     private ProjectController projectController;
-    private EnquiryController enquiryController;
-    private ApplicationController applicationController;
-    
+    private EnquiryController enquiryController;    
 
     public HDBManagerController(HDBManager manager) {
         this.currentManager = manager;
         this.projectReader = new ProjectFileReader();
         this.projectWriter = new ProjectFileWriter();
         this.projectController = new ProjectController();
-        this.applicationController = new ApplicationController();
-        loadProjects();
-
-        // Check visibility for all projects after loading
-        for (Project project : allProjects) {
-            if (projectController.updateProjectVisibility(project)) {
-                // If visibility was changed, save the changes
-                saveProjects();
-            }
-        }
-
         this.enquiryController = new EnquiryController(allProjects);
+
+
+        loadProjects();
     }
 
     /**
      * Loads projects from the CSV file using ProjectFileReader
      */
     private void loadProjects() {
-        Map<String, Project> projectMap = projectReader.readFromFile();
+        this.projectMap = projectReader.readFromFile();
+        
+        // Now populate allProjects list from the map if needed
         this.allProjects = new ArrayList<>(projectMap.values());
         
         // Associate projects with current manager
         for (Project project : allProjects) {
             if (project.getManagerInCharge() != null &&
                     project.getManagerInCharge().getName().equals(currentManager.getName())) {
-                // Check if project is already in manager's list
-                boolean alreadyManaged = false;
-                for (Project managedProject : currentManager.getManagedProjects()) {
-                    if (managedProject.getProjectName().equals(project.getProjectName())) {
-                        alreadyManaged = true;
-                        break;
-                    }
-                }
-                
-                if (!alreadyManaged) {
-                    currentManager.addManagedProject(project);
-                }
+                currentManager.addManagedProject(project);
             }
         }
+        
+        // Debug output
+        System.out.println("Loaded " + projectMap.size() + " total projects");
+        System.out.println("Current manager: " + currentManager.getName());
+        System.out.println("Manager's projects: " + currentManager.getManagedProjects().size());
     }
     
 
@@ -159,11 +147,6 @@ public class HDBManagerController {
             // Save changes
             saveProjects();
 
-            // Check if visibility should be automatically updated
-            if (projectController.updateProjectVisibility(project)) {
-                saveProjects(); // Save again if visibility was changed
-            }
-
             return true;
 
         } catch (ParseException e) {
@@ -198,70 +181,18 @@ public class HDBManagerController {
         return true;
     }
 
-    public void updateProjectVisibility(Project project) {
-        // Skip if project is already hidden
-        if (!project.isVisible()) {
-            return;
-        }
-
-        Date currentDate = new Date();
-        boolean shouldBeVisible = true;
-
-        // Check if application period has ended
-        if (currentDate.after(project.getApplicationCloseDate())) {
-            shouldBeVisible = false;
-
-        }
-
-        // Check if all flats are allocated
-        boolean hasAvailableFlats = false;
-        for (FlatType flatType : project.getFlatTypes()) {
-            if (flatType.getUnitCount() > 0) {
-                hasAvailableFlats = true;
-                break;
-            }
-        }
-
-        if (!hasAvailableFlats) {
-            shouldBeVisible = false;
-        }
-
-        // Update visibility if needed
-        if (!shouldBeVisible) {
-            project.setVisibility(false);
-
-            saveProjects();
-        }
-    }
 
     public boolean toggleVisibility(Project project) {
-        // Check if project exists and is managed by current manager
         if (!isProjectManagedByCurrentManager(project)) {
             System.out.println("Error: You can only toggle visibility for projects you manage.");
             return false;
         }
-
-        // Get current visibility
-        boolean currentVisibility = project.isVisible();
-
-        // If trying to turn visibility ON, check conditions
-        if (!currentVisibility) {
-            ProjectController.VisibilityCheckResult result = projectController.canMakeVisible(project);
-            if (!result.canMakeVisible()) {
-                System.out.println("Error: " + result.getReason());
-                return false;
-            }
-        }
-
-        // Toggle visibility
-        boolean newVisibility = !currentVisibility;
-        project.setVisibility(newVisibility);
-
-        // Save changes
+        
+        project.setVisibility(!project.isVisible());
         saveProjects();
-
         return true;
     }
+    
 
     // public boolean approveOfficerRegistration(OfficerRegistration registration) {
     // Project project = registration.getProject();
