@@ -1,6 +1,6 @@
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Date;
+import java.util.List;
 
 public class ApplicantController {
     private Applicant applicant;
@@ -13,6 +13,7 @@ public class ApplicantController {
         this.projectReader = new ProjectFileReader();
         this.allProjects = new ArrayList<>(projectReader.readFromFile().values());
         this.enquiryController = new EnquiryController(allProjects);
+        this.enquiryController.linkEnquiriesTo(applicant);
     }
 
     public Applicant getApplicant() {

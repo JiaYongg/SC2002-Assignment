@@ -1,7 +1,7 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 
 public class EnquiryController {
     private List<Applicant> allApplicants;
@@ -53,7 +53,19 @@ public class EnquiryController {
             Map<String, Enquiry> enquiryMap = reader.readFromFile();
             
             // Add all enquiries to the list
-            allEnquiries.addAll(enquiryMap.values());
+            for (Enquiry enquiry : enquiryMap.values()) {
+                allEnquiries.add(enquiry);
+    
+                Applicant applicant = enquiry.getApplicant();
+                Project project = enquiry.getProject();
+    
+                if (!applicant.getEnquiries().contains(enquiry)) {
+                    applicant.getEnquiries().add(enquiry);
+                }
+                if (!project.getEnquiries().contains(enquiry)) {
+                    project.addEnquiry(enquiry);
+                }
+            }
             
             System.out.println("Successfully loaded " + enquiryMap.size() + " enquiries.");
         } catch (Exception e) {
@@ -211,4 +223,18 @@ public class EnquiryController {
             System.out.println("No enquiries found in the system.");
         }
     }
+
+    public void linkEnquiriesTo(Applicant activeApplicant) {
+        for (Applicant loadedApplicant : allApplicants) {
+            if (loadedApplicant.getNric().equals(activeApplicant.getNric())) {
+                List<Enquiry> loaded = loadedApplicant.getEnquiries();
+                List<Enquiry> actual = activeApplicant.getEnquiries();
+    
+                actual.clear();            // Clear existing list
+                actual.addAll(loaded);     // Copy over loaded enquiries
+                break;
+            }
+        }
+    }
+    
 }
