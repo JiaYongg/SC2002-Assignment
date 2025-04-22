@@ -109,7 +109,7 @@ public class HDBOfficerController {
             System.out.println("You have already registered for this project.");
             return;
         }
-        OfficerRegistration registration = new OfficerRegistration(officer, project)
+        OfficerRegistration registration = new OfficerRegistration(officer, project);
         officer.setAssignedProject(project);
         officer.getRegistrations().add(registration);
         project.addOfficerRegistration(registration);  
