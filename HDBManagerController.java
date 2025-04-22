@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-
 public class HDBManagerController {
     private HDBManager currentManager;
     private Map<String, Project> projectMap;
@@ -15,17 +14,16 @@ public class HDBManagerController {
     private ProjectFileReader projectReader;
     private ProjectFileWriter projectWriter;
     private ProjectController projectController;
-    private EnquiryController enquiryController;    
+    private EnquiryController enquiryController;
 
     public HDBManagerController(HDBManager manager) {
         this.currentManager = manager;
         this.projectReader = new ProjectFileReader();
         this.projectWriter = new ProjectFileWriter();
         this.projectController = new ProjectController();
-        this.enquiryController = new EnquiryController(allProjects);
-
 
         loadProjects();
+        this.enquiryController = new EnquiryController(allProjects);
     }
 
     /**
@@ -33,10 +31,10 @@ public class HDBManagerController {
      */
     private void loadProjects() {
         this.projectMap = projectReader.readFromFile();
-        
+
         // Now populate allProjects list from the map if needed
         this.allProjects = new ArrayList<>(projectMap.values());
-        
+
         // Associate projects with current manager
         for (Project project : allProjects) {
             if (project.getManagerInCharge() != null &&
@@ -44,15 +42,12 @@ public class HDBManagerController {
                 currentManager.addManagedProject(project);
             }
         }
-        
+
         // Debug output
         System.out.println("Loaded " + projectMap.size() + " total projects");
         System.out.println("Current manager: " + currentManager.getName());
         System.out.println("Manager's projects: " + currentManager.getManagedProjects().size());
     }
-    
-
-
 
     /**
      * Saves projects to the CSV file using ProjectFileWriter
@@ -181,18 +176,16 @@ public class HDBManagerController {
         return true;
     }
 
-
     public boolean toggleVisibility(Project project) {
         if (!isProjectManagedByCurrentManager(project)) {
             System.out.println("Error: You can only toggle visibility for projects you manage.");
             return false;
         }
-        
+
         project.setVisibility(!project.isVisible());
         saveProjects();
         return true;
     }
-    
 
     // public boolean approveOfficerRegistration(OfficerRegistration registration) {
     // Project project = registration.getProject();
@@ -300,7 +293,6 @@ public class HDBManagerController {
         return true; // All projects are inactive, can create a new one
     }
 
-
     public List<WithdrawalRequest> getPendingWithdrawalRequests() {
         WithdrawalRequestController withdrawalController = new WithdrawalRequestController();
 
@@ -332,9 +324,43 @@ public class HDBManagerController {
         return withdrawalController.rejectRequest(request);
     }
 
-
     public List<Application> getPendingApplications() {
         ApplicationController appController = new ApplicationController();
         return appController.getPendingApplications();
     }
+
+    public void viewAllEnquiries() {
+        enquiryController.viewAllEnquiries();
+    }
+
+    public List<Enquiry> getManagerEnquiries() {
+        List<Enquiry> managerEnquiries = new ArrayList<>();
+
+        for (Project project : currentManager.getManagedProjects()) {
+            if (project.getEnquiries() != null) {
+                managerEnquiries.addAll(project.getEnquiries());
+            }
+        }
+
+        return managerEnquiries;
+    }
+
+    public boolean replyToEnquiry(int enquiryId, String reply) {
+        // Find the project that contains this enquiry
+        for (Project project : currentManager.getManagedProjects()) {
+            if (project.getEnquiries() == null)
+                continue;
+
+            for (Enquiry enquiry : project.getEnquiries()) {
+                if (enquiry.getEnquiryID() == enquiryId) {
+                    enquiryController.replyToEnquiry(project, enquiryId, reply);
+                    return true;
+                }
+            }
+        }
+
+        System.out.println("Error: Enquiry not found or you are not authorized to reply.");
+        return false;
+    }
+
 }
