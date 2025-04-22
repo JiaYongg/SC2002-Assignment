@@ -1,8 +1,6 @@
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 
 public class ApplicantController {
@@ -192,5 +190,29 @@ public class ApplicantController {
     public void deleteEnquiry(Enquiry enquiry) {
         applicant.getEnquiries().remove(enquiry);
         enquiry.getProject().getEnquiries().remove(enquiry);
+    }
+
+    public void viewApplicationStatus(Applicant applicant) {
+        Application app = applicant.getApplication();
+        if (app != null) {
+            // Find the project in allProjects (bypassing visibility checks)
+            Project appliedProject = null;
+            for (Project p : allProjects) {
+                if (p.getProjectName().equals(app.getProject().getProjectName())) {
+                    appliedProject = p;
+                    break;
+                }
+            }
+            
+            if (appliedProject != null) {
+                System.out.println("Application Status: " + app.getStatus());
+                System.out.println("Project: " + appliedProject.getProjectName());
+                System.out.println("Flat Type: " + app.getFlatType().getName());
+            } else {
+                System.out.println("Project data not available");
+            }
+        } else {
+            System.out.println("No application made yet.");
+        }
     }
 }
