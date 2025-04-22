@@ -115,8 +115,9 @@ public class EnquiryController {
         for (Enquiry enq : applicant.getEnquiries()) {
             if (enq.getEnquiryID() == enquiryId) {
                 enq.updateContent(newContent);
-                System.out.println("Enquiry ID " + enquiryId + " updated.");
+                updateAllEnquiryReferences(enq);
                 saveEnquiries();
+                System.out.println("Enquiry ID " + enquiryId + " updated.");
                 return;
             }
         }
@@ -131,7 +132,7 @@ public class EnquiryController {
 
         Enquiry target = null;
 
-        for (Enquiry enq : applicant.getEnquiries()) {
+        for (Enquiry enq : allEnquiries) {
             if (enq.getEnquiryID() == enquiryId) {
                 target = enq;
                 break;
@@ -140,17 +141,17 @@ public class EnquiryController {
 
         if (target != null) {
             applicant.getEnquiries().remove(target);
-
-            if (project.getEnquiries() != null) {
-                project.getEnquiries().remove(target);
-            }
-
-            // Also remove from allEnquiries list
+            project.getEnquiries().remove(target);
             allEnquiries.remove(target);
+            
+
+            // Save once after all removals
+            saveEnquiries();;
 
             System.out.println("Enquiry ID " + enquiryId + " deleted.");
             saveEnquiries();
-        } else {
+        } 
+        else {
             System.out.println("Enquiry not found.");
         }
     }
@@ -237,4 +238,23 @@ public class EnquiryController {
         }
     }
     
+    private void updateAllEnquiryReferences(Enquiry updatedEnquiry) {
+        // Update in applicant's list
+        updatedEnquiry.getApplicant().getEnquiries().stream()
+            .filter(e -> e.getEnquiryID() == updatedEnquiry.getEnquiryID())
+            .findFirst()
+            .ifPresent(e -> {
+                e.updateContent(updatedEnquiry.getContent());
+                e.setResponse(updatedEnquiry.getResponse());
+            });
+    
+        // Update in project's list
+        updatedEnquiry.getProject().getEnquiries().stream()
+            .filter(e -> e.getEnquiryID() == updatedEnquiry.getEnquiryID())
+            .findFirst()
+            .ifPresent(e -> {
+                e.updateContent(updatedEnquiry.getContent());
+                e.setResponse(updatedEnquiry.getResponse());
+            });
+    }
 }

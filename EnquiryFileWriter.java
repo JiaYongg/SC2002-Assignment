@@ -17,6 +17,9 @@ public class EnquiryFileWriter extends FileWriter<Enquiry> {
 
     @Override
     protected String formatLine(Enquiry enquiry) {
+        String safeContent = enquiry.getContent().replace(",", "\\,");
+        String safeResponse = enquiry.getResponse().replace(",", "\\,");
+
         return String.format("%d,%s,%s,%s,%s",
                 enquiry.getEnquiryID(),
                 enquiry.getApplicant().getNric(),

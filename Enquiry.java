@@ -52,4 +52,13 @@ public class Enquiry {
     public void updateContent(String newContent) {
         this.content = newContent;
     }
+
+    public String toCsvString() {
+        return String.format("%d,%s,%s,%s,%s",
+            this.enquiryID,
+            this.applicant.getNric(),
+            this.project.getProjectName(),
+            this.content.replace(",", "\\,"),
+            this.response.replace(",", "\\,"));
+    }
 }
