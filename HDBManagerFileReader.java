@@ -1,8 +1,8 @@
 import java.util.Map;
 
-public class ManagerFileReader extends FileReader<User> {
+public class HDBManagerFileReader extends FileReader<User> {
     
-    public ManagerFileReader() {
+    public HDBManagerFileReader() {
         super("ManagerList.csv");
     }
     

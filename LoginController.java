@@ -20,7 +20,7 @@ public class LoginController implements iAuthService {
 
     private void loadUsers() {
         // Read managers
-        ManagerFileReader managerReader = new ManagerFileReader();
+        HDBManagerFileReader managerReader = new HDBManagerFileReader();
         Map<String, User> managers = managerReader.readFromFile();
         managers.values().forEach(this::addUser);
 
