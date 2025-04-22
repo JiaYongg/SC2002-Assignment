@@ -120,7 +120,7 @@ public class ApplicationController {
         }
         
         // Create new application
-        Application app = new Application(applicant, project, flatType);
+        Application app = new Application(0,applicant, project, flatType);
         app.setStatus(ApplicationStatus.PENDING);
         
         // Add to list and associate with applicant
@@ -132,8 +132,6 @@ public class ApplicationController {
         
         // Save to CSV
         saveApplications();
-        
-        System.out.println("Application submitted successfully for " + project.getProjectName());
         return true;
     }
 

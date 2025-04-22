@@ -2,6 +2,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.text.ParseException;
 
 public class ApplicationFileReader extends FileReader<Application> {
     private Map<String, Project> projects;
@@ -23,7 +24,7 @@ public class ApplicationFileReader extends FileReader<Application> {
         try {
             String[] data = line.split(",");
             
-            if (data.length < 4) {
+            if (data.length < 6) { // We need at least 6 fields including dateApplied
                 System.out.println("Invalid application data format: " + line);
                 return;
             }
@@ -33,14 +34,36 @@ public class ApplicationFileReader extends FileReader<Application> {
             String projectName = data[2].trim();
             String flatTypeName = data[3].trim();
             String statusStr = data[4].trim();
-            String dateBookedStr = data.length > 5 ? data[5].trim() : "";
+            String dateAppliedStr = data[5].trim();
+            
+            // Parse dateApplied
+            Date dateApplied = new Date(); // Default to current date (April 23, 2025)
+            if (!dateAppliedStr.isEmpty()) {
+                try {
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                    dateApplied = sdf.parse(dateAppliedStr);
+                } catch (ParseException e) {
+                    System.out.println("Error parsing date applied: " + dateAppliedStr + ". Using current date.");
+                }
+            }
+            
+            // Parse dateBooked if available (field at index 6)
+            Date dateBooked = null;
+            if (data.length > 6 && !data[6].trim().isEmpty()) {
+                try {
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                    dateBooked = sdf.parse(data[6].trim());
+                } catch (ParseException e) {
+                    System.out.println("Error parsing date booked: " + data[6]);
+                }
+            }
 
             // Look up the applicant, project, and flat type
             Applicant applicant = applicants.get(applicantNRIC);
             Project project = projects.get(projectName);
             
             if (project == null || applicant == null) {
-                
+                System.out.println("Could not find project or applicant for application: " + line);
                 return;
             }
             
@@ -61,16 +84,16 @@ public class ApplicationFileReader extends FileReader<Application> {
             // Parse the application status
             ApplicationStatus status = ApplicationStatus.valueOf(statusStr);
             
-            // Create the application with the specified ID
-            Application application = new Application(applicationID, applicant, project, flatType);
-            application.setStatus(status);
-
-            // Set the date booked if available
-            if (!dateBookedStr.isEmpty()) {
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                Date dateBooked = sdf.parse(dateBookedStr);
-                application.setDateBooked(dateBooked);
-            }
+            // Create the application with all details
+            Application application = new Application(
+                applicationID, 
+                applicant, 
+                project, 
+                flatType, 
+                status, 
+                dateApplied, 
+                dateBooked
+            );
 
             // Add to the map of applications
             applications.put(String.valueOf(applicationID), application);
