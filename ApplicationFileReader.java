@@ -40,7 +40,7 @@ public class ApplicationFileReader extends FileReader<Application> {
             Project project = projects.get(projectName);
             
             if (project == null || applicant == null) {
-                System.out.println("Could not find project or applicant for application: " + line);
+                
                 return;
             }
             
