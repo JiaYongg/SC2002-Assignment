@@ -1,6 +1,8 @@
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 public class ApplicantController {
@@ -9,6 +11,7 @@ public class ApplicantController {
     private ProjectFileReader projectReader;
     private EnquiryController enquiryController;
     private ApplicationFileWriter applicationWriter;
+    private ApplicationFileReader applicationReader;
 
     public ApplicantController(Applicant applicant) {
         this.applicant = applicant;
@@ -17,6 +20,18 @@ public class ApplicantController {
         this.enquiryController = new EnquiryController(allProjects);
         this.enquiryController.linkEnquiriesTo(applicant);
         this.applicationWriter = new ApplicationFileWriter();
+
+        Map<String, Project> projectMap = new HashMap<>();
+        for (Project p : allProjects) {
+            projectMap.put(p.getProjectName(), p);
+        }
+
+        Map<String, Applicant> applicantMap = new HashMap<>();
+        applicantMap.put(applicant.getNric(), applicant);
+
+        // Load application and automatically set it into applicant
+        ApplicationFileReader applicationReader = new ApplicationFileReader(projectMap, applicantMap);
+        applicationReader.readFromFile(); // This populates applicant.setApplication internally
     }
 
     public Applicant getApplicant() {
@@ -106,25 +121,24 @@ public class ApplicantController {
         System.out.println("\nAvailable Flat Types:");
 
         for (int i = 0; i < eligibleFlatTypes.size(); i++) {
-            FlatType ft = eligibleFlatTypes.get(i);
-            System.out.printf("%d. %s ($%.2f)\n", (i + 1), ft.getName(), ft.getPrice());
+            System.out.println((i + 1) + ". " + eligibleFlatTypes.get(i).getName() + 
+                              " ($" + eligibleFlatTypes.get(i).getPrice() + ")");
         }
-
-        System.out.print("\nEnter your choice (1-" + eligibleFlatTypes.size() + "): ");
-
+    
+        System.out.print("Select flat type (1-" + eligibleFlatTypes.size() + "): ");
         try {
-            int choice = scanner.nextInt();
+            int choice = Integer.parseInt(scanner.nextLine());
             if (choice >= 1 && choice <= eligibleFlatTypes.size()) {
                 return eligibleFlatTypes.get(choice - 1);
-            } else {
-                System.out.println("Invalid choice. Please select a number between 1 and " + eligibleFlatTypes.size());
-                return selectFlatType(project, applicant); // Recursive call for invalid input
             }
+            System.out.println("Invalid choice. Please select between 1 and " + eligibleFlatTypes.size());
         } catch (Exception e) {
             scanner.nextLine(); // Clear the scanner buffer
             System.out.println("Invalid input. Please enter a number.");
             return selectFlatType(project, applicant); // Recursive call for invalid input
         }
+        System.out.println("Invalid selection.");
+        return null;
     }
 
     public boolean checkEligibility(Applicant applicant, Project project, FlatType flatType) {
@@ -158,9 +172,14 @@ public class ApplicantController {
     public void withdraw(Application app) {
         if (app != null) {
             app.setStatus(ApplicationStatus.PENDING);
-            WithdrawalRequest req = new WithdrawalRequest(app);
-            System.out.println("Withdrawal request submitted. Pending approval.");
-        } else {
+            WithdrawalRequestController contr = new WithdrawalRequestController();
+            boolean created = contr.createWithdrawalRequest(app);
+
+        if (created) {
+                System.out.println("Withdrawal request submitted. Pending approval.");
+        }
+        }   
+        else {
             System.out.println("No application found.");
         }
     }

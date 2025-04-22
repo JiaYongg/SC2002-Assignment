@@ -176,14 +176,12 @@ public class ApplicantView {
         Project selectedProject = eligibleProjects.get(projectNum - 1);
 
         // Display available flat types
-        System.out.println("\nAvailable Flat Types:");
         List<FlatType> availableFlatTypes = new ArrayList<>();
         
         for (FlatType ft : selectedProject.getFlatTypes()) {
             // Pass the selectedProject as the second parameter
             if (ft.getUnitCount() > 0 && controller.checkEligibility(controller.getApplicant(), selectedProject, ft)) {
                 availableFlatTypes.add(ft);
-                System.out.println("- " + ft.getName() + " ($" + ft.getPrice() + ")");
             }
         }
 
@@ -192,25 +190,26 @@ public class ApplicantView {
             return;
         }
 
-        // Get flat type selection
-        System.out.print("Enter flat type name: ");
-        String flatTypeName = scanner.nextLine().trim();
-
-        FlatType selectedFlatType = null;
+        System.out.println("\nAvailable Flat Types:");
+        int index = 1;
         for (FlatType ft : availableFlatTypes) {
-            if (ft.getName().equalsIgnoreCase(flatTypeName)) {
-                selectedFlatType = ft;
-                break;
+            System.out.println(index + ". " + ft.getName() + " ($" + ft.getPrice() + ")");
+            index++;
+        }
+
+        // Get flat type selection
+        System.out.print("Select flat type by number (1-" + availableFlatTypes.size() + "): ");
+        try {
+            int selectedNumber = Integer.parseInt(scanner.nextLine());
+            if (selectedNumber < 1 || selectedNumber > availableFlatTypes.size()) {
+                System.out.println("Invalid selection.");
+                return;
             }
+            FlatType selectedFlatType = availableFlatTypes.get(selectedNumber - 1);
+            controller.submitApplication(controller.getApplicant(), selectedProject, selectedFlatType);
+        } catch (NumberFormatException e) {
+            System.out.println("Please enter a valid number.");
         }
-
-        if (selectedFlatType == null) {
-            System.out.println("Invalid flat type or not eligible.");
-            return;
-        }
-
-        // Submit application
-        controller.submitApplication(controller.getApplicant(), selectedProject, selectedFlatType);
     }
 
     private void submitEnquiry() {
