@@ -1022,11 +1022,12 @@ public class HDBManagerView {
         ApplicationController applicationController = new ApplicationController();
         try {
             int appIndex = Integer.parseInt(scanner.nextLine().trim()) - 1;
-
             if (appIndex >= 0 && appIndex < pendingApplications.size()) {
                 Application selectedApp = pendingApplications.get(appIndex);
                 boolean success = applicationController.updateApplicationStatus(selectedApp,
                         ApplicationStatus.SUCCESSFUL);
+                
+                
                 if (success) {
                     System.out.println("Application approved successfully.");
                 } else {
@@ -1039,6 +1040,8 @@ public class HDBManagerView {
             System.out.println("Invalid input. Please enter a number.");
         }
     }
+    
+    
 
     private void rejectApplicationMenu(List<Application> pendingApplications) {
         System.out.print("\nEnter application number to reject: ");

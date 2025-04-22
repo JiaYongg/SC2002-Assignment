@@ -15,12 +15,14 @@ public class HDBManagerController {
     private ProjectFileWriter projectWriter;
     private ProjectController projectController;
     private EnquiryController enquiryController;
+    private ApplicationController applicationController;
 
     public HDBManagerController(HDBManager manager) {
         this.currentManager = manager;
         this.projectReader = new ProjectFileReader();
         this.projectWriter = new ProjectFileWriter();
         this.projectController = new ProjectController();
+        this.applicationController = new ApplicationController();
 
         loadProjects();
         this.enquiryController = new EnquiryController(allProjects);
@@ -324,9 +326,21 @@ public class HDBManagerController {
         return withdrawalController.rejectRequest(request);
     }
 
+
+    
+
     public List<Application> getPendingApplications() {
         ApplicationController appController = new ApplicationController();
-        return appController.getPendingApplications();
+        List<Application> allPendingApplications = appController.getPendingApplications();
+        List<Application> managerPendingApplications = new ArrayList<>();
+
+        for (Application app : allPendingApplications) {
+            if (isProjectManagedByCurrentManager(app.getProject())) {
+                managerPendingApplications.add(app);
+            }
+        }
+
+        return managerPendingApplications;
     }
 
     public void viewAllEnquiries() {
@@ -362,5 +376,10 @@ public class HDBManagerController {
         System.out.println("Error: Enquiry not found or you are not authorized to reply.");
         return false;
     }
+
+    public HDBManager getCurrentManager() {
+        return this.currentManager;
+    }
+    
 
 }
