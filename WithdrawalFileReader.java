@@ -25,6 +25,10 @@ public class WithdrawalFileReader extends FileReader<WithdrawalRequest> {
             int requestId = Integer.parseInt(data[0].trim());
             String applicantNRIC = data[1].trim();
             String projectName = data[2].trim();
+            Project project = projects.get(projectName);
+            if (project == null) {
+                System.out.println("Project not found for name: '" + projectName + "'");
+            }
             String flatTypeName = data[3].trim();
             
 
@@ -34,7 +38,9 @@ public class WithdrawalFileReader extends FileReader<WithdrawalRequest> {
             
             // Find the applicant and project
             Applicant applicant = applicants.get(applicantNRIC);
-            Project project = projects.get(projectName);
+            if (applicant == null) {
+                System.out.println("Applicant not found for NRIC: " + applicantNRIC);
+            }
             
             if (applicant != null && project != null) {
                 // Find the flat type
@@ -49,6 +55,7 @@ public class WithdrawalFileReader extends FileReader<WithdrawalRequest> {
                 if (flatType != null) {
                     // Create a new application
                     Application application = new Application(0, applicant, project, flatType);
+
                     
                     // Create the withdrawal request
                     WithdrawalRequest withdrawal = new WithdrawalRequest(

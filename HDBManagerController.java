@@ -16,6 +16,7 @@ public class HDBManagerController {
     private ProjectController projectController;
     private EnquiryController enquiryController;
     private ApplicationController applicationController;
+    private WithdrawalRequestController withdrawalController;
 
     public HDBManagerController(HDBManager manager) {
         this.currentManager = manager;
@@ -26,6 +27,8 @@ public class HDBManagerController {
 
         loadProjects();
         this.enquiryController = new EnquiryController(allProjects);
+        this.withdrawalController = new WithdrawalRequestController();
+
     }
 
     /**
@@ -295,39 +298,29 @@ public class HDBManagerController {
         return true; // All projects are inactive, can create a new one
     }
 
-    public List<WithdrawalRequest> getPendingWithdrawalRequests() {
-        WithdrawalRequestController withdrawalController = new WithdrawalRequestController();
-
-        // Get all pending requests and filter for current manager's projects
-        return withdrawalController.getPendingRequests().stream()
-                .filter(req -> isProjectManagedByCurrentManager(req.getApplication().getProject()))
-                .collect(Collectors.toList());
-    }
-
-    public boolean approveWithdrawalRequest(WithdrawalRequest request) {
-        // Check if manager is authorized
-        if (!isProjectManagedByCurrentManager(request.getApplication().getProject())) {
-            System.out.println("Error: You are not authorized to approve this withdrawal request.");
-            return false;
-        }
-
-        WithdrawalRequestController withdrawalController = new WithdrawalRequestController();
-        return withdrawalController.approveRequest(request);
-    }
-
-    public boolean rejectWithdrawalRequest(WithdrawalRequest request) {
-        // Check if manager is authorized
-        if (!isProjectManagedByCurrentManager(request.getApplication().getProject())) {
-            System.out.println("Error: You are not authorized to reject this withdrawal request.");
-            return false;
-        }
-
-        WithdrawalRequestController withdrawalController = new WithdrawalRequestController();
-        return withdrawalController.rejectRequest(request);
-    }
-
-
+    public List<WithdrawalRequest> getPendingWithdrawalsForMyProjects() {
+        List<Project> myProjects = allProjects.stream()
+        .filter(p -> p.getManagerInCharge() != null &&
+                     p.getManagerInCharge().getName().equals(currentManager.getName()))
+        .collect(Collectors.toList());
     
+
+        List<WithdrawalRequest> allPending = withdrawalController.getPendingRequests();
+
+        return allPending.stream()
+                .filter(req -> myProjects.stream().anyMatch(
+                        p -> p.getProjectName().equals(req.getApplication().getProject().getProjectName())))
+                .collect(Collectors.toList());
+
+    }
+
+    public boolean approveWithdrawal(WithdrawalRequest req) {
+        return withdrawalController.approveRequest(req);
+    }
+
+    public boolean rejectWithdrawal(WithdrawalRequest req) {
+        return withdrawalController.rejectRequest(req);
+    }
 
     public List<Application> getPendingApplications() {
         ApplicationController appController = new ApplicationController();
@@ -380,6 +373,5 @@ public class HDBManagerController {
     public HDBManager getCurrentManager() {
         return this.currentManager;
     }
-    
 
 }

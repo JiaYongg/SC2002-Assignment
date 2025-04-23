@@ -734,96 +734,50 @@ public class HDBManagerView {
         // Implementation for handling officer registrations
     }
 
-    private void manageWithdrawalRequestsMenu() {
-        System.out.println("\n===== Manage Withdrawal Requests =====");
-
-        List<WithdrawalRequest> pendingRequests = controller.getPendingWithdrawalRequests();
-
-        if (pendingRequests.isEmpty()) {
-            System.out.println("No pending withdrawal requests.");
-            System.out.println("Press Enter to continue...");
-            scanner.nextLine();
+    public void manageWithdrawalRequestsMenu() {
+        List<WithdrawalRequest> pending = controller.getPendingWithdrawalsForMyProjects();
+    
+        System.out.println("=== Pending Withdrawal Requests ===");
+        if (pending.isEmpty()) {
+            System.out.println("No pending requests.");
             return;
         }
-
-        System.out.println("Pending Withdrawal Requests:");
-        System.out.println("ID | Project | Flat Type | Applicant | Date Requested");
-        System.out.println("--------------------------------------------------");
-
-        for (int i = 0; i < pendingRequests.size(); i++) {
-            WithdrawalRequest req = pendingRequests.get(i);
-            Application app = req.getApplication();
-
-            System.out.printf("%2d | %-15s | %-8s | %-15s | %s\n",
-                    (i + 1),
-                    app.getProject().getProjectName(),
-                    app.getFlatType().getName(),
-                    app.getApplicant().getName(),
-                    new SimpleDateFormat("dd/MM/yyyy").format(req.getDateRequested()));
+    
+        for (int i = 0; i < pending.size(); i++) {
+            WithdrawalRequest req = pending.get(i);
+            System.out.println((i + 1) + ") " + req.getApplication().getApplicant().getName() +
+                    " | Project: " + req.getApplication().getProject().getProjectName() +
+                    " | Flat: " + req.getApplication().getFlatType().getName() +
+                    " | Requested: " + req.getDateRequested());
         }
-
-        System.out.print("\nEnter request number to process (0 to cancel): ");
-        try {
-            int choice = Integer.parseInt(scanner.nextLine().trim());
-
-            if (choice == 0 || choice > pendingRequests.size()) {
-                return;
-            }
-
-            WithdrawalRequest selectedRequest = pendingRequests.get(choice - 1);
-            Application app = selectedRequest.getApplication();
-
-            System.out.println("\n===== Withdrawal Request Details =====");
-            System.out.println("Request ID: " + selectedRequest.getRequestId());
-            System.out.println("Project: " + app.getProject().getProjectName());
-            System.out.println("Flat Type: " + app.getFlatType().getName());
-            System.out
-                    .println("Applicant: " + app.getApplicant().getName() + " (" + app.getApplicant().getNric() + ")");
-            System.out.println(
-                    "Date Requested: " + new SimpleDateFormat("dd/MM/yyyy").format(selectedRequest.getDateRequested()));
-            System.out.println("Status: " + selectedRequest.getStatus());
-
-            System.out.println("\nOptions:");
-            System.out.println("1. Approve Withdrawal");
-            System.out.println("2. Reject Withdrawal");
-            System.out.println("0. Cancel");
-
-            System.out.print("Enter your choice: ");
-            int action = Integer.parseInt(scanner.nextLine().trim());
-
-            switch (action) {
-                case 1:
-                    boolean approved = controller.approveWithdrawalRequest(selectedRequest);
-                    if (approved) {
-                        System.out.println("Withdrawal request approved successfully.");
-                    }
-                    break;
-                case 2:
-                    boolean rejected = controller.rejectWithdrawalRequest(selectedRequest);
-                    if (rejected) {
-                        System.out.println("Withdrawal request rejected successfully.");
-                    }
-                    break;
-                default:
-                    System.out.println("Operation cancelled.");
-            }
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid input. Please enter a number.");
+    
+        System.out.println("Enter number to approve/reject, or 0 to go back:");
+        int choice = Integer.parseInt(scanner.nextLine());
+    
+        if (choice == 0 || choice > pending.size()) return;
+    
+        WithdrawalRequest selected = pending.get(choice - 1);
+        System.out.println("1) Approve\n2) Reject");
+        int action = Integer.parseInt(scanner.nextLine());
+    
+        boolean result = false;
+        if (action == 1) {
+            result = controller.approveWithdrawal(selected);
+        } else if (action == 2) {
+            result = controller.rejectWithdrawal(selected);
         }
-
-        System.out.println("Press Enter to continue...");
-        scanner.nextLine();
+    
+        if (result) System.out.println("Request updated.");
+        else System.out.println("Action failed.");
     }
-
-    // Implement these methods in the HDBManagerView class
-
+    
     private void viewAllEnquiriesMenu() {
         controller.viewAllEnquiries();
-        
+
         System.out.println("\nPress Enter to continue...");
         scanner.nextLine();
     }
-    
+
     private void viewAndReplyToMyProjectsEnquiriesMenu() {
         System.out.println("\n===== Enquiries for My Projects =====");
         List<Enquiry> managerEnquiries = controller.getManagerEnquiries();
@@ -1026,8 +980,7 @@ public class HDBManagerView {
                 Application selectedApp = pendingApplications.get(appIndex);
                 boolean success = applicationController.updateApplicationStatus(selectedApp,
                         ApplicationStatus.SUCCESSFUL);
-                
-                
+
                 if (success) {
                     System.out.println("Application approved successfully.");
                 } else {
@@ -1040,8 +993,6 @@ public class HDBManagerView {
             System.out.println("Invalid input. Please enter a number.");
         }
     }
-    
-    
 
     private void rejectApplicationMenu(List<Application> pendingApplications) {
         System.out.print("\nEnter application number to reject: ");

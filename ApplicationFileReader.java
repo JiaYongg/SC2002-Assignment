@@ -51,7 +51,7 @@ public class ApplicationFileReader extends FileReader<Application> {
             Date dateBooked = null;
             if (data.length > 6 && !data[6].trim().isEmpty()) {
                 try {
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
                     dateBooked = sdf.parse(data[6].trim());
                 } catch (ParseException e) {
                     System.out.println("Error parsing date booked: " + data[6]);
