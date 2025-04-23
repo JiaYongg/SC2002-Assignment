@@ -1,6 +1,9 @@
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
 
 
 public class HDBOfficerController {
@@ -8,23 +11,29 @@ public class HDBOfficerController {
     private List<Project> allProjects;
     private HDBOfficerView view;
     private static int receiptIdCounter=1;
-    private static int registrationid=1;
+    private static int registrationid;
+    static {
+        registrationid = OfficerRegistrationFileReader.getLastUsedRegistrationId("OfficerRegistration.csv") + 1;
+    }
     
     public HDBOfficerController(HDBOfficer currentOfficer){
         this.currentOfficer=currentOfficer;
-        this.allProjects= new ArrayList<>();
+        loadProjectsForOfficer();
+        loadRegistrationsForOfficer();
         // In a full implementation, you would load projects from a file
     }
     
     public List<Project> getVisibleProjects() {
-     List<Project> visibleProjects = new ArrayList<>();
-         for (Project project : allProjects) {
-             if (project.isVisible() && currentOfficer.canRegisterForProject(project)) {
-                 visibleProjects.add(project);
-             }
-         }
-         return visibleProjects;
-     }
+        List<Project> visibleProjects = new ArrayList<>();
+        for (Project project : allProjects) {
+            if ((project.isVisible() && currentOfficer.canRegisterForProject(project)) ||
+                (currentOfficer.getAssignedProject() != null &&
+                 currentOfficer.getAssignedProject().equals(project))) {
+                visibleProjects.add(project);
+            }
+        }
+        return visibleProjects;
+    }
    
     public List<Project> getAvailableProjectsForRegistration() {
          List<Project> availableProjects = new ArrayList<>();
@@ -120,6 +129,8 @@ public class HDBOfficerController {
         
         project.addOfficerRegistration(registration);
         officer.addRegistration(registration);
+        OfficerRegistrationFileWriter writer = new OfficerRegistrationFileWriter();
+        writer.appendRegistration(registration);
     
 
         System.out.println("Registration submitted for project: " + project.getProjectName());
@@ -178,20 +189,200 @@ public class HDBOfficerController {
             view.viewAssignedProject();
         }
     }
-        public void viewEnquiries(HDBOfficer officer) {
-            Project assigned = officer.getAssignedProject();
-            if (assigned == null) {
-                System.out.println("No project assigned.");
+    public void viewEnquiries(HDBOfficer officer) {
+        Project assigned = officer.getAssignedProject();
+        if (assigned == null) {
+            System.out.println("No project assigned.");
+            return;
+        }
+
+        List<Enquiry> enquiries = assigned.getEnquiries();
+        if (enquiries.isEmpty()) {
+            System.out.println("No enquiries.");
+        } else {
+            view.viewProjectEnquiries();
+        }
+    }
+
+    private void loadProjectsForOfficer() {
+        ProjectFileReader projectReader = new ProjectFileReader();
+        Map<String, Project> loadedMap = projectReader.readFromFile();  // just use locally
+        this.allProjects = new ArrayList<>(loadedMap.values());
+    
+        // Debug output
+        System.out.println("Loaded " + allProjects.size() + " total projects");
+    
+        // Check for any approved/assigned projects for this officer
+        for (Project project : allProjects) {
+            OfficerRegistration reg = project.getRegistrationByOfficer(currentOfficer);
+            if (reg != null && reg.getRegistrationStatus() == OfficerRegistrationStatus.approved) {
+                currentOfficer.setAssignedProject(project);
+                System.out.println("Assigned project found: " + project.getProjectName());
+                break;
+            }
+        }
+    
+        System.out.println("Current officer: " + currentOfficer.getName());
+        System.out.println("Assigned project: " + 
+            (currentOfficer.getAssignedProject() != null 
+                ? currentOfficer.getAssignedProject().getProjectName()
+                : "None"));
+    }
+
+    private void loadRegistrationsForOfficer() {
+        ProjectFileReader projectReader = new ProjectFileReader();
+        Map<String, Project> projectMap = projectReader.readFromFile();
+    
+        HDBOfficerFileReader officerReader = new HDBOfficerFileReader(); // must return Map<String, User>
+        Map<String, User> userMap = officerReader.readFromFile();
+    
+        // Convert User map to HDBOfficer map
+        Map<String, HDBOfficer> officerMap = new HashMap<>();
+        for (User user : userMap.values()) {
+            if (user instanceof HDBOfficer officer) {
+                officerMap.put(officer.getNric(), officer);
+            }
+        }
+    
+        OfficerRegistrationFileReader registrationReader = new OfficerRegistrationFileReader(projectMap, officerMap);
+        Map<String, OfficerRegistration> allRegs = registrationReader.readFromFile();
+    
+        for (OfficerRegistration reg : allRegs.values()) {
+            if (reg.getOfficer().getNric().equals(currentOfficer.getNric())) {
+                currentOfficer.addRegistration(reg);
+            }
+        }
+    
+        System.out.println("Loaded " + currentOfficer.getRegistrations().size() +
+            " registrations for officer: " + currentOfficer.getName());
+    }
+
+    public void submitApplicationAsOfficer(Project project, FlatType flatType) {
+        // Disallow applying for a project that the officer is handling
+        if (currentOfficer.getAssignedProject() != null &&
+            currentOfficer.getAssignedProject().equals(project)) {
+            System.out.println("You cannot apply for a project you are handling.");
+            return;
+        }
+    
+        // Disallow applying if already registered to handle the project
+        for (OfficerRegistration reg : currentOfficer.getRegistrations()) {
+            if (reg.getProject().equals(project)) {
+                System.out.println("You cannot apply for a project you have registered to handle.");
                 return;
             }
+        }
     
-            List<Enquiry> enquiries = assigned.getEnquiries();
-            if (enquiries.isEmpty()) {
-                System.out.println("No enquiries.");
-            } else {
-                view.viewProjectEnquiries();
-            }
+        // Otherwise reuse applicant logic
+        ApplicationController appController = new ApplicationController();
+        boolean success = appController.applyForProject(currentOfficer, project, flatType);
+        if (!success) {
+            System.out.println("Application submission failed.");
+        }
     }
+
+    public boolean canOfficerApply(Project p) {
+        if (currentOfficer.getAssignedProject() != null &&
+            currentOfficer.getAssignedProject().equals(p)) return false;
+    
+        for (OfficerRegistration reg : currentOfficer.getRegistrations()) {
+            if (reg.getProject().equals(p)) return false;
+        }
+    
+        Application existing = currentOfficer.getApplication();
+        if (existing != null && existing.getProject().equals(p)) return false;
+    
+        return true;
+    }
+
+    public List<Project> getEligibleProjectsToApply() {
+        List<Project> eligible = new ArrayList<>();
+        for (Project p : allProjects) {
+            if (!p.isVisible()) continue;
+            if (!canOfficerApply(p)) continue;
+            for (FlatType ft : p.getFlatTypes()) {
+                if (checkEligibility(currentOfficer, p, ft)) {
+                    eligible.add(p);
+                    break;
+                }
+            }
+        }
+        return eligible;
+    }
+
+    public boolean checkEligibility(HDBOfficer officer, Project project, FlatType flatType) {
+        Date currentDate = new Date();
+        if (!project.isVisible() ||
+            currentDate.before(project.getApplicationOpenDate()) ||
+            currentDate.after(project.getApplicationCloseDate())) {
+            return false;
+        }
+    
+        if (flatType.getUnitCount() <= 0) {
+            return false;
+        }
+    
+        // Officer can't apply for a project they are handling or have registered for
+        if (officer.getAssignedProject() != null &&
+            officer.getAssignedProject().getProjectName().equals(project.getProjectName())) {
+            return false;
+        }
+    
+        for (OfficerRegistration reg : officer.getRegistrations()) {
+            if (reg.getProject().equals(project)) {
+                return false;
+            }
+        }
+    
+        int age = officer.getAge();
+        String maritalStatus = officer.getMaritalStatus();
+    
+        if (maritalStatus.equalsIgnoreCase("Single")) {
+            return age >= 35 && flatType.getName().equalsIgnoreCase("2-Room");
+        } else if (maritalStatus.equalsIgnoreCase("Married")) {
+            return age >= 21 && 
+                (flatType.getName().equalsIgnoreCase("2-Room") || 
+                 flatType.getName().equalsIgnoreCase("3-Room"));
+        }
+    
+        return false;
+    }
+
+    public FlatType selectFlatType(Project project) {
+        List<FlatType> eligibleFlatTypes = new ArrayList<>();
+        for (FlatType ft : project.getFlatTypes()) {
+            if (checkEligibility(currentOfficer, project, ft)) {
+                eligibleFlatTypes.add(ft);
+            }
+        }
+
+        if (eligibleFlatTypes.isEmpty()) {
+            System.out.println("No eligible flat types available for this project.");
+            return null;
+        }
+
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("\nAvailable Flat Types:");
+        for (int i = 0; i < eligibleFlatTypes.size(); i++) {
+            System.out.println((i + 1) + ". " + eligibleFlatTypes.get(i).getName() +
+                            " ($" + eligibleFlatTypes.get(i).getPrice() + ")");
+        }
+
+        System.out.print("Select flat type (1-" + eligibleFlatTypes.size() + "): ");
+        try {
+            int choice = Integer.parseInt(scanner.nextLine());
+            if (choice >= 1 && choice <= eligibleFlatTypes.size()) {
+                return eligibleFlatTypes.get(choice - 1);
+            }
+        } catch (Exception e) {
+            System.out.println("Invalid input.");
+        }
+
+        System.out.println("Invalid selection.");
+        return null;
+    }
+    
+
 }       
     
 

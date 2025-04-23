@@ -24,7 +24,7 @@ public class LoginController implements iAuthService {
         Map<String, User> managers = managerReader.readFromFile();
         managers.values().forEach(this::addUser);
 
-        OfficerFileReader officerReader = new OfficerFileReader();
+        HDBOfficerFileReader officerReader = new HDBOfficerFileReader();
         Map<String, User> officers = officerReader.readFromFile();
         officers.values().forEach(this::addUser);
 

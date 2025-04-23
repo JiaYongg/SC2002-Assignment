@@ -1,8 +1,8 @@
 import java.util.Map;
 
-public class OfficerFileReader extends FileReader<User> {
+public class HDBOfficerFileReader extends FileReader<User> {
     
-    public OfficerFileReader() {
+    public HDBOfficerFileReader() {
         super("OfficerList.csv");
     }
     
