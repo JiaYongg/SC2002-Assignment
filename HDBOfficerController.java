@@ -11,6 +11,8 @@ public class HDBOfficerController {
     private HDBOfficerView view;
     private static int receiptIdCounter = 1;
     private static int registrationid;
+    private EnquiryController enquiryController;
+
     static {
         registrationid = OfficerRegistrationFileReader.getLastUsedRegistrationId("OfficerRegistration.csv") + 1;
     }
@@ -18,6 +20,7 @@ public class HDBOfficerController {
     public HDBOfficerController(HDBOfficer currentOfficer) {
         this.currentOfficer = currentOfficer;
         loadProjectsForOfficer();
+        this.enquiryController = new EnquiryController(allProjects);
         loadRegistrationsForOfficer();
         loadApplicationsForOfficer();
     }
@@ -121,16 +124,24 @@ public class HDBOfficerController {
         return assigned.getEnquiries(); // Now properly populated
     }
 
-    public boolean replyToEnquiry(Enquiry enquiry, String reply) {
-        if (currentOfficer.getAssignedProject() == null ||
-                !enquiry.getProject().equals(currentOfficer.getAssignedProject())) {
+    public boolean replyToEnquiry(int enquiryId, String reply) {
+        Project assigned = currentOfficer.getAssignedProject();
+        if (assigned == null || assigned.getEnquiries() == null) {
+            System.out.println("No assigned project or enquiries.");
             return false;
         }
-
-        enquiry.setResponse(reply);
-        return true;
+    
+        for (Enquiry enquiry : assigned.getEnquiries()) {
+            if (enquiry.getEnquiryID() == enquiryId) {
+                enquiryController.replyToEnquiry(assigned, enquiryId, reply); // ✅ This saves to file
+                return true;
+            }
+        }
+    
+        System.out.println("Enquiry not found.");
+        return false;
     }
-
+    
     public Application getApplicationByNric(String nric) {
         if (currentOfficer.getAssignedProject() == null)
             return null;
@@ -282,21 +293,6 @@ public class HDBOfficerController {
         }
     }
 
-    public void viewEnquiries(HDBOfficer officer) {
-        Project assigned = officer.getAssignedProject();
-        if (assigned == null) {
-            System.out.println("No project assigned.");
-            return;
-        }
-
-        List<Enquiry> enquiries = assigned.getEnquiries();
-        if (enquiries.isEmpty()) {
-            System.out.println("No enquiries.");
-        } else {
-            view.viewProjectEnquiries();
-        }
-    }
-
     private void loadProjectsForOfficer() {
         // Load all projects
         ProjectFileReader projectReader = new ProjectFileReader();
@@ -315,14 +311,19 @@ public class HDBOfficerController {
         for (OfficerRegistration reg : allRegs.values()) {
             if (reg.getOfficer().getNric().equals(currentOfficer.getNric()) &&
                     reg.getRegistrationStatus() == OfficerRegistrationStatus.approved) {
-                currentOfficer.setAssignedProject(reg.getProject());
-
-                List<Project> singleProjectList = new ArrayList<>();
-                singleProjectList.add(reg.getProject());
-                EnquiryController ec = new EnquiryController(singleProjectList);
+        
+                // Ensure we use the project instance from allProjects (for EnquiryController compatibility)
+                for (Project p : allProjects) {
+                    if (p.getProjectName().equals(reg.getProject().getProjectName())) {
+                        currentOfficer.setAssignedProject(p);
+                        break;
+                    }
+                }
+        
                 break;
             }
         }
+        
 
         System.out.println("Current officer: " + currentOfficer.getName());
         System.out.println("Assigned project: " +
