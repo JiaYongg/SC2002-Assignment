@@ -196,19 +196,19 @@ public class HDBOfficerView {
     }
     
     public void viewAssignedProject() {
-    Project assignedProject = controller.getAssignedProject(currentOfficer);
-
-    System.out.println("\n===== Assigned Project =====");
-    if (assignedProject != null) {
-        System.out.println("You are assigned to: " + assignedProject.getProjectName());
-        System.out.println("Neighborhood: " + assignedProject.getNeighborhood());
-        System.out.println("Application Period: " +
-            new SimpleDateFormat("dd/MM/yyyy").format(assignedProject.getApplicationOpenDate()) +
-            " to " +
-            new SimpleDateFormat("dd/MM/yyyy").format(assignedProject.getApplicationCloseDate()));
-    } else {
-        System.out.println("You are not assigned to any project yet.");
-    }
+        Project assignedProject = controller.getAssignedProject(currentOfficer); // ✅ always recheck
+    
+        System.out.println("\n===== Assigned Project =====");
+        if (assignedProject != null) {
+            System.out.println("You are assigned to: " + assignedProject.getProjectName());
+            System.out.println("Neighborhood: " + assignedProject.getNeighborhood());
+            System.out.println("Application Period: " +
+                new SimpleDateFormat("dd/MM/yyyy").format(assignedProject.getApplicationOpenDate()) +
+                " to " +
+                new SimpleDateFormat("dd/MM/yyyy").format(assignedProject.getApplicationCloseDate()));
+        } else {
+            System.out.println("You are not assigned to any project yet.");
+        }
     }
     
     public void viewProjectEnquiries() {
@@ -234,23 +234,44 @@ public class HDBOfficerView {
     
     private void processFlatBooking() {
         System.out.println("\n===== Process Flat Booking =====");
-        System.out.print("Enter applicant NRIC: ");
-        String nric = scanner.nextLine().trim();
     
-        Application app = controller.getApplicationByNric(nric);
-        if (app == null) {
-            System.out.println("Application not found for NRIC: " + nric);
-            System.out.println("Press Enter to continue...");
-            scanner.nextLine();
+        List<Application> eligibleApps = controller.getSuccessfulApplicationsForAssignedProject();
+        if (eligibleApps.isEmpty()) {
+            System.out.println("No successful applications found.");
             return;
         }
     
-        controller.bookFlat(app);
-        Receipt receipt = controller.generateReceipt(app);
+        System.out.println("Eligible Applications:");
+        for (int i = 0; i < eligibleApps.size(); i++) {
+            Application app = eligibleApps.get(i);
+            System.out.printf("%d) %s | %s | %s\n", i + 1,
+                app.getApplicant().getName(),
+                app.getFlatType().getName(),
+                app.getApplicant().getNric());
+        }
     
-        System.out.println("\n===== Booking Receipt =====");
-        System.out.println(receipt.formatReceipt());
-        System.out.println("Booking successful for: " + app.getApplicant().getName());
+        System.out.print("Select application number to proceed with booking (0 to cancel): ");
+        try {
+            int choice = Integer.parseInt(scanner.nextLine().trim());
+            if (choice == 0) return;
+    
+            if (choice < 1 || choice > eligibleApps.size()) {
+                System.out.println("Invalid selection.");
+                return;
+            }
+    
+            Application app = eligibleApps.get(choice - 1);
+    
+            controller.bookFlat(app);
+            Receipt receipt = controller.generateReceipt(app);
+    
+            System.out.println("\n===== Booking Receipt =====");
+            System.out.println(receipt.formatReceipt());
+            System.out.println("Booking successful for: " + app.getApplicant().getName());
+    
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input. Please enter a valid number.");
+        }
     }
     
     public void closeScanner() {
