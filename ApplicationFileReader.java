@@ -39,18 +39,17 @@ public class ApplicationFileReader extends FileReader<Application> {
             Date dateApplied = new Date(); 
             if (!dateAppliedStr.isEmpty()) {
                 try {
-                    SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
                     dateApplied = sdf.parse(dateAppliedStr);
                 } catch (ParseException e) {
                     System.out.println("Error parsing date applied: " + dateAppliedStr + ". Using current date.");
                 }
             }
-            
             // Parse dateBooked if available (field at index 6)
             Date dateBooked = null;
             if (data.length > 6 && !data[6].trim().isEmpty()) {
                 try {
-                    SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
                     dateBooked = sdf.parse(data[6].trim());
                 } catch (ParseException e) {
                     System.out.println("Error parsing date booked: " + data[6]);
@@ -62,7 +61,6 @@ public class ApplicationFileReader extends FileReader<Application> {
             Project project = projects.get(projectName);
             
             if (project == null || applicant == null) {
-                System.out.println("Could not find project or applicant for application: " + line);
                 return;
             }
             
