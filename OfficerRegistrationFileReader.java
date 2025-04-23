@@ -43,7 +43,7 @@ public class OfficerRegistrationFileReader extends FileReader<OfficerRegistratio
             OfficerRegistrationStatus status = OfficerRegistrationStatus.valueOf(statusStr);
             
             // Parse the date applied
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
             Date dateApplied = sdf.parse(dateAppliedStr);
 
             // Create the officer registration with the specified ID

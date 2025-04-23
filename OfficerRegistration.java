@@ -16,6 +16,10 @@ public class OfficerRegistration {
     this.status = status;
     this.registrationDate = registrationDate;
     }
+    public OfficerRegistration(HDBOfficer officer, Project project){
+        this.officer=officer;
+        this.project=project;
+    }
 
     public OfficerRegistrationStatus getRegistrationStatus() {
         return status;

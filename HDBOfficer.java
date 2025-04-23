@@ -30,27 +30,27 @@ public class HDBOfficer extends Applicant {
         return assignedProject != null;
     }
     
-    // public boolean canRegisterForProject(Project project) {
-    //      Cannot register if already assigned to a project
-    //     if (isAssignedToProject()) {
-    //         return false;
-    //     }
+     public boolean canRegisterForProject(Project project) {
+          //Cannot register if already assigned to a project
+         if (isAssignedToProject()) {
+             return false;
+         }
         
-    //     // Cannot register if already applied for this project as an applicant
-    //     for (Application app : getApplications()) {
-    //         if (app.getProject().equals(project)) {
-    //             return false;
-    //         }
-    //     }
+         // Cannot register if already applied for this project as an applicant
+         for (Application app : getApplications()) {
+             if (app.getProject().equals(project)) {
+                 return false;
+             }
+         }
         
-    //     // Cannot register if already registered for another project with overlapping dates
-    //     for (OfficerRegistration reg : registrations) {
-    //         if (reg.getStatus().equals("Approved") && 
-    //             reg.getProject().isOverlappingWith(project)) {
-    //             return false;
-    //         }
-    //     }
+         // Cannot register if already registered for another project with overlapping dates
+         for (OfficerRegistration reg : registrations) {
+             if (reg.getRegistrationStatus().equals("Approved") && 
+                 reg.getProject().isOverlappingWith(project)) {
+                 return false;
+             }
+         }
         
-    //     return true;
-    // }
+         return true;
+     }
 }

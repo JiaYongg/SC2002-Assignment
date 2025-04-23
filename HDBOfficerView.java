@@ -107,7 +107,7 @@ public class HDBOfficerView {
                 System.out.printf("%2d | %-20s | %s\n", 
                                  index++, 
                                  reg.getProject().getProjectName(), 
-                                 reg.getStatus());
+                                 reg.getRegistrationStatus());
             }
         }
         
@@ -115,7 +115,7 @@ public class HDBOfficerView {
         scanner.nextLine();
     }
     
-    private void viewAssignedProject() {
+    public void viewAssignedProject() {
         System.out.println("\n===== Assigned Project =====");
         Project assignedProject = controller.getAssignedProject();
         
@@ -140,7 +140,7 @@ public class HDBOfficerView {
         scanner.nextLine();
     }
     
-    private void viewProjectEnquiries() {
+    public void viewProjectEnquiries() {
         System.out.println("\n===== Project Enquiries =====");
         System.out.println("This feature is not fully implemented in the minimal version.");
         System.out.println("Press Enter to continue...");

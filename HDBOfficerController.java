@@ -1,13 +1,14 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Date;
 
-import javafx.application.Application;
 
 public class HDBOfficerController {
     private HDBOfficer currentOfficer;
     private List<Project> allProjects;
     private HDBOfficerView view;
     private static int receiptIdCounter=1;
+    private static int registrationid=1;
     
     public HDBOfficerController(HDBOfficer currentOfficer, List<Project> allProjects,HDBOfficerView view){
         this.currentOfficer=currentOfficer;
@@ -19,7 +20,7 @@ public class HDBOfficerController {
     public List<Project> getVisibleProjects() {
      List<Project> visibleProjects = new ArrayList<>();
          for (Project project : allProjects) {
-             if (project.isVisible() && currentOfficer.isEligibleForProject(project)) {
+             if (project.isVisible() && currentOfficer.canRegisterForProject(project)) {
                  visibleProjects.add(project);
              }
          }
@@ -70,7 +71,7 @@ public class HDBOfficerController {
              return false;
          }
         
-         enquiry.setReply(reply);
+         enquiry.setResponse(reply);
          return true;
      }
     
@@ -84,13 +85,13 @@ public class HDBOfficerController {
          return null;
      }
     
-     public boolean updateApplicationStatus(Application application, String newStatus) {
+     public boolean updateApplicationStatus(Application app, ApplicationStatus newStatus) {
          if (currentOfficer.getAssignedProject() == null || 
-             !application.getProject().equals(currentOfficer.getAssignedProject())) {
+             !app.getProject().equals(currentOfficer.getAssignedProject())) {
              return false;
          }
-        
-         application.setStatus(newStatus);
+       
+         app.setStatus(newStatus);
          return true;
      }
     
@@ -99,22 +100,32 @@ public class HDBOfficerController {
     public HDBOfficer getCurrentOfficer() {
         return currentOfficer;
     }
-    public void registerToHandleProject(Project project){
-        HDBOfficer officer=getCurrentOfficer();
-        if(project.getRemainingOfficerSlots()<=0){
-            System.out.println("no available slots");
-            return;}
-
-        if(project.getRegistrationByOfficer(officer)!= null) {
+    public void registerToHandleProject(Project project) {
+        HDBOfficer officer = getCurrentOfficer();
+    
+        
+        if (project.getRegistrationByOfficer(officer) != null) {
             System.out.println("You have already registered for this project.");
             return;
         }
-        OfficerRegistration registration = new OfficerRegistration(officer, project);
-        officer.setAssignedProject(project);
-        officer.getRegistrations().add(registration);
-        project.addOfficerRegistration(registration);  
-        System.out.println("Registered to handle project: " + project.getProjectName());
+    
+        
+        if (project.getRemainingOfficerSlots() <= 0) {
+            System.out.println("No officer slots available in this project.");
+            return;
+        }
+    
+        
+        OfficerRegistration registration = new OfficerRegistration(registrationid, officer, project, OfficerRegistrationStatus.pending, new Date() );
+    
+        
+        project.addOfficerRegistration(registration);
+        officer.addRegistration(registration);
+    
+
+        System.out.println("Registration submitted for project: " + project.getProjectName());
     }
+    
     
     public void applyForProject(Project project, FlatType flatType) {
         if (!project.isOpen()) {
@@ -131,19 +142,20 @@ public class HDBOfficerController {
 
         System.out.println("Application submitted for " + flatType.getName() + " in " + project.getProjectName());
     }
-    public void bookFlat(Applicant applicant, Project project, FlatType flatType){
-        FlatType flat=project.getFlatTypeByName(flatType.getName());
-        if(flat==null){
-            System.out.println("Flat type not found");
+    public void bookFlat(Application application) {
+        FlatType flat = application.getFlatType();
+        if (flat.getRemainingUnits() <= 0) {
+            System.out.println("Booking not allowed: No remaining units.");
             return;
         }
-        // not sure
-        System.out.println("Flat of type " + flatType.getName() + " booked for applicant: " + applicant.getName());
+    
+        application.setStatus(ApplicationStatus.BOOKED); // Also decrements unit inside
+        System.out.println("Flat booked successfully for applicant: " + application.getApplicant().getName());
     }
 
-    public Receipt generateReceipt(Applicant applicant){
-        Receipt receipt = new Receipt(receiptIdCounter++, applicant,currentOfficer);
-        System.out.println("Receipt generated for: " + applicant.getApplicant().getName());
+    public Receipt generateReceipt(Application app) {
+        Receipt receipt = new Receipt( receiptIdCounter++,  app, currentOfficer);
+        System.out.println("Receipt generated for: " + app.getApplicant().getName());
         return receipt;
     }
     public OfficerRegistrationStatus getRegistrationStatus(Project project) {
@@ -173,7 +185,7 @@ public class HDBOfficerController {
             if (enquiries.isEmpty()) {
                 System.out.println("No enquiries.");
             } else {
-                view.viewProjectEnquiries(enquiries);
+                view.viewProjectEnquiries();
             }
     }
 }       
