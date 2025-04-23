@@ -17,12 +17,13 @@ public class HDBOfficerView {
         while (!logout && !exitProgram) {
             System.out.println("\n===== HDB Officer Menu =====");
             System.out.println("1. View Available Projects");
-            System.out.println("2. View My Applications");
-            System.out.println("3. Register for Project");
-            System.out.println("4. View Registration Status");
-            System.out.println("5. View Assigned Project");
-            System.out.println("6. View Project Enquiries");
-            System.out.println("7. Process Flat Booking");
+            System.out.println("2. View Eligible Projects"); // NEW
+            System.out.println("3. Submit Application as Officer");
+            System.out.println("4. Register for Project");
+            System.out.println("5. View Registration Status");
+            System.out.println("6. View Assigned Project");
+            System.out.println("7. View Project Enquiries");
+            System.out.println("8. Process Flat Booking");
             System.out.println("0. Logout");
             System.out.println("9. Exit Program");
             System.out.print("Enter your choice: ");
@@ -35,21 +36,23 @@ public class HDBOfficerView {
                         viewAvailableProjects();
                         break;
                     case 2:
-                        viewMyApplications();
+                        displayEligibleProjects();
                         break;
                     case 3:
+                        submitApplicationMenu();
+                    case 4:
                         registerForProject();
                         break;
-                    case 4:
+                    case 5:
                         viewRegistrationStatus();
                         break;
-                    case 5:
+                    case 6:
                         viewAssignedProject();
                         break;
-                    case 6:
+                    case 7:
                         viewProjectEnquiries();
                         break;
-                    case 7:
+                    case 8:
                         processFlatBooking();
                         break;
                     case 0:
@@ -75,7 +78,7 @@ public class HDBOfficerView {
         System.out.println("\n===== Available Projects =====");
         List<Project> projects= controller.getVisibleProjects();
         if(projects.isEmpty()){
-            System.out.println("No Projetcs available");
+            System.out.println("No Projects available");
         }else{
             for (int i = 0; i < projects.size(); i++) {
                 Project p = projects.get(i);
@@ -87,18 +90,52 @@ public class HDBOfficerView {
     }
         
     
-    private void viewMyApplications() {
-        System.out.println("\n===== My Applications =====");
-        List<Application> apps = controller.getCurrentOfficer().getApplication();
-        if (apps.isEmpty()) {
-            System.out.println("No applications found.");
-        } else {
-            for (Application app : apps) {
-                System.out.println("Project: " + app.getProject().getProjectName());
-                System.out.println("Flat Type: " + app.getFlatType().getName());
-                System.out.println("Status: " + app.getStatus());
-                System.out.println("-----");
+    private void displayEligibleProjects() {
+        System.out.println("\n===== Eligible Projects =====");
+        List<Project> projects = controller.getVisibleProjects();
+        boolean found = false;
+        for (Project p : projects) {
+            if (!controller.canOfficerApply(p)) continue;
+            for (FlatType ft : p.getFlatTypes()) {
+                if (controller.checkEligibility(controller.getCurrentOfficer(), p, ft)) {
+                    System.out.printf("%s - %s ($%.2f) [%d units]\n",
+                        p.getProjectName(), ft.getName(), ft.getPrice(), ft.getUnitCount());
+                    found = true;
+                }
             }
+        }
+        if (!found) System.out.println("No eligible projects.");
+        System.out.println("Press Enter to continue...");
+        scanner.nextLine();
+    }
+
+    private void submitApplicationMenu() {
+        System.out.println("\n===== Submit Application =====");
+        List<Project> eligible = controller.getEligibleProjectsToApply();
+        if (eligible.isEmpty()) {
+            System.out.println("No eligible projects available.");
+            return;
+        }
+    
+        for (int i = 0; i < eligible.size(); i++) {
+            Project p = eligible.get(i);
+            System.out.println((i + 1) + ". " + p.getProjectName());
+        }
+    
+        System.out.print("Select project number: ");
+        try {
+            int idx = Integer.parseInt(scanner.nextLine());
+            if (idx < 1 || idx > eligible.size()) {
+                System.out.println("Invalid selection.");
+                return;
+            }
+            Project selected = eligible.get(idx - 1);
+            FlatType chosen = controller.selectFlatType(selected);
+            if (chosen != null) {
+                controller.submitApplicationAsOfficer(selected, chosen);
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input.");
         }
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
@@ -215,8 +252,6 @@ public class HDBOfficerView {
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }
-    
-    
     
     public void closeScanner() {
         scanner.close();
