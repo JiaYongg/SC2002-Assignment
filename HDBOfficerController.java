@@ -82,12 +82,43 @@ public class HDBOfficerController {
     }
 
     public List<Enquiry> getProjectEnquiries() {
+        // Step 1: Load projects
+        ProjectFileReader projectReader = new ProjectFileReader();
+        Map<String, Project> projectMap = projectReader.readFromFile();
 
-        if (currentOfficer.getAssignedProject() == null) {
-            return new ArrayList<>();
+        // Step 2: Load officers and registrations to get the assigned project
+        OfficerRegistrationFileReader regReader = new OfficerRegistrationFileReader(projectMap,
+                Map.of(currentOfficer.getNric(), currentOfficer));
+        Map<String, OfficerRegistration> allRegs = regReader.readFromFile();
+
+        Project assigned = null;
+        for (OfficerRegistration reg : allRegs.values()) {
+            if (reg.getOfficer().getNric().equals(currentOfficer.getNric()) &&
+                    reg.getRegistrationStatus() == OfficerRegistrationStatus.approved) {
+                assigned = projectMap.get(reg.getProject().getProjectName());
+                break;
+            }
         }
 
-        return currentOfficer.getAssignedProject().getEnquiries();
+        if (assigned == null)
+            return new ArrayList<>();
+
+        // Step 3: Load applicants (needed for EnquiryFileReader)
+        ApplicantFileReader applicantReader = new ApplicantFileReader();
+        Map<String, User> userMap = applicantReader.readFromFile();
+
+        Map<String, Applicant> applicantMap = new HashMap<>();
+        for (User user : userMap.values()) {
+            if (user instanceof Applicant a) {
+                applicantMap.put(a.getNric(), a);
+            }
+        }
+
+        // Step 4: Load enquiries for the project
+        EnquiryFileReader enquiryReader = new EnquiryFileReader(applicantMap, projectMap);
+        enquiryReader.readFromFile(); // This populates project.getEnquiries()
+
+        return assigned.getEnquiries(); // Now properly populated
     }
 
     public boolean replyToEnquiry(Enquiry enquiry, String reply) {
@@ -101,25 +132,27 @@ public class HDBOfficerController {
     }
 
     public Application getApplicationByNric(String nric) {
-        if (currentOfficer.getAssignedProject() == null) return null;
-    
+        if (currentOfficer.getAssignedProject() == null)
+            return null;
+
         Map<String, Project> projectMap = new ProjectFileReader().readFromFile();
-    
+
         Map<String, User> userMap = new ApplicantFileReader().readFromFile();
         Map<String, Applicant> applicantMap = new HashMap<>();
         for (User u : userMap.values()) {
-            if (u instanceof Applicant a) applicantMap.put(a.getNric(), a);
+            if (u instanceof Applicant a)
+                applicantMap.put(a.getNric(), a);
         }
-    
+
         ApplicationFileReader reader = new ApplicationFileReader(projectMap, applicantMap);
         Map<String, Application> allApps = reader.readFromFile();
-    
+
         for (Application app : allApps.values()) {
             if (app.getApplicant() != null &&
-                app.getApplicant().getNric() != null &&
-                app.getApplicant().getNric().equals(nric) &&
-                app.getProject().getProjectName().equals(currentOfficer.getAssignedProject().getProjectName()) &&
-                app.getStatus() == ApplicationStatus.SUCCESSFUL) {
+                    app.getApplicant().getNric() != null &&
+                    app.getApplicant().getNric().equals(nric) &&
+                    app.getProject().getProjectName().equals(currentOfficer.getAssignedProject().getProjectName()) &&
+                    app.getStatus() == ApplicationStatus.SUCCESSFUL) {
                 return app;
             }
         }
@@ -177,48 +210,50 @@ public class HDBOfficerController {
     public void bookFlat(Application application) {
         Project project = application.getProject();
         FlatType bookedType = project.getFlatTypeByName(application.getFlatType().getName());
-    
+
         if (bookedType == null || bookedType.getRemainingUnits() <= 0) {
             System.out.println("Booking not allowed: No remaining units.");
             return;
         }
-    
-        // Decrement the unit count for the flat type (the first time it works fine, make sure it works consistently)
+
+        // Decrement the unit count for the flat type (the first time it works fine,
+        // make sure it works consistently)
         bookedType.decrementUnit();
-        application.setStatus(ApplicationStatus.BOOKED);  // Set the booking status
-    
+        application.setStatus(ApplicationStatus.BOOKED); // Set the booking status
+
         // Persist updated project list with decremented unit
         Map<String, Project> updatedProjects = new ProjectFileReader().readFromFile();
-    
+
         // Ensure the updated project is saved
         updatedProjects.put(project.getProjectName(), project);
-    
+
         // Write the updated project data back to the file
         new ProjectFileWriter().writeToFile(updatedProjects);
-    
+
         System.out.println("Flat booked successfully for applicant: " + application.getApplicant().getName());
-    
+
         // Persist booking to Application.csv
         Map<String, Project> projectMap = new ProjectFileReader().readFromFile();
-    
+
         ApplicantFileReader applicantReader = new ApplicantFileReader();
         Map<String, User> userMap = applicantReader.readFromFile();
-    
+
         Map<String, Applicant> applicantMap = new HashMap<>();
         for (User u : userMap.values()) {
             if (u instanceof Applicant) {
                 applicantMap.put(u.getNric(), (Applicant) u);
             }
         }
-    
+
         ApplicationFileReader appReader = new ApplicationFileReader(projectMap, applicantMap);
         Map<String, Application> allApps = appReader.readFromFile();
         allApps.put(String.valueOf(application.getApplicationID()), application);
-        
+
         // Save the updated applications to Application.csv
         new ApplicationFileWriter().writeToFile(allApps);
-    
-        // Writing updated project data back to ProjectList.csv again (in case any changes were missed)
+
+        // Writing updated project data back to ProjectList.csv again (in case any
+        // changes were missed)
         updatedProjects.put(application.getProject().getProjectName(), application.getProject());
         new ProjectFileWriter().writeToFile(updatedProjects);
     }
