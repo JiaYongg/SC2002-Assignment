@@ -29,7 +29,7 @@ public class ApplicationController {
         this.applicantMap = new HashMap<>();
         
         for (User user : userMap.values()) {
-            if (user instanceof Applicant && !(user instanceof HDBOfficer)) {
+            if (user instanceof Applicant) {
                 Applicant applicant = (Applicant) user;
                 applicantMap.put(applicant.getNric(), applicant);
             }

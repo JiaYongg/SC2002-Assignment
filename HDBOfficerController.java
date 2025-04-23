@@ -20,7 +20,7 @@ public class HDBOfficerController {
         this.currentOfficer=currentOfficer;
         loadProjectsForOfficer();
         loadRegistrationsForOfficer();
-        // In a full implementation, you would load projects from a file
+        loadApplicationsForOfficer();
     }
     
     public List<Project> getVisibleProjects() {
@@ -255,6 +255,21 @@ public class HDBOfficerController {
     
         System.out.println("Loaded " + currentOfficer.getRegistrations().size() +
             " registrations for officer: " + currentOfficer.getName());
+    }
+
+    private void loadApplicationsForOfficer() {
+        ProjectFileReader projectReader = new ProjectFileReader();
+        Map<String, Project> projectMap = projectReader.readFromFile();
+    
+        // Read officers into a map of Applicants
+        Map<String, Applicant> combined = new HashMap<>();
+    
+        // Add this officer into the applicant map since officers can apply too
+        combined.put(currentOfficer.getNric(), currentOfficer);  // key = NRIC, value = HDBOfficer as Applicant
+    
+        // Load applications (this will automatically link them via applicant.setApplication)
+        ApplicationFileReader appReader = new ApplicationFileReader(projectMap, combined);
+        appReader.readFromFile();
     }
 
     public void submitApplicationAsOfficer(Project project, FlatType flatType) {
