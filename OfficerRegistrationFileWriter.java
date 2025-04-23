@@ -19,13 +19,13 @@ public class OfficerRegistrationFileWriter extends FileWriter<OfficerRegistratio
     @Override
     protected String formatLine(OfficerRegistration registration) {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-        String dateAppliedStr = sdf.format(registration.getDateApplied());
+        String dateAppliedStr = sdf.format(registration.getRegistrationDate());
         
         return String.format("%d,%s,%s,%s,%s",
                 registration.getRegistrationId(),
-                registration.getNric(),
+                registration.getOfficer().getNric(),
                 registration.getProject().getProjectName(),
-                registration.getStatus().toString(),
+                registration.getRegistrationStatus().toString(),
                 dateAppliedStr);
     }
 }

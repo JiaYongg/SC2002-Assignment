@@ -40,32 +40,32 @@ public class WithdrawalRequestController {
     
         // Save both withdrawal and application updates
         saveWithdrawalRequests();
-        saveApplicationUpdate(application);
+        //saveApplicationUpdate(application);
     
         System.out.println("Withdrawal request approved for application: " +
                 application.getProject().getProjectName());
         return true;
     }
-    private void saveApplicationUpdate(Application updatedApp) {
-        try {
-            ApplicationFileReader reader = new ApplicationFileReader(
-                new ProjectFileReader().readFromFile(),
-                new ApplicantFileReader().readFromFile()
-            );
-            Map<String, Application> appMap = reader.readFromFile();
+    // private void saveApplicationUpdate(Application updatedApp) {
+    //     try {
+    //         ApplicationFileReader reader = new ApplicationFileReader(
+    //             new ProjectFileReader().readFromFile(),
+    //             new ApplicantFileReader().readFromFile()
+    //         );
+    //         Map<String, Application> appMap = reader.readFromFile();
     
-            // Replace existing application by ID
-            appMap.put(String.valueOf(updatedApp.getApplicationID()), updatedApp);
+    //         // Replace existing application by ID
+    //         appMap.put(String.valueOf(updatedApp.getApplicationID()), updatedApp);
     
-            ApplicationFileWriter writer = new ApplicationFileWriter();
-            writer.writeToFile(appMap);
+    //         ApplicationFileWriter writer = new ApplicationFileWriter();
+    //         writer.writeToFile(appMap);
     
-            System.out.println("✅ Application status updated and saved.");
-        } catch (Exception e) {
-            System.out.println("❌ Error saving updated application: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
+    //         System.out.println("✅ Application status updated and saved.");
+    //     } catch (Exception e) {
+    //         System.out.println("❌ Error saving updated application: " + e.getMessage());
+    //         e.printStackTrace();
+    //     }
+    // }
         
 
     // The manager authorization check will be done in HDBManagerController before
