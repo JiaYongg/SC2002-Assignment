@@ -1,1 +1,3 @@
 ApplicationID,ApplicantNRIC,ProjectName,FlatType,Status,DateApplied,DateBooked
+1003,S9876543C,test,3-ROOM,BOOKED,23/04/2025,
+1002,T0239934O,mic,2-ROOM,PENDING,23/04/2025,
