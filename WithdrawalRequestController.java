@@ -29,47 +29,53 @@ public class WithdrawalRequestController {
     public boolean approveRequest(WithdrawalRequest request) {
         request.setStatus(WithdrawalStatus.APPROVED);
     
-        // Update application status
         Application application = request.getApplication();
-        application.setStatus(ApplicationStatus.UNSUCCESSFUL); // Change status
-        application.getApplicant().setApplication(application); // Ensure applicant reference updated
+        application.setStatus(ApplicationStatus.UNSUCCESSFUL);
     
-        // Increase flat availability
-        FlatType flatType = application.getFlatType();
-        flatType.setUnitCount(flatType.getUnitCount() + 1);
+        saveApplicationUpdate(application);  // <-- this ensures it’s persisted
     
-        // Save both withdrawal and application updates
         saveWithdrawalRequests();
-        //saveApplicationUpdate(application);
-    
-        System.out.println("Withdrawal request approved for application: " +
-                application.getProject().getProjectName());
         return true;
     }
-    // private void saveApplicationUpdate(Application updatedApp) {
-    //     try {
-    //         ApplicationFileReader reader = new ApplicationFileReader(
-    //             new ProjectFileReader().readFromFile(),
-    //             new ApplicantFileReader().readFromFile()
-    //         );
-    //         Map<String, Application> appMap = reader.readFromFile();
     
-    //         // Replace existing application by ID
-    //         appMap.put(String.valueOf(updatedApp.getApplicationID()), updatedApp);
-    
-    //         ApplicationFileWriter writer = new ApplicationFileWriter();
-    //         writer.writeToFile(appMap);
-    
-    //         System.out.println("✅ Application status updated and saved.");
-    //     } catch (Exception e) {
-    //         System.out.println("❌ Error saving updated application: " + e.getMessage());
-    //         e.printStackTrace();
-    //     }
-    // }
-        
 
-    // The manager authorization check will be done in HDBManagerController before
-    // calling this
+    private void saveApplicationUpdate(Application updatedApp) {
+        try {
+            ProjectFileReader projectReader = new ProjectFileReader();
+            ApplicantFileReader applicantReader = new ApplicantFileReader();
+
+            Map<String, Project> projectMap = projectReader.readFromFile();
+            Map<String, User> userMap = applicantReader.readFromFile();
+            Map<String, Applicant> applicantMap = new HashMap<>();
+
+            for (User user : userMap.values()) {
+                if (user instanceof Applicant && !(user instanceof HDBOfficer)) {
+                    applicantMap.put(user.getNric(), (Applicant) user);
+                }
+            }
+
+            ApplicationFileReader reader = new ApplicationFileReader(projectMap, applicantMap);
+            Map<String, Application> appMap = reader.readFromFile();
+
+            for (Map.Entry<String, Application> entry : appMap.entrySet()) {
+                Application app = entry.getValue();
+                if (app.getApplicant().getNric().equals(updatedApp.getApplicant().getNric()) &&
+                        app.getFlatType().getName().equals(updatedApp.getFlatType().getName())) {
+                    entry.setValue(updatedApp);
+                    break;
+                }
+            }
+
+            ApplicationFileWriter writer = new ApplicationFileWriter();
+            writer.writeToFile(appMap);
+
+            System.out.println("Application updated to UNSUCCESSFUL.");
+        } catch (Exception e) {
+            System.out.println("Error saving application update: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
     public boolean rejectRequest(WithdrawalRequest request) {
         request.setStatus(WithdrawalStatus.REJECTED);
 

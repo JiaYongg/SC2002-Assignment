@@ -73,25 +73,29 @@ public class ApplicationController {
         return pendingApplications;
     }
     public boolean updateApplicationStatus(Application application, ApplicationStatus newStatus) {
-        // Find the application in our list
         for (Application app : allApplications) {
             if (app.getApplicationID() == application.getApplicationID()) {
-                app.setStatus(newStatus);
-                
-                // If status is BOOKED, set the booking date
-                if (newStatus == ApplicationStatus.BOOKED) {
-                    app.setDateBooked(new Date());
+    
+                // Prevent approval if no flats are left
+                if (newStatus == ApplicationStatus.SUCCESSFUL) {
+                    if (app.getFlatType().getUnitCount() <= 0) {
+                        System.out.println("Error: No more units available for this flat type.");
+                        return false;
+                    }
                 }
-                
-                // Save changes to CSV
+    
+                app.setStatus(newStatus);
+    
+                if (newStatus == ApplicationStatus.BOOKED) {
+                    app.setDateBooked(new Date()); // already handles decrement
+                }
+    
                 saveApplications();
                 return true;
             }
         }
         return false;
     }
-
-
     private void saveApplications() {
         try {
             Map<String, Application> applicationMap = new HashMap<>();
