@@ -37,6 +37,14 @@ public class OfficerRegistration {
         return registrationDate;
     }
 
+    public void approve() {
+        this.status = OfficerRegistrationStatus.approved;
+    }
+
+    public void reject() {
+        this.status = OfficerRegistrationStatus.rejected;
+    }
+
     public void setStatus(OfficerRegistrationStatus status) {
         this.status = status;
     }

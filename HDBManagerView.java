@@ -731,7 +731,57 @@ public class HDBManagerView {
     }
 
     private void handleOfficerRegistrationsMenu() {
-        // Implementation for handling officer registrations
+        List<OfficerRegistration> pending = controller.getPendingOfficerRegistrations();
+        if (pending.isEmpty()) {
+            System.out.println("No pending officer registrations.");
+            return;
+        }
+    
+        System.out.println("\n===== Pending Officer Registrations =====");
+        for (int i = 0; i < pending.size(); i++) {
+            OfficerRegistration reg = pending.get(i);
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+            String dateStr = sdf.format(reg.getRegistrationDate());
+            Project proj = reg.getProject();
+            String fullNote = proj.getRemainingOfficerSlots() <= 0 ? " [FULL - Cannot approve]" : "";
+            System.out.printf("%d) %s applied for %s on %s%s\n", 
+                i + 1, 
+                reg.getOfficer().getName(),
+                proj.getProjectName(),
+                dateStr,
+                fullNote);
+        }
+    
+        System.out.print("Select a registration to process (0 to cancel): ");
+        int choice = Integer.parseInt(scanner.nextLine().trim());
+        if (choice == 0 || choice > pending.size()) return;
+    
+        OfficerRegistration selected = pending.get(choice - 1);
+
+        if (selected.getProject().getRemainingOfficerSlots() <= 0) {
+            selected.reject();  // Automatically reject
+            OfficerRegistrationFileWriter writer = new OfficerRegistrationFileWriter();
+            writer.updateRegistration(selected);
+            System.out.println("Registration automatically rejected due to full officer slots.");
+            return;
+        }
+        
+        System.out.println("1) Approve\n2) Reject");
+        int action = Integer.parseInt(scanner.nextLine());
+    
+        boolean result = false;
+        if (action == 1) result = controller.approveOfficerRegistration(selected);
+        else if (action == 2) result = controller.rejectOfficerRegistration(selected);
+    
+        if (result) {
+            String status = action == 1 ? "APPROVED" : "REJECTED";
+            System.out.println("\n===== Registration " + status + " =====");
+            System.out.println("Officer: " + selected.getOfficer().getName());
+            System.out.println("Project: " + selected.getProject().getProjectName());
+            System.out.println("New Status: " + selected.getRegistrationStatus());
+        } else {
+            System.out.println("\nFailed to update registration. Please try again.");
+        }
     }
 
     public void manageWithdrawalRequestsMenu() {

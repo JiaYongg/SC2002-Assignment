@@ -1,3 +1,4 @@
+import java.util.HashMap;
 import java.util.Map;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
@@ -6,6 +7,27 @@ import java.text.SimpleDateFormat;
 public class OfficerRegistrationFileWriter extends FileWriter<OfficerRegistration> {
     public OfficerRegistrationFileWriter() {
         super("OfficerRegistration.csv");
+    }
+
+    public void updateRegistration(OfficerRegistration updated) {
+        ProjectFileReader projectReader = new ProjectFileReader();
+        Map<String, Project> projectMap = projectReader.readFromFile();
+
+        HDBOfficerFileReader officerReader = new HDBOfficerFileReader();
+        Map<String, User> userMap = officerReader.readFromFile();
+
+        Map<String, HDBOfficer> officerMap = new HashMap<>();
+        for (User u : userMap.values()) {
+            if (u instanceof HDBOfficer o) {
+                officerMap.put(o.getNric(), o);
+            }
+        }
+
+        OfficerRegistrationFileReader reader = new OfficerRegistrationFileReader(projectMap, officerMap);
+        Map<String, OfficerRegistration> allRegs = reader.readFromFile();
+
+        allRegs.put(String.valueOf(updated.getRegistrationId()), updated); // Make sure getId() exists in your class
+        writeToFile(allRegs);
     }
 
     @Override

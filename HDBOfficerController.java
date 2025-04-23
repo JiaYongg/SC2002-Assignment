@@ -61,8 +61,21 @@ public class HDBOfficerController {
         return currentOfficer.getRegistrations();
     }
     
-    public Project getAssignedProject() {
-        return currentOfficer.getAssignedProject();
+    public Project getAssignedProject(HDBOfficer officer) {
+        OfficerRegistrationFileReader reader = new OfficerRegistrationFileReader(
+            new ProjectFileReader().readFromFile(),
+            Map.of(officer.getNric(), officer) // Map with current officer only
+        );
+    
+        Map<String, OfficerRegistration> allRegs = reader.readFromFile();
+    
+        for (OfficerRegistration reg : allRegs.values()) {
+            if (reg.getOfficer().getNric().equals(officer.getNric()) &&
+                reg.getRegistrationStatus() == OfficerRegistrationStatus.approved) {
+                return reg.getProject();
+            }
+        }
+        return null;
     }
     
      public List<Enquiry> getProjectEnquiries() {
@@ -205,26 +218,31 @@ public class HDBOfficerController {
     }
 
     private void loadProjectsForOfficer() {
+        // Load all projects
         ProjectFileReader projectReader = new ProjectFileReader();
-        Map<String, Project> loadedMap = projectReader.readFromFile();  // just use locally
-        this.allProjects = new ArrayList<>(loadedMap.values());
+        Map<String, Project> projectMap = projectReader.readFromFile();
+        this.allProjects = new ArrayList<>(projectMap.values());
     
-        // Debug output
-        System.out.println("Loaded " + allProjects.size() + " total projects");
+        // Prepare a single-officer map for filtering
+        Map<String, HDBOfficer> officerMap = new HashMap<>();
+        officerMap.put(currentOfficer.getNric(), currentOfficer);
     
-        // Check for any approved/assigned projects for this officer
-        for (Project project : allProjects) {
-            OfficerRegistration reg = project.getRegistrationByOfficer(currentOfficer);
-            if (reg != null && reg.getRegistrationStatus() == OfficerRegistrationStatus.approved) {
-                currentOfficer.setAssignedProject(project);
-                System.out.println("Assigned project found: " + project.getProjectName());
+        // Load registrations from file
+        OfficerRegistrationFileReader regReader = new OfficerRegistrationFileReader(projectMap, officerMap);
+        Map<String, OfficerRegistration> allRegs = regReader.readFromFile();
+    
+        // Check if any approved registration exists
+        for (OfficerRegistration reg : allRegs.values()) {
+            if (reg.getOfficer().getNric().equals(currentOfficer.getNric()) &&
+                reg.getRegistrationStatus() == OfficerRegistrationStatus.approved) {
+                currentOfficer.setAssignedProject(reg.getProject());
                 break;
             }
         }
     
         System.out.println("Current officer: " + currentOfficer.getName());
-        System.out.println("Assigned project: " + 
-            (currentOfficer.getAssignedProject() != null 
+        System.out.println("Assigned project: " +
+            (currentOfficer.getAssignedProject() != null
                 ? currentOfficer.getAssignedProject().getProjectName()
                 : "None"));
     }

@@ -1,4 +1,6 @@
 import java.util.Map;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
@@ -19,6 +21,15 @@ public class ProjectFileWriter extends FileWriter <Project> {
     @Override
     public void writeToFile(Map<String, Project> projects) {
         writeCSV(projects);
+    }
+
+    public void appendProject(Project project) {
+        try (PrintWriter writer = new PrintWriter(new FileOutputStream("ProjectList.csv", true))) {
+            writer.println(formatLine(project)); // Appends one project as a CSV row
+        } catch (Exception e) {
+            System.out.println("Error appending to ProjectList.csv");
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -81,13 +92,13 @@ public class ProjectFileWriter extends FileWriter <Project> {
         
         // Add officers if any
         List<HDBOfficer> officers = project.getAssignedOfficers();
-        if (officers.size() > 0) {
+        if (!officers.isEmpty()) {
             StringBuilder officerList = new StringBuilder();
             for (int i = 0; i < officers.size(); i++) {
                 if (i > 0) {
                     officerList.append(";");
                 }
-                officerList.append(officers.get(i).getNric());
+                officerList.append(officers.get(i).getName());  // <-- USE NAME
             }
             sb.append(officerList);
         }

@@ -24,11 +24,6 @@ public class ApplicationFileReader extends FileReader<Application> {
         try {
             String[] data = line.split(",");
             
-            if (data.length < 6) { 
-                System.out.println("Invalid application data format: " + line);
-                return;
-            }
-            
             int applicationID = Integer.parseInt(data[0].trim());
             String applicantNRIC = data[1].trim();
             String projectName = data[2].trim();

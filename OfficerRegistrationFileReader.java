@@ -71,10 +71,6 @@ public class OfficerRegistrationFileReader extends FileReader<OfficerRegistratio
             Date dateApplied = sdf.parse(dateAppliedStr);
 
             HDBOfficer officer = officers.get(nric);
-            if (officer == null) {
-                System.out.println("Could not find officer with NRIC: " + nric);
-                return;
-            }
 
             // Create the officer registration with the specified ID
             OfficerRegistration registration = new OfficerRegistration(officerRegistrationID, officer, project, status, dateApplied);

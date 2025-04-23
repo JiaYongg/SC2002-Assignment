@@ -192,54 +192,6 @@ public class HDBManagerController {
         return true;
     }
 
-    // public boolean approveOfficerRegistration(OfficerRegistration registration) {
-    // Project project = registration.getProject();
-
-    // // Check if project exists and is managed by current manager
-    // if (!isProjectManagedByCurrentManager(project)) {
-    // System.out.println("Error: You can only approve registrations for projects
-    // you manage.");
-    // return false;
-    // }
-
-    // // Check if there are available officer slots
-    // if (project.getRemainingOfficerSlots() <= 0) {
-    // System.out.println("Error: No remaining officer slots for this project.");
-    // return false;
-    // }
-
-    // // Approve registration
-    // registration.approve();
-
-    // // Assign officer to project
-    // HDBOfficer officer = registration.getOfficer();
-    // project.assignOfficer(officer);
-
-    // // Save changes
-    // saveProjects();
-
-    // return true;
-    // }
-
-    // public boolean rejectOfficerRegistration(OfficerRegistration registration) {
-    // Project project = registration.getProject();
-
-    // // Check if project exists and is managed by current manager
-    // if (!isProjectManagedByCurrentManager(project)) {
-    // System.out.println("Error: You can only reject registrations for projects you
-    // manage.");
-    // return false;
-    // }
-
-    // // Reject registration
-    // registration.reject();
-
-    // // Save changes
-    // saveProjects();
-
-    // return true;
-    // }
-
     public List<Project> viewAllProjects() {
         return new ArrayList<>(allProjects);
     }
@@ -248,20 +200,6 @@ public class HDBManagerController {
         return currentManager.getManagedProjects();
     }
 
-    // public List<OfficerRegistration>
-    // getOfficerRegistrationsByStatus(OfficerRegistrationStatus status) {
-    // List<OfficerRegistration> result = new ArrayList<>();
-
-    // for (Project project : currentManager.getManagedProjects()) {
-    // for (OfficerRegistration reg : project.getRegistrationRequests()) {
-    // if (reg.getStatus() == status) {
-    // result.add(reg);
-    // }
-    // }
-    // }
-
-    // return result;
-    // }DDD
 
     public List<Application> getBookedApplications(String flatTypeFilter, String maritalStatusFilter) {
         // Load user map (NRIC → User)
@@ -402,6 +340,63 @@ public class HDBManagerController {
 
     public HDBManager getCurrentManager() {
         return this.currentManager;
+    }
+
+    public List<OfficerRegistration> getPendingOfficerRegistrations() {
+        HDBOfficerFileReader officerReader = new HDBOfficerFileReader();
+        Map<String, User> userMap = officerReader.readFromFile();
+
+        Map<String, HDBOfficer> officerMap = new HashMap<>();
+        for (User u : userMap.values()) {
+            if (u instanceof HDBOfficer o) {
+                officerMap.put(o.getNric(), o);
+            }
+        }
+        
+        OfficerRegistrationFileReader reader = new OfficerRegistrationFileReader(projectMap, officerMap); // pass your officerMap if needed
+        Map<String, OfficerRegistration> allRegistrations = reader.readFromFile();
+    
+        List<OfficerRegistration> pending = new ArrayList<>();
+        for (OfficerRegistration reg : allRegistrations.values()) {
+            Project project = reg.getProject();
+            if (reg.getRegistrationStatus() == OfficerRegistrationStatus.pending &&
+                project.getManagerInCharge() != null &&
+                project.getManagerInCharge().getName().equals(currentManager.getName())) {
+                pending.add(reg);
+            }
+        }
+        return pending;
+    }
+
+    public boolean approveOfficerRegistration(OfficerRegistration registration) {
+        Project project = registration.getProject();
+        OfficerRegistrationFileWriter writer = new OfficerRegistrationFileWriter();
+        if (!isProjectManagedByCurrentManager(project)) return false;
+        if (project.getRemainingOfficerSlots() <= 0) return false;
+    
+        if (project.getRemainingOfficerSlots() <= 0) {
+            registration.reject();
+            writer.updateRegistration(registration);
+            System.out.println("Officer slot full. Registration has been rejected.");
+            return false;
+        }
+
+        registration.approve();
+        project.assignOfficer(registration.getOfficer());
+    
+        // Persist change
+        writer.updateRegistration(registration);
+        saveProjects(); // if needed
+        return true;
+    }
+    
+    public boolean rejectOfficerRegistration(OfficerRegistration registration) {
+        if (!isProjectManagedByCurrentManager(registration.getProject())) return false;
+    
+        registration.reject();
+        OfficerRegistrationFileWriter writer = new OfficerRegistrationFileWriter();
+        writer.updateRegistration(registration);
+        return true;
     }
 
 }

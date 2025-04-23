@@ -1,12 +1,15 @@
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Scanner;
 
 public class HDBOfficerView {
     private HDBOfficerController controller;
+    private HDBOfficer currentOfficer;
     private Scanner scanner;
     
-    public HDBOfficerView(HDBOfficerController controller) {
+    public HDBOfficerView(HDBOfficerController controller, HDBOfficer currentOfficer) {
         this.controller = controller;
+        this.currentOfficer = currentOfficer;
         this.scanner = new Scanner(System.in);
     }
     
@@ -193,27 +196,19 @@ public class HDBOfficerView {
     }
     
     public void viewAssignedProject() {
-        System.out.println("\n===== Assigned Project =====");
-        Project assignedProject = controller.getAssignedProject();
-        
-        if (assignedProject == null) {
-            System.out.println("You are not assigned to any project yet.");
-        } else {
-            System.out.println("Project Name       : " + assignedProject.getProjectName());
-            System.out.println("Neighborhood       : " + assignedProject.getNeighborhood());
-            System.out.println("Application Period : " +
-                assignedProject.getApplicationOpenDate() + " to " +
-                assignedProject.getApplicationCloseDate());
-        
-            System.out.println("\nFlat Types:");
-            System.out.println("------------------------------------------------------");
-            System.out.printf("%-15s %-15s %-10s\n", "Flat Type", "Units Left", "Price (SGD)");
-            System.out.println("------------------------------------------------------");
-            for (FlatType ft : assignedProject.getFlatTypes()) {
-                System.out.printf("%-15s %-15d $%-10.2f\n", ft.getName(), ft.getUnitCount(), ft.getPrice());
-            }
-            System.out.println("------------------------------------------------------");
-        }
+    Project assignedProject = controller.getAssignedProject(currentOfficer);
+
+    System.out.println("\n===== Assigned Project =====");
+    if (assignedProject != null) {
+        System.out.println("You are assigned to: " + assignedProject.getProjectName());
+        System.out.println("Neighborhood: " + assignedProject.getNeighborhood());
+        System.out.println("Application Period: " +
+            new SimpleDateFormat("dd/MM/yyyy").format(assignedProject.getApplicationOpenDate()) +
+            " to " +
+            new SimpleDateFormat("dd/MM/yyyy").format(assignedProject.getApplicationCloseDate()));
+    } else {
+        System.out.println("You are not assigned to any project yet.");
+    }
     }
     
     public void viewProjectEnquiries() {

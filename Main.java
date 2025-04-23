@@ -39,11 +39,11 @@ public class Main {
                     break;
 
                  case "OFFICER":
-                     HDBOfficer officer = (HDBOfficer) currentUser;
-                     HDBOfficerController officerController = new HDBOfficerController(officer);
-                     HDBOfficerView officerView = new HDBOfficerView(officerController);
-                     exitProgram = officerView.displayOfficerMenu();
-                     break;
+                    HDBOfficer officer = (HDBOfficer) currentUser;
+                    HDBOfficerController officerController = new HDBOfficerController(officer);
+                    HDBOfficerView officerView = new HDBOfficerView(officerController, officer);
+                    exitProgram = officerView.displayOfficerMenu();
+                    break;
 
                case "APPLICANT":
                default:

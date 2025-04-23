@@ -19,76 +19,74 @@ public class ProjectFileReader extends FileReader<Project> {
 
     @Override
     protected void processLine(String line, Map<String, Project> projects) {
-        String[] data = line.split(",");
-        
-        // Skip if line doesn't have enough fields
-        if (data.length < 13) {
+        String[] data = line.split(",", -1);
+
+        if (data.length < 14) {
+            System.out.println("Skipping malformed line: " + line);
             return;
         }
-        
+
         try {
-            // Parse project details
+            // Parse basic fields
             String projectName = data[0].trim();
             String neighborhood = data[1].trim();
-            
-            // Parse flat types
+
             List<FlatType> flatTypes = new ArrayList<>();
-            
-            // Add Type 1 if it exists
+
+            // Type 1
             if (!data[2].isEmpty()) {
-                String typeName = data[2].trim();
-                int units = Integer.parseInt(data[3].trim());
-                double price = Double.parseDouble(data[4].trim());
-                flatTypes.add(new FlatType(typeName, units, price));
+                flatTypes.add(new FlatType(data[2].trim(), Integer.parseInt(data[3].trim()), Double.parseDouble(data[4].trim())));
             }
-            
-            // Add Type 2 if it exists
-            if (data.length > 5 && !data[5].isEmpty()) {
-                String typeName = data[5].trim();
-                int units = Integer.parseInt(data[6].trim());
-                double price = Double.parseDouble(data[7].trim());
-                flatTypes.add(new FlatType(typeName, units, price));
+
+            // Type 2
+            if (!data[5].isEmpty()) {
+                flatTypes.add(new FlatType(data[5].trim(), Integer.parseInt(data[6].trim()), Double.parseDouble(data[7].trim())));
             }
-            
-            // Parse dates
+
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
             Date openDate = dateFormat.parse(data[8].trim());
             Date closeDate = dateFormat.parse(data[9].trim());
-            
-            // Parse manager
+
             String managerName = data[10].trim();
             HDBManager manager = findOrCreateManager(managerName);
-            
-            // Parse officer slots
+
             int officerSlots = Integer.parseInt(data[11].trim());
+            boolean isVisible = Boolean.parseBoolean(data[13].trim());
 
-            boolean isVisible = Boolean.parseBoolean(data[data.length - 1].trim());
+            Project project = new Project(projectName, neighborhood, openDate, closeDate, isVisible, flatTypes, manager, officerSlots);
 
-            // Create project
-            Project project = new Project(
-                projectName,
-                neighborhood,
-                openDate,
-                closeDate,
-                isVisible, // Default visibility to true for loaded projects
-                flatTypes,
-                manager,
-                officerSlots
-            );
-            
-            // Check if visibility should be updated based on dates and flat availability
-            ProjectController projectController = new ProjectController();
-            projectController.updateProjectVisibility(project);
-            
-            // Add project to the map with project name as key
+            if (!data[12].isEmpty()) {
+                String[] officerNames = data[12].split(";");
+                for (String name : officerNames) {
+                    HDBOfficer officer = findOrCreateOfficer(name.trim());
+                    officer.setAssignedProject(project);
+                    project.assignOfficer(officer);
+                }
+            }
+
+            // Optional: auto-hide if outdated
+            new ProjectController().updateProjectVisibility(project);
+
             projects.put(projectName, project);
-            
-        } catch (NumberFormatException | ParseException e) {
+
+        } catch (Exception e) {
             System.out.println("Error processing line: " + line);
-            System.out.println("Error details: " + e.getMessage());
+            e.printStackTrace();
         }
     }
-    
+
+    private HDBOfficer findOrCreateOfficer(String name) {
+        HDBOfficer officer = new HDBOfficer();
+        officer.setName(name);
+        try {
+            // Assign a dummy NRIC (format valid but random)
+            officer.setNric("T" + (int)(Math.random() * 9000000 + 1000000) + "Z");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Invalid NRIC generated for officer: " + name);
+        }
+        return officer;
+    }
+
     
     // Helper method to find or create a Manager object
     private HDBManager findOrCreateManager(String managerName) {
