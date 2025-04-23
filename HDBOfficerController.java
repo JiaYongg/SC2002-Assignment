@@ -10,10 +10,8 @@ public class HDBOfficerController {
     private static int receiptIdCounter=1;
     private static int registrationid=1;
     
-    public HDBOfficerController(HDBOfficer currentOfficer, List<Project> allProjects,HDBOfficerView view){
+    public HDBOfficerController(HDBOfficer currentOfficer){
         this.currentOfficer=currentOfficer;
-        this.allProjects = new ArrayList<>();
-        this.view=view;
         // In a full implementation, you would load projects from a file
     }
     
@@ -43,7 +41,7 @@ public class HDBOfficerController {
              return false;
          }
         
-         OfficerRegistration registration = new OfficerRegistration(currentOfficer, project);
+         OfficerRegistration registration = new OfficerRegistration(registrationid, currentOfficer, project, OfficerRegistrationStatus.pending, new Date());
          currentOfficer.addRegistration(registration);
          project.addOfficerRegistration(registration);
          return true;

@@ -4,12 +4,18 @@ import java.util.List;
 public class HDBOfficer extends Applicant {
     private Project assignedProject;
     private List<OfficerRegistration> registrations;
+    private List<Project> handledProjects;
     
-    public HDBOfficer() {
+    public HDBOfficer(List<Project> handledProjects) {
         super();
         this.registrations = new ArrayList<>();
+        this.handledProjects = handledProjects;
     }
     
+    public List<Project> getHandledProjects() {
+        return handledProjects;
+    }
+
     public Project getAssignedProject() {
         return assignedProject;
     }
@@ -30,17 +36,16 @@ public class HDBOfficer extends Applicant {
         return assignedProject != null;
     }
     
-     public boolean canRegisterForProject(Project project) {
+    public boolean canRegisterForProject(Project project) {
           //Cannot register if already assigned to a project
          if (isAssignedToProject()) {
              return false;
          }
         
          // Cannot register if already applied for this project as an applicant
-         for (Application app : getApplications()) {
-             if (app.getProject().equals(project)) {
-                 return false;
-             }
+         Application app = getApplication();
+         if (app != null && app.getProject().equals(project)) {
+             return false;
          }
         
          // Cannot register if already registered for another project with overlapping dates
