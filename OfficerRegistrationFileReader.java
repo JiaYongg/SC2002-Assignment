@@ -4,10 +4,12 @@ import java.text.SimpleDateFormat;
 
 public class OfficerRegistrationFileReader extends FileReader<OfficerRegistration> {
     private Map<String, Project> projects;
+    private Map<String, HDBOfficer> officers;
 
-    public OfficerRegistrationFileReader(Map<String, Project> projects) {
+    public OfficerRegistrationFileReader(Map<String, Project> projects, Map<String, HDBOfficer> officers) {
         super("OfficerRegistration.csv");
         this.projects = projects;
+        this.officers = officers;
     }
 
     @Override
@@ -46,8 +48,14 @@ public class OfficerRegistrationFileReader extends FileReader<OfficerRegistratio
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
             Date dateApplied = sdf.parse(dateAppliedStr);
 
+            HDBOfficer officer = officers.get(nric);
+            if (officer == null) {
+                System.out.println("Could not find officer with NRIC: " + nric);
+                return;
+            }
+
             // Create the officer registration with the specified ID
-            OfficerRegistration registration = new OfficerRegistration(officerRegistrationID, nric, project, status, dateApplied);
+            OfficerRegistration registration = new OfficerRegistration(officerRegistrationID, officer, project, status, dateApplied);
 
             // Add to the map of officer registrations
             officerRegistrations.put(String.valueOf(officerRegistrationID), registration);

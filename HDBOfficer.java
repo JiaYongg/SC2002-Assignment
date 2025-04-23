@@ -6,10 +6,10 @@ public class HDBOfficer extends Applicant {
     private List<OfficerRegistration> registrations;
     private List<Project> handledProjects;
     
-    public HDBOfficer(List<Project> handledProjects) {
+    public HDBOfficer() {
         super();
         this.registrations = new ArrayList<>();
-        this.handledProjects = handledProjects;
+        this.handledProjects = new ArrayList<>();
     }
     
     public List<Project> getHandledProjects() {
