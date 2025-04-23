@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.IntStream;
 
 public class HDBManagerView {
     private HDBManagerController controller;
@@ -24,51 +25,25 @@ public class HDBManagerView {
             try {
                 int choice = Integer.parseInt(scanner.nextLine().trim());
                 switch (choice) {
-                    case 1:
-                        createProjectMenu();
-                        break;
-                    case 2:
-                        viewAllProjectsMenu();
-                        break;
-                    case 3:
-                        viewOwnProjectsMenu();
-                        break;
-                    case 4:
-                        editProjectMenu();
-                        break;
-                    case 5:
-                        deleteProjectMenu();
-                        break;
-                    case 6:
-                        toggleVisibilityMenu();
-                        break;
-                    case 7:
-                        handleOfficerRegistrationsMenu();
-                        break;
-                    case 8:
-                        viewPendingApplicationsMenu();
-                        break;
-                    case 9:
-                        manageWithdrawalRequestsMenu();
-                        break;
-                    case 10:
-                        generateBookingReport();
-
-                        break;
-                    case 11:
-                        viewAllEnquiriesMenu();
-                        break;
-                    case 12:
-                        viewAndReplyToMyProjectsEnquiriesMenu();
-                        break;
-
-                    case 0:
+                    case 1 -> createProjectMenu();
+                    case 2 -> viewAllProjectsMenu();
+                    case 3 -> viewOwnProjectsMenu();
+                    case 4 -> editProjectMenu();
+                    case 5 -> deleteProjectMenu();
+                    case 6 -> toggleVisibilityMenu();
+                    case 7 -> handleOfficerRegistrationsMenu();
+                    case 8 -> viewPendingApplicationsMenu();
+                    case 9 -> manageWithdrawalRequestsMenu();
+                    case 10 -> generateBookingReport();
+                    case 11 -> viewAllEnquiriesMenu();
+                    case 12 -> viewAndReplyToMyProjectsEnquiriesMenu();
+                    case 0 -> {
                         running = false;
                         System.out.println("Logging out...");
-                        break;
-                    default:
-                        System.out.println("Invalid option. Please try again.");
+                    }
+                    default -> System.out.println("Invalid option. Please try again.");
                 }
+
             } catch (NumberFormatException e) {
                 System.out.println("Please enter a valid number.");
             }
@@ -175,22 +150,10 @@ public class HDBManagerView {
         System.out.println("\nID | Project Name | Neighborhood | Application Period | Visibility | Manager");
         System.out.println("-------------------------------------------------------------------------------------");
 
-        int index = 1;
-        for (Project project : projects) {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-            String openDate = dateFormat.format(project.getApplicationOpenDate());
-            String closeDate = dateFormat.format(project.getApplicationCloseDate());
-            String visibility = project.isVisible() ? "Visible" : "Hidden";
-            String managerName = project.getManagerInCharge().getName();
-
-            System.out.printf("%2d | %-20s | %-15s | %s to %s | %-8s | %s\n",
-                    index++,
-                    project.getProjectName(),
-                    project.getNeighborhood(),
-                    openDate, closeDate,
-                    visibility,
-                    managerName);
-        }
+        IntStream.range(0, projects.size()).forEach(i -> {
+            Project p = projects.get(i);
+            printProjectSummary(p, i + 1);
+        });
 
         System.out.println("\nOptions:");
         System.out.println("1. View Project Details");
@@ -199,19 +162,28 @@ public class HDBManagerView {
 
         try {
             int choice = Integer.parseInt(scanner.nextLine().trim());
-
             switch (choice) {
-                case 1:
-                    viewProjectDetailsMenu(projects);
-                    break;
-                case 0:
+                case 1 -> viewProjectDetailsMenu(projects);
+                case 0 -> {
                     return;
-                default:
-                    System.out.println("Invalid option. Returning to main menu.");
+                }
+                default -> System.out.println("Invalid option. Returning to main menu.");
             }
         } catch (NumberFormatException e) {
             System.out.println("Invalid input. Returning to main menu.");
         }
+    }
+
+    private void printProjectSummary(Project project, int index) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        String openDate = dateFormat.format(project.getApplicationOpenDate());
+        String closeDate = dateFormat.format(project.getApplicationCloseDate());
+        String visibility = project.isVisible() ? "Visible" : "Hidden";
+        String managerName = project.getManagerInCharge().getName();
+
+        System.out.printf("%2d | %-20s | %-15s | %s to %s | %-8s | %s\n",
+                index, project.getProjectName(), project.getNeighborhood(),
+                openDate, closeDate, visibility, managerName);
     }
 
     private void viewProjectDetailsMenu(List<Project> projects) {
@@ -265,6 +237,20 @@ public class HDBManagerView {
         System.out.println("\nStatus: " + status.getStatusMessage());
     }
 
+    private void printOwnProjectSummary(Project project, int index) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        String openDate = dateFormat.format(project.getApplicationOpenDate());
+        String closeDate = dateFormat.format(project.getApplicationCloseDate());
+        String visibility = project.isVisible() ? "Visible" : "Hidden";
+
+        System.out.printf("%2d | %-20s | %-15s | %s to %s | %s\n",
+                index,
+                project.getProjectName(),
+                project.getNeighborhood(),
+                openDate, closeDate,
+                visibility);
+    }
+
     private void viewOwnProjectsMenu() {
         System.out.println("\n===== My BTO Projects =====");
 
@@ -281,20 +267,8 @@ public class HDBManagerView {
         System.out.println("\nID | Project Name | Neighborhood | Application Period | Visibility");
         System.out.println("--------------------------------------------------------------------");
 
-        int index = 1;
-        for (Project project : projects) {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-            String openDate = dateFormat.format(project.getApplicationOpenDate());
-            String closeDate = dateFormat.format(project.getApplicationCloseDate());
-            String visibility = project.isVisible() ? "Visible" : "Hidden";
-
-            System.out.printf("%2d | %-20s | %-15s | %s to %s | %s\n",
-                    index++,
-                    project.getProjectName(),
-                    project.getNeighborhood(),
-                    openDate, closeDate,
-                    visibility);
-        }
+        IntStream.range(0, projects.size())
+                .forEach(i -> printOwnProjectSummary(projects.get(i), i + 1));
 
         System.out.println("\nOptions:");
         System.out.println("1. View Project Details");
@@ -304,18 +278,13 @@ public class HDBManagerView {
 
         try {
             int choice = Integer.parseInt(scanner.nextLine().trim());
-
             switch (choice) {
-                case 1:
-                    viewProjectDetailsMenu(projects);
-                    break;
-                case 2:
-                    toggleProjectFromList(projects);
-                    break;
-                case 0:
+                case 1 -> viewProjectDetailsMenu(projects);
+                case 2 -> toggleProjectFromList(projects);
+                case 0 -> {
                     return;
-                default:
-                    System.out.println("Invalid option. Returning to main menu.");
+                }
+                default -> System.out.println("Invalid option. Returning to main menu.");
             }
         } catch (NumberFormatException e) {
             System.out.println("Invalid input. Returning to main menu.");
@@ -353,9 +322,7 @@ public class HDBManagerView {
     private void editProjectMenu() {
         System.out.println("\n===== Edit Project =====");
 
-        // Get projects managed by the current manager
         List<Project> ownProjects = controller.viewOwnProjects();
-
         if (ownProjects.isEmpty()) {
             System.out.println("You don't have any projects to edit.");
             System.out.println("Press Enter to continue...");
@@ -363,372 +330,289 @@ public class HDBManagerView {
             return;
         }
 
-        // Display list of projects
-        System.out.println("Your Projects:");
-        System.out.println("ID | Project Name | Neighborhood | Application Period");
-        System.out.println("------------------------------------------------------");
+        printProjectList(ownProjects);
 
-        int index = 1;
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        for (Project project : ownProjects) {
-            String openDate = dateFormat.format(project.getApplicationOpenDate());
-            String closeDate = dateFormat.format(project.getApplicationCloseDate());
+        Project selectedProject = selectProjectFromList(ownProjects, "edit");
+        if (selectedProject == null)
+            return;
 
-            System.out.printf("%2d | %-20s | %-15s | %s to %s\n",
-                    index++,
-                    project.getProjectName(),
-                    project.getNeighborhood(),
-                    openDate, closeDate);
+        System.out.println("\nCurrent Project Details:");
+        displayProjectDetails(selectedProject);
+
+        System.out.print("\nAre you sure you want to edit this project? (y/n): ");
+        String confirm = scanner.nextLine().trim().toLowerCase();
+        if (!confirm.equals("y") && !confirm.equals("yes")) {
+            System.out.println("Edit operation canceled.");
+            System.out.println("Press Enter to continue...");
+            scanner.nextLine();
+            return;
         }
 
-        // Get user selection
-        System.out.print("\nEnter project ID to edit (0 to cancel): ");
+        Project updated = gatherUpdatedProjectFields(selectedProject);
+        if (updated == null)
+            return;
+
+        boolean success = controller.editProject(
+                selectedProject,
+                updated.getProjectName(),
+                updated.getNeighborhood(),
+                updated.getFlatTypes(),
+                new SimpleDateFormat("dd/MM/yyyy").format(updated.getApplicationOpenDate()),
+                new SimpleDateFormat("dd/MM/yyyy").format(updated.getApplicationCloseDate()),
+                updated.getOfficerSlots());
+
+        System.out.println(success
+                ? "\nProject updated successfully: " + updated.getProjectName()
+                : "\nFailed to update project. Please check your inputs and try again.");
+
+        System.out.println("Press Enter to continue...");
+        scanner.nextLine();
+    }
+
+    private Project selectProjectFromList(List<Project> projects, String action) {
+        System.out.print("\nEnter project ID to " + action + " (0 to cancel): ");
         try {
             int projectId = Integer.parseInt(scanner.nextLine().trim());
-
-            if (projectId == 0) {
-                return; // User canceled
+            if (projectId == 0)
+                return null;
+            if (projectId < 1 || projectId > projects.size()) {
+                System.out.println("Invalid project ID.");
+                return null;
             }
-
-            if (projectId < 1 || projectId > ownProjects.size()) {
-                System.out.println("Invalid project ID. Please try again.");
-                System.out.println("Press Enter to continue...");
-                scanner.nextLine();
-                return;
-            }
-
-            // Get the selected project
-            Project selectedProject = ownProjects.get(projectId - 1);
-
-            // Display current project details
-            System.out.println("\nCurrent Project Details:");
-            displayProjectDetails(selectedProject);
-
-            // Confirm edit
-            System.out.print("\nAre you sure you want to edit this project? (y/n): ");
-            String confirmation = scanner.nextLine().trim().toLowerCase();
-            if (!confirmation.equals("y") && !confirmation.equals("yes")) {
-                System.out.println("Edit operation canceled.");
-                System.out.println("Press Enter to continue...");
-                scanner.nextLine();
-                return;
-            }
-
-            // Get new values (with current values as defaults)
-            System.out.println("\nEnter new values (press Enter to keep current value):");
-
-            // Project name
-            System.out.print("Project Name [" + selectedProject.getProjectName() + "]: ");
-            String newName = scanner.nextLine().trim();
-            if (newName.isEmpty()) {
-                newName = selectedProject.getProjectName();
-            }
-
-            // Neighborhood
-            System.out.print("Neighborhood [" + selectedProject.getNeighborhood() + "]: ");
-            String newNeighborhood = scanner.nextLine().trim();
-            if (newNeighborhood.isEmpty()) {
-                newNeighborhood = selectedProject.getNeighborhood();
-            }
-
-            // Flat types
-            List<FlatType> currentFlatTypes = selectedProject.getFlatTypes();
-            List<FlatType> newFlatTypes = new ArrayList<>();
-
-            // For each existing flat type, prompt for new values
-            for (FlatType flatType : currentFlatTypes) {
-                System.out.println("\n----- " + flatType.getName() + " Flat Type -----");
-
-                System.out.print("Number of units [" + flatType.getUnitCount() + "]: ");
-                String unitsStr = scanner.nextLine().trim();
-                int units = unitsStr.isEmpty() ? flatType.getUnitCount() : Integer.parseInt(unitsStr);
-
-                System.out.print("Base price [$" + String.format("%,.2f", flatType.getPrice()) + "]: ");
-                String priceStr = scanner.nextLine().trim();
-                double price = priceStr.isEmpty() ? flatType.getPrice() : Double.parseDouble(priceStr);
-
-                newFlatTypes.add(new FlatType(flatType.getName(), units, price));
-            }
-
-            // Application dates
-            System.out.print(
-                    "Application opening date [" + dateFormat.format(selectedProject.getApplicationOpenDate()) + "]: ");
-            String newOpenDateStr = scanner.nextLine().trim();
-            if (newOpenDateStr.isEmpty()) {
-                newOpenDateStr = dateFormat.format(selectedProject.getApplicationOpenDate());
-            }
-
-            System.out.print("Application closing date [" + dateFormat.format(selectedProject.getApplicationCloseDate())
-                    + "]: ");
-            String newCloseDateStr = scanner.nextLine().trim();
-            if (newCloseDateStr.isEmpty()) {
-                newCloseDateStr = dateFormat.format(selectedProject.getApplicationCloseDate());
-            }
-
-            // Officer slots
-            System.out.print("Officer slots [" + selectedProject.getOfficerSlots() + "]: ");
-            String officerSlotsStr = scanner.nextLine().trim();
-            int newOfficerSlots = officerSlotsStr.isEmpty() ? selectedProject.getOfficerSlots()
-                    : Integer.parseInt(officerSlotsStr);
-
-            // Call controller to update project
-            boolean success = controller.editProject(
-                    selectedProject,
-                    newName,
-                    newNeighborhood,
-                    newFlatTypes,
-                    newOpenDateStr,
-                    newCloseDateStr,
-                    newOfficerSlots);
-
-            if (success) {
-                System.out.println("\nProject updated successfully!");
-                System.out.println("Project: " + newName);
-            } else {
-                System.out.println("\nFailed to update project. Please check your inputs and try again.");
-            }
-
+            return projects.get(projectId - 1);
         } catch (NumberFormatException e) {
-            System.out.println("Invalid input. Please enter a number.");
-        } catch (Exception e) {
-            System.out.println("Error editing project: " + e.getMessage());
+            System.out.println("Invalid input.");
+            return null;
         }
+    }
 
-        System.out.println("\nPress Enter to continue...");
-        scanner.nextLine();
+    private Project gatherUpdatedProjectFields(Project oldProject) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+        try {
+            System.out.println("\nEnter new values (leave blank to keep current):");
+
+            System.out.print("Project Name [" + oldProject.getProjectName() + "]: ");
+            String name = scanner.nextLine().trim();
+            if (name.isEmpty())
+                name = oldProject.getProjectName();
+
+            System.out.print("Neighborhood [" + oldProject.getNeighborhood() + "]: ");
+            String neighborhood = scanner.nextLine().trim();
+            if (neighborhood.isEmpty())
+                neighborhood = oldProject.getNeighborhood();
+
+            List<FlatType> flatTypes = new ArrayList<>();
+            for (FlatType ft : oldProject.getFlatTypes()) {
+                System.out.println("\n----- " + ft.getName() + " Flat Type -----");
+                System.out.print("Units [" + ft.getUnitCount() + "]: ");
+                String unitsStr = scanner.nextLine().trim();
+                int units = unitsStr.isEmpty() ? ft.getUnitCount() : Integer.parseInt(unitsStr);
+
+                System.out.print("Price [$" + String.format("%,.2f", ft.getPrice()) + "]: ");
+                String priceStr = scanner.nextLine().trim();
+                double price = priceStr.isEmpty() ? ft.getPrice() : Double.parseDouble(priceStr);
+
+                flatTypes.add(new FlatType(ft.getName(), units, price));
+            }
+
+            System.out.print("Opening Date [" + dateFormat.format(oldProject.getApplicationOpenDate()) + "]: ");
+            String openStr = scanner.nextLine().trim();
+            Date open = openStr.isEmpty() ? oldProject.getApplicationOpenDate() : dateFormat.parse(openStr);
+
+            System.out.print("Closing Date [" + dateFormat.format(oldProject.getApplicationCloseDate()) + "]: ");
+            String closeStr = scanner.nextLine().trim();
+            Date close = closeStr.isEmpty() ? oldProject.getApplicationCloseDate() : dateFormat.parse(closeStr);
+
+            System.out.print("Officer Slots [" + oldProject.getOfficerSlots() + "]: ");
+            String slotsStr = scanner.nextLine().trim();
+            int slots = slotsStr.isEmpty() ? oldProject.getOfficerSlots() : Integer.parseInt(slotsStr);
+
+            return new Project(name, neighborhood, open, close, oldProject.isVisible(),
+                    flatTypes, oldProject.getManagerInCharge(), slots);
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+            return null;
+        }
+    }
+
+    private void printProjectList(List<Project> projects) {
+        System.out.println("ID | Project Name | Neighborhood | Application Period");
+        System.out.println("------------------------------------------------------");
+        IntStream.range(0, projects.size())
+                .forEach(i -> printOwnProjectSummary(projects.get(i), i + 1));
     }
 
     private void deleteProjectMenu() {
         System.out.println("\n===== Delete Project =====");
         System.out.println("Warning: This action cannot be undone!");
-
-        // Get projects managed by the current manager
+    
         List<Project> ownProjects = controller.viewOwnProjects();
-
         if (ownProjects.isEmpty()) {
             System.out.println("You don't have any projects to delete.");
             System.out.println("Press Enter to continue...");
             scanner.nextLine();
             return;
         }
-
-        // Display list of projects
-        System.out.println("Your Projects:");
-        System.out.println("ID | Project Name | Neighborhood | Application Period | Officers");
-        System.out.println("---------------------------------------------------------------");
-
-        int index = 1;
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        for (Project project : ownProjects) {
-            String openDate = dateFormat.format(project.getApplicationOpenDate());
-            String closeDate = dateFormat.format(project.getApplicationCloseDate());
-            int officerCount = project.getAssignedOfficers().size();
-
-            System.out.printf("%2d | %-20s | %-15s | %s to %s | %d/%d\n",
-                    index++,
-                    project.getProjectName(),
-                    project.getNeighborhood(),
-                    openDate, closeDate,
-                    officerCount, project.getOfficerSlots());
+    
+        printDeletableProjects(ownProjects);
+    
+        Project selectedProject = selectProjectFromList(ownProjects, "delete");
+        if (selectedProject == null) return;
+    
+        if (!selectedProject.getAssignedOfficers().isEmpty()) {
+            System.out.println("\nError: Cannot delete project with assigned officers.");
+            System.out.println("You must remove all officers from the project before deleting it.");
+            System.out.println("Press Enter to continue...");
+            scanner.nextLine();
+            return;
         }
-
-        // Get user selection
-        System.out.print("\nEnter project ID to delete (0 to cancel): ");
-        try {
-            int projectId = Integer.parseInt(scanner.nextLine().trim());
-
-            if (projectId == 0) {
-                return; // User canceled
-            }
-
-            if (projectId < 1 || projectId > ownProjects.size()) {
-                System.out.println("Invalid project ID. Please try again.");
-                System.out.println("Press Enter to continue...");
-                scanner.nextLine();
-                return;
-            }
-
-            // Get the selected project
-            Project selectedProject = ownProjects.get(projectId - 1);
-
-            // Check if project has assigned officers
-            if (!selectedProject.getAssignedOfficers().isEmpty()) {
-                System.out.println("\nError: Cannot delete project with assigned officers.");
-                System.out.println("You must remove all officers from the project before deleting it.");
-                System.out.println("Press Enter to continue...");
-                scanner.nextLine();
-                return;
-            }
-
-            // Display project details
-            System.out.println("\nProject to delete:");
-            System.out.println("Project Name: " + selectedProject.getProjectName());
-            System.out.println("Neighborhood: " + selectedProject.getNeighborhood());
-            System.out.println("Application Period: " +
-                    dateFormat.format(selectedProject.getApplicationOpenDate()) + " to " +
-                    dateFormat.format(selectedProject.getApplicationCloseDate()));
-
-            // Confirm deletion with double confirmation for safety
-            System.out.print("\nAre you sure you want to delete this project? (y/n): ");
-            String confirmation1 = scanner.nextLine().trim().toLowerCase();
-
-            if (!confirmation1.equals("y") && !confirmation1.equals("yes")) {
-                System.out.println("Delete operation canceled.");
-                System.out.println("Press Enter to continue...");
-                scanner.nextLine();
-                return;
-            }
-
-            System.out.print("\nThis action CANNOT be undone. Type the project name to confirm deletion: ");
-            String confirmation2 = scanner.nextLine().trim();
-
-            if (!confirmation2.equals(selectedProject.getProjectName())) {
-                System.out.println("Project name doesn't match. Delete operation canceled.");
-                System.out.println("Press Enter to continue...");
-                scanner.nextLine();
-                return;
-            }
-
-            // Call controller to delete project
-            boolean success = controller.deleteProject(selectedProject);
-
-            if (success) {
-                System.out.println("\nProject deleted successfully!");
-                System.out.println("Project: " + selectedProject.getProjectName());
-            } else {
-                System.out.println("\nFailed to delete project. Please try again later.");
-            }
-
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid input. Please enter a number.");
-        } catch (Exception e) {
-            System.out.println("Error deleting project: " + e.getMessage());
+    
+        if (!confirmDeletion(selectedProject)) {
+            System.out.println("Delete operation canceled.");
+            System.out.println("Press Enter to continue...");
+            scanner.nextLine();
+            return;
         }
-
-        System.out.println("\nPress Enter to continue...");
+    
+        boolean success = controller.deleteProject(selectedProject);
+        System.out.println(success
+            ? "\nProject deleted successfully: " + selectedProject.getProjectName()
+            : "\nFailed to delete project. Please try again later.");
+    
+        System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }
-
+    
+    private void printDeletableProjects(List<Project> projects) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+    
+        System.out.println("ID | Project Name | Neighborhood | Application Period | Officers");
+        System.out.println("---------------------------------------------------------------");
+    
+        IntStream.range(0, projects.size()).forEach(i -> {
+            Project p = projects.get(i);
+            String openDate = dateFormat.format(p.getApplicationOpenDate());
+            String closeDate = dateFormat.format(p.getApplicationCloseDate());
+            System.out.printf("%2d | %-20s | %-15s | %s to %s | %d/%d\n",
+                    i + 1,
+                    p.getProjectName(),
+                    p.getNeighborhood(),
+                    openDate, closeDate,
+                    p.getAssignedOfficers().size(),
+                    p.getOfficerSlots());
+        });
+    }
+    private boolean confirmDeletion(Project project) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+    
+        System.out.println("\nProject to delete:");
+        System.out.println("Project Name: " + project.getProjectName());
+        System.out.println("Neighborhood: " + project.getNeighborhood());
+        System.out.println("Application Period: " +
+                dateFormat.format(project.getApplicationOpenDate()) + " to " +
+                dateFormat.format(project.getApplicationCloseDate()));
+    
+        System.out.print("\nAre you sure you want to delete this project? (y/n): ");
+        String confirmation1 = scanner.nextLine().trim().toLowerCase();
+        if (!confirmation1.equals("y") && !confirmation1.equals("yes")) return false;
+    
+        System.out.print("\nThis action CANNOT be undone. Type the project name to confirm deletion: ");
+        String confirmation2 = scanner.nextLine().trim();
+    
+        return confirmation2.equals(project.getProjectName());
+    }
+    
+    
     private void toggleVisibilityMenu() {
         System.out.println("\n===== Toggle Project Visibility =====");
-        System.out.println(
-                "As a manager, you have full control over your projects' visibility regardless of application dates.");
-
-        // Get projects managed by the current manager
+        System.out.println("As a manager, you have full control over your projects' visibility.");
+    
         List<Project> ownProjects = controller.viewOwnProjects();
-
         if (ownProjects.isEmpty()) {
             System.out.println("You don't have any projects to manage.");
             System.out.println("Press Enter to continue...");
             scanner.nextLine();
             return;
         }
-
-        // Display list of projects with their current visibility status and dates
-        System.out.println("\nYour Projects:");
-        System.out.println("ID | Project Name | Neighborhood | Current Status | Application Period");
-        System.out.println("-------------------------------------------------------------------------");
-
-        int index = 1;
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        Date currentDate = new Date();
-
-        for (Project project : ownProjects) {
-            String openDate = dateFormat.format(project.getApplicationOpenDate());
-            String closeDate = dateFormat.format(project.getApplicationCloseDate());
-            String visibility = project.isVisible() ? "VISIBLE" : "HIDDEN";
-
-            // Determine if the project is currently open for applications
-            String periodStatus = "";
-            if (currentDate.before(project.getApplicationOpenDate())) {
-                periodStatus = "(Not yet open)";
-            } else if (currentDate.after(project.getApplicationCloseDate())) {
-                periodStatus = "(Closed)";
-            } else {
-                periodStatus = "(Open)";
-            }
-
-            System.out.printf("%2d | %-20s | %-15s | %-12s | %s to %s %s\n",
-                    index++,
-                    project.getProjectName(),
-                    project.getNeighborhood(),
-                    visibility,
-                    openDate, closeDate,
-                    periodStatus);
+    
+        printVisibilityProjects(ownProjects);
+    
+        Project selectedProject = selectProjectFromList(ownProjects, "toggle visibility for");
+        if (selectedProject == null) return;
+    
+        if (!confirmVisibilityToggle(selectedProject)) {
+            System.out.println("Operation canceled.");
+            System.out.println("Press Enter to continue...");
+            scanner.nextLine();
+            return;
         }
-
-        // Get user selection
-        System.out.print("\nEnter project ID to toggle visibility (0 to cancel): ");
-        try {
-            int projectId = Integer.parseInt(scanner.nextLine().trim());
-
-            if (projectId == 0) {
-                return; // User canceled
-            }
-
-            if (projectId < 1 || projectId > ownProjects.size()) {
-                System.out.println("Invalid project ID. Please try again.");
-                System.out.println("Press Enter to continue...");
-                scanner.nextLine();
-                return;
-            }
-
-            // Get the selected project
-            Project selectedProject = ownProjects.get(projectId - 1);
-
-            // Confirm the action with the user
-            boolean currentVisibility = selectedProject.isVisible();
-            System.out.println("\nProject: " + selectedProject.getProjectName());
-            System.out.println(
-                    "Current visibility: " + (currentVisibility ? "VISIBLE to applicants" : "HIDDEN from applicants"));
-            System.out.print("Are you sure you want to change this to " +
-                    (!currentVisibility ? "VISIBLE" : "HIDDEN") + "? (y/n): ");
-
-            String confirmation = scanner.nextLine().trim().toLowerCase();
-            if (!confirmation.equals("y") && !confirmation.equals("yes")) {
-                System.out.println("Operation canceled.");
-                System.out.println("Press Enter to continue...");
-                scanner.nextLine();
-                return;
-            }
-
-            // Toggle visibility
-            boolean success = controller.toggleVisibility(selectedProject);
-
-            if (success) {
-                boolean newVisibility = selectedProject.isVisible();
-                System.out.println("\nSuccess! Project visibility changed to: " +
-                        (newVisibility ? "VISIBLE" : "HIDDEN"));
-
-                if (newVisibility) {
-                    System.out.println("The project is now visible to applicants in the system.");
-
-                    // If project is not yet open or already closed, provide additional information
-                    if (currentDate.before(selectedProject.getApplicationOpenDate())) {
-                        System.out.println("Note: This project is not yet open for applications. " +
-                                "Applicants will see it but cannot apply until " +
-                                dateFormat.format(selectedProject.getApplicationOpenDate()) + ".");
-                    } else if (currentDate.after(selectedProject.getApplicationCloseDate())) {
-                        System.out.println("Note: This project's application period has ended. " +
-                                "Applicants will see it but cannot apply as it closed on " +
-                                dateFormat.format(selectedProject.getApplicationCloseDate()) + ".");
-                    }
-                } else {
-                    System.out.println("The project is now hidden from applicants in the system.");
-                    System.out.println(
-                            "Applicants will not be able to see or apply for this project until you make it visible again.");
-                }
-            } else {
-                System.out.println("Failed to toggle project visibility. Please try again later.");
-            }
-
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid input. Please enter a number.");
+    
+        boolean success = controller.toggleVisibility(selectedProject);
+    
+        if (success) {
+            String newState = selectedProject.isVisible() ? "VISIBLE" : "HIDDEN";
+            System.out.println("\nSuccess! Project visibility changed to: " + newState);
+            showVisibilityNotes(selectedProject);
+        } else {
+            System.out.println("Failed to toggle project visibility. Please try again later.");
         }
-
+    
         System.out.println("\nPress Enter to continue...");
         scanner.nextLine();
     }
+    private void printVisibilityProjects(List<Project> projects) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        Date currentDate = new Date();
+    
+        System.out.println("ID | Project Name | Neighborhood | Current Status | Application Period");
+        System.out.println("-------------------------------------------------------------------------");
+    
+        IntStream.range(0, projects.size()).forEach(i -> {
+            Project p = projects.get(i);
+            String openDate = dateFormat.format(p.getApplicationOpenDate());
+            String closeDate = dateFormat.format(p.getApplicationCloseDate());
+            String visibility = p.isVisible() ? "VISIBLE" : "HIDDEN";
+    
+            String periodStatus = currentDate.before(p.getApplicationOpenDate()) ? "(Not yet open)"
+                    : currentDate.after(p.getApplicationCloseDate()) ? "(Closed)" : "(Open)";
+    
+            System.out.printf("%2d | %-20s | %-15s | %-12s | %s to %s %s\n",
+                    i + 1,
+                    p.getProjectName(),
+                    p.getNeighborhood(),
+                    visibility,
+                    openDate, closeDate,
+                    periodStatus);
+        });
+    }
+    private boolean confirmVisibilityToggle(Project project) {
+        boolean currentVisibility = project.isVisible();
+        System.out.println("\nProject: " + project.getProjectName());
+        System.out.println("Current visibility: " + (currentVisibility ? "VISIBLE to applicants" : "HIDDEN from applicants"));
+    
+        System.out.print("Change this to " + (!currentVisibility ? "VISIBLE" : "HIDDEN") + "? (y/n): ");
+        String confirmation = scanner.nextLine().trim().toLowerCase();
+        return confirmation.equals("y") || confirmation.equals("yes");
+    }
+    private void showVisibilityNotes(Project project) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        Date now = new Date();
+    
+        if (project.isVisible()) {
+            if (now.before(project.getApplicationOpenDate())) {
+                System.out.println("Note: This project is visible but not yet open for applications.");
+                System.out.println("Applicants can view it but cannot apply until " +
+                        dateFormat.format(project.getApplicationOpenDate()) + ".");
+            } else if (now.after(project.getApplicationCloseDate())) {
+                System.out.println("Note: This project is visible but the application period has ended.");
+                System.out.println("Closed on " + dateFormat.format(project.getApplicationCloseDate()) + ".");
+            }
+        } else {
+            System.out.println("The project is now hidden from applicants.");
+        }
+    }
+    
 
     private void handleOfficerRegistrationsMenu() {
         List<OfficerRegistration> pending = controller.getPendingOfficerRegistrations();
@@ -736,7 +620,7 @@ public class HDBManagerView {
             System.out.println("No pending officer registrations.");
             return;
         }
-    
+
         System.out.println("\n===== Pending Officer Registrations =====");
         for (int i = 0; i < pending.size(); i++) {
             OfficerRegistration reg = pending.get(i);
@@ -744,35 +628,38 @@ public class HDBManagerView {
             String dateStr = sdf.format(reg.getRegistrationDate());
             Project proj = reg.getProject();
             String fullNote = proj.getRemainingOfficerSlots() <= 0 ? " [FULL - Cannot approve]" : "";
-            System.out.printf("%d) %s applied for %s on %s%s\n", 
-                i + 1, 
-                reg.getOfficer().getName(),
-                proj.getProjectName(),
-                dateStr,
-                fullNote);
+            System.out.printf("%d) %s applied for %s on %s%s\n",
+                    i + 1,
+                    reg.getOfficer().getName(),
+                    proj.getProjectName(),
+                    dateStr,
+                    fullNote);
         }
-    
+
         System.out.print("Select a registration to process (0 to cancel): ");
         int choice = Integer.parseInt(scanner.nextLine().trim());
-        if (choice == 0 || choice > pending.size()) return;
-    
+        if (choice == 0 || choice > pending.size())
+            return;
+
         OfficerRegistration selected = pending.get(choice - 1);
 
         if (selected.getProject().getRemainingOfficerSlots() <= 0) {
-            selected.reject();  // Automatically reject
+            selected.reject(); // Automatically reject
             OfficerRegistrationFileWriter writer = new OfficerRegistrationFileWriter();
             writer.updateRegistration(selected);
             System.out.println("Registration automatically rejected due to full officer slots.");
             return;
         }
-        
+
         System.out.println("1) Approve\n2) Reject");
         int action = Integer.parseInt(scanner.nextLine());
-    
+
         boolean result = false;
-        if (action == 1) result = controller.approveOfficerRegistration(selected);
-        else if (action == 2) result = controller.rejectOfficerRegistration(selected);
-    
+        if (action == 1)
+            result = controller.approveOfficerRegistration(selected);
+        else if (action == 2)
+            result = controller.rejectOfficerRegistration(selected);
+
         if (result) {
             String status = action == 1 ? "APPROVED" : "REJECTED";
             System.out.println("\n===== Registration " + status + " =====");
@@ -866,7 +753,6 @@ public class HDBManagerView {
     }
 
     private void displayEnquiries(List<Enquiry> enquiries, boolean showIndex) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
         System.out.println("\n" + (showIndex ? "ID | " : "") + "Project | Applicant | Content | Response");
         System.out.println("----------------------------------------------------------");
@@ -939,37 +825,37 @@ public class HDBManagerView {
 
     public void generateBookingReport() {
         System.out.println("\n===== Generate Booking Report =====");
-    
+
         System.out.print("Filter by Flat Type (leave blank for all): ");
         String flatTypeFilter = scanner.nextLine().trim();
-        if (flatTypeFilter.isEmpty()) flatTypeFilter = null;
-    
+        if (flatTypeFilter.isEmpty())
+            flatTypeFilter = null;
+
         System.out.print("Filter by Marital Status (Single/Married, leave blank for all): ");
         String maritalStatusFilter = scanner.nextLine().trim();
-        if (maritalStatusFilter.isEmpty()) maritalStatusFilter = null;
-    
+        if (maritalStatusFilter.isEmpty())
+            maritalStatusFilter = null;
+
         List<Application> bookedApps = controller.getBookedApplications(flatTypeFilter, maritalStatusFilter);
-    
+
         if (bookedApps.isEmpty()) {
             System.out.println("No matching bookings found.");
             return;
         }
-    
+
         System.out.println("\n--- Booking Report ---");
         System.out.printf("%-10s %-6s %-10s %-10s %-20s\n", "NRIC", "Age", "Marital", "Flat", "Project");
-    
+
         for (Application app : bookedApps) {
             Applicant a = app.getApplicant();
             System.out.printf("%-10s %-6d %-10s %-10s %-20s\n",
-                a.getNric(),
-                a.getAge(),
-                a.getMaritalStatus(),
-                app.getFlatType().getName(),
-                app.getProject().getProjectName()
-            );
+                    a.getNric(),
+                    a.getAge(),
+                    a.getMaritalStatus(),
+                    app.getFlatType().getName(),
+                    app.getProject().getProjectName());
         }
     }
-    
 
     private void viewPendingApplicationsMenu() {
         System.out.println("\n===== Pending Applications =====");
@@ -1109,3 +995,5 @@ public class HDBManagerView {
     }
 
 }
+
+
