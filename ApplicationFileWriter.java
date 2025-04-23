@@ -1,3 +1,4 @@
+import java.util.HashMap;
 import java.util.Map;
 import java.text.SimpleDateFormat;
 
@@ -5,6 +6,27 @@ public class ApplicationFileWriter extends FileWriter<Application> {
     
     public ApplicationFileWriter() {
         super("Application.csv");
+    }
+
+    public void updateApplication(Application updatedApp) {
+        ApplicantFileReader applicantReader = new ApplicantFileReader();
+        Map<String, User> userMap = applicantReader.readFromFile();
+
+        Map<String, Applicant> applicantMap = new HashMap<>();
+        for (User user : userMap.values()) {
+            if (user instanceof Applicant) {
+                applicantMap.put(user.getNric(), (Applicant) user);
+            }
+        }
+
+        ProjectFileReader projectReader = new ProjectFileReader();
+        Map<String, Project> projectMap = projectReader.readFromFile();
+
+        ApplicationFileReader reader = new ApplicationFileReader(projectMap, applicantMap);
+        Map<String, Application> allApps = reader.readFromFile();
+
+        allApps.put(String.valueOf(updatedApp.getApplicationID()), updatedApp);
+        writeToFile(allApps);
     }
     
     @Override

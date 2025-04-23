@@ -15,7 +15,7 @@ public class HDBManagerController {
     private ProjectFileWriter projectWriter;
     private ProjectController projectController;
     private EnquiryController enquiryController;
-    private ApplicationController applicationController;
+
     private WithdrawalRequestController withdrawalController;
 
     public HDBManagerController(HDBManager manager) {
@@ -23,7 +23,6 @@ public class HDBManagerController {
         this.projectReader = new ProjectFileReader();
         this.projectWriter = new ProjectFileWriter();
         this.projectController = new ProjectController();
-        this.applicationController = new ApplicationController();
 
         loadProjects();
         this.enquiryController = new EnquiryController(allProjects);
