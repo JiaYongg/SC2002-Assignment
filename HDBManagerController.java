@@ -261,7 +261,38 @@ public class HDBManagerController {
     // }
 
     // return result;
-    // }
+    // }DDD
+
+    public List<Application> getBookedApplications(String flatTypeFilter, String maritalStatusFilter) {
+        // Load user map (NRIC → User)
+        ApplicantFileReader applicantReader = new ApplicantFileReader();
+        Map<String, User> userMap = applicantReader.readFromFile();
+    
+        // Filter to actual applicants only
+        Map<String, Applicant> applicantMap = new HashMap<>();
+        for (User u : userMap.values()) {
+            if (u instanceof Applicant) {
+                applicantMap.put(u.getNric(), (Applicant) u);
+            }
+        }
+    
+        // Load project map
+        ProjectFileReader projectReader = new ProjectFileReader();
+        Map<String, Project> projectMap = projectReader.readFromFile();
+    
+        // Load applications
+        ApplicationFileReader applicationReader = new ApplicationFileReader(projectMap, applicantMap);
+        Map<String, Application> appMap = applicationReader.readFromFile();
+    
+        // Filter booked applications based on user input
+        return appMap.values().stream()
+            .filter(app -> app.getStatus() == ApplicationStatus.BOOKED)
+            .filter(app -> flatTypeFilter == null || app.getFlatType().getName().equalsIgnoreCase(flatTypeFilter))
+            .filter(app -> maritalStatusFilter == null || 
+                app.getApplicant().getMaritalStatus().equalsIgnoreCase(maritalStatusFilter))
+            .collect(Collectors.toList());
+    }
+    
 
     private boolean isProjectManagedByCurrentManager(Project project) {
         if (project == null || project.getManagerInCharge() == null) {
@@ -300,10 +331,9 @@ public class HDBManagerController {
 
     public List<WithdrawalRequest> getPendingWithdrawalsForMyProjects() {
         List<Project> myProjects = allProjects.stream()
-        .filter(p -> p.getManagerInCharge() != null &&
-                     p.getManagerInCharge().getName().equals(currentManager.getName()))
-        .collect(Collectors.toList());
-    
+                .filter(p -> p.getManagerInCharge() != null &&
+                        p.getManagerInCharge().getName().equals(currentManager.getName()))
+                .collect(Collectors.toList());
 
         List<WithdrawalRequest> allPending = withdrawalController.getPendingRequests();
 

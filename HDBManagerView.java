@@ -52,8 +52,8 @@ public class HDBManagerView {
                         manageWithdrawalRequestsMenu();
                         break;
                     case 10:
-                        // controller.generateBookingReport();
-                        System.out.println("Booking report generated successfully!");
+                        generateBookingReport();
+
                         break;
                     case 11:
                         viewAllEnquiriesMenu();
@@ -736,13 +736,13 @@ public class HDBManagerView {
 
     public void manageWithdrawalRequestsMenu() {
         List<WithdrawalRequest> pending = controller.getPendingWithdrawalsForMyProjects();
-    
+
         System.out.println("=== Pending Withdrawal Requests ===");
         if (pending.isEmpty()) {
             System.out.println("No pending requests.");
             return;
         }
-    
+
         for (int i = 0; i < pending.size(); i++) {
             WithdrawalRequest req = pending.get(i);
             System.out.println((i + 1) + ") " + req.getApplication().getApplicant().getName() +
@@ -750,27 +750,30 @@ public class HDBManagerView {
                     " | Flat: " + req.getApplication().getFlatType().getName() +
                     " | Requested: " + req.getDateRequested());
         }
-    
+
         System.out.println("Enter number to approve/reject, or 0 to go back:");
         int choice = Integer.parseInt(scanner.nextLine());
-    
-        if (choice == 0 || choice > pending.size()) return;
-    
+
+        if (choice == 0 || choice > pending.size())
+            return;
+
         WithdrawalRequest selected = pending.get(choice - 1);
         System.out.println("1) Approve\n2) Reject");
         int action = Integer.parseInt(scanner.nextLine());
-    
+
         boolean result = false;
         if (action == 1) {
             result = controller.approveWithdrawal(selected);
         } else if (action == 2) {
             result = controller.rejectWithdrawal(selected);
         }
-    
-        if (result) System.out.println("Request updated.");
-        else System.out.println("Action failed.");
+
+        if (result)
+            System.out.println("Request updated.");
+        else
+            System.out.println("Action failed.");
     }
-    
+
     private void viewAllEnquiriesMenu() {
         controller.viewAllEnquiries();
 
@@ -883,6 +886,40 @@ public class HDBManagerView {
         System.out.println("\nPress Enter to continue...");
         scanner.nextLine();
     }
+
+    public void generateBookingReport() {
+        System.out.println("\n===== Generate Booking Report =====");
+    
+        System.out.print("Filter by Flat Type (leave blank for all): ");
+        String flatTypeFilter = scanner.nextLine().trim();
+        if (flatTypeFilter.isEmpty()) flatTypeFilter = null;
+    
+        System.out.print("Filter by Marital Status (Single/Married, leave blank for all): ");
+        String maritalStatusFilter = scanner.nextLine().trim();
+        if (maritalStatusFilter.isEmpty()) maritalStatusFilter = null;
+    
+        List<Application> bookedApps = controller.getBookedApplications(flatTypeFilter, maritalStatusFilter);
+    
+        if (bookedApps.isEmpty()) {
+            System.out.println("No matching bookings found.");
+            return;
+        }
+    
+        System.out.println("\n--- Booking Report ---");
+        System.out.printf("%-10s %-6s %-10s %-10s %-20s\n", "NRIC", "Age", "Marital", "Flat", "Project");
+    
+        for (Application app : bookedApps) {
+            Applicant a = app.getApplicant();
+            System.out.printf("%-10s %-6d %-10s %-10s %-20s\n",
+                a.getNric(),
+                a.getAge(),
+                a.getMaritalStatus(),
+                app.getFlatType().getName(),
+                app.getProject().getProjectName()
+            );
+        }
+    }
+    
 
     private void viewPendingApplicationsMenu() {
         System.out.println("\n===== Pending Applications =====");

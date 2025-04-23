@@ -24,7 +24,7 @@ public class ApplicationFileReader extends FileReader<Application> {
         try {
             String[] data = line.split(",");
             
-            if (data.length < 6) { // We need at least 6 fields including dateApplied
+            if (data.length < 6) { 
                 System.out.println("Invalid application data format: " + line);
                 return;
             }
@@ -36,11 +36,10 @@ public class ApplicationFileReader extends FileReader<Application> {
             String statusStr = data[4].trim();
             String dateAppliedStr = data[5].trim();
             
-            // Parse dateApplied
-            Date dateApplied = new Date(); // Default to current date (April 23, 2025)
+            Date dateApplied = new Date(); 
             if (!dateAppliedStr.isEmpty()) {
                 try {
-                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
                     dateApplied = sdf.parse(dateAppliedStr);
                 } catch (ParseException e) {
                     System.out.println("Error parsing date applied: " + dateAppliedStr + ". Using current date.");
@@ -51,7 +50,7 @@ public class ApplicationFileReader extends FileReader<Application> {
             Date dateBooked = null;
             if (data.length > 6 && !data[6].trim().isEmpty()) {
                 try {
-                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
                     dateBooked = sdf.parse(data[6].trim());
                 } catch (ParseException e) {
                     System.out.println("Error parsing date booked: " + data[6]);
