@@ -37,8 +37,8 @@ public class LoginController implements iAuthService {
     public Object getControllerForUser(User user) {
         if (user instanceof HDBManager) {
             return new HDBManagerController((HDBManager) user);
-        // } else if (user instanceof HDBOfficer) {
-        //     return new HDBOfficerController((HDBOfficer) user);
+        } else if (user instanceof HDBOfficer) {
+            return new HDBOfficerController((HDBOfficer) user);
         } else {
             return new ApplicantController((Applicant) user);
         }
