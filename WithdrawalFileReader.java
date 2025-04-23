@@ -1,3 +1,4 @@
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
@@ -25,7 +26,10 @@ public class WithdrawalFileReader extends FileReader<WithdrawalRequest> {
             String applicantNRIC = data[1].trim();
             String projectName = data[2].trim();
             String flatTypeName = data[3].trim();
-            long dateRequested = Long.parseLong(data[4].trim());
+            
+
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+            Date dateRequested = sdf.parse(data[4].trim());
             WithdrawalStatus status = WithdrawalStatus.valueOf(data[5].trim());
             
             // Find the applicant and project
@@ -50,7 +54,7 @@ public class WithdrawalFileReader extends FileReader<WithdrawalRequest> {
                     WithdrawalRequest withdrawal = new WithdrawalRequest(
                         requestId,
                         application,
-                        new Date(dateRequested),
+                        dateRequested,
                         status
                     );
                     

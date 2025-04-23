@@ -40,7 +40,7 @@ public class ApplicationFileReader extends FileReader<Application> {
             Date dateApplied = new Date(); // Default to current date (April 23, 2025)
             if (!dateAppliedStr.isEmpty()) {
                 try {
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
                     dateApplied = sdf.parse(dateAppliedStr);
                 } catch (ParseException e) {
                     System.out.println("Error parsing date applied: " + dateAppliedStr + ". Using current date.");
