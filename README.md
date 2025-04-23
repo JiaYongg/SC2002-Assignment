@@ -1,20 +1,23 @@
-# SC2002-Assignment
+# SC2002-Assignment (HDB BTO Management System)
 
-## Tracker / Progress Flow
+## Overview
+The HDB BTO Management System is meant to handle three different users -- Applicant, HDB Manager, and HDB Officer -- as well as their respective capabilities.
 
-### Updates
-- Changed download new csv file instead of xls <br/>
-- Uncomment codes that you're working on. E.g. if you're working on officer, uncomment them at login and main files.
+### Installation
+- 
 
-### New interfaces
-- AuthService (Can be expanded in the future for biometrics/other ways login besides password) [OCP Principle]<br/>
+### Usage
+1. Run Main.java to execute program <br/>
+2. Input credentials to log in (NRIC and password) <br/>
+3. Menu will display and prompt user input <br/>
+4. Input the respective number for action wish to be made <br/>
+5. Use application as see fit and logout to change user or exit program to terminate program <br/>
 
-### New classes
-- Main, User, Manager <br/>
-    - to add Officer, Project, Application etc<br/>
-- FileReader, ApplicantFileReader, ManagerFileReader Class (Read data from CSV NOT XLSX)<br/>
-    - to add OfficerFileReader (Use ManagerFileReader as reference) etc<br/>
-- LoginController, ManagerController (Handles methods' logic) <br/>
-    - to add OfficerController etc<br/>
-- LoginView, ManagerView (Print UI for Login, and different interface for different roles)<br/>
-    - to add ApplicantView, OfficerView (Can use ManagerView as reference) etc <br/>
+### Contributors
+- NICOLE YAP XIU EN
+- POH JIA YONG
+- SOH HAO MING
+- WAYNE CHUA ENG KIAT (CAI RONGJIE)
+
+### License
+For Academic use only
