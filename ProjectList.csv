@@ -1,4 +1,9 @@
 Project Name,Neighborhood,Type 1,Number of units for Type 1,Selling price for Type 1,Type 2,Number of units for Type 2,Selling price for Type 2,Application opening date,Application closing date,Manager,Officer Slot,Officer,Visibility
+<<<<<<< HEAD
+test,test,2-ROOM,2,2.0,3-ROOM,23,3.0,23/04/2025,02/12/2025,Jessica,2,,true
+mic,mic,2-ROOM,0,2.0,3-ROOM,0,3.0,02/12/2002,02/12/2025,Michael,2,,true
+=======
 test,test,2-ROOM,2,2,3-ROOM,23,3,23/4/2025,2/12/2025,Jessica,2,,TRUE
 mic,mic,2-ROOM,2,2,3-ROOM,3,3,2/12/2002,2/12/2025,Michael,2,,TRUE
 project A,punggol,2-ROOM,5,100000,3-ROOM,10,150000,22/4/2025,30/4/2025,Michael,2,,TRUE
+>>>>>>> 9aa315f1b6343082eaad5e2fbdea1a60da9be718

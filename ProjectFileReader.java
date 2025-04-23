@@ -23,7 +23,6 @@ public class ProjectFileReader extends FileReader<Project> {
         
         // Skip if line doesn't have enough fields
         if (data.length < 13) {
-            System.out.println("Warning: Skipping malformed line in CSV: " + line);
             return;
         }
         

@@ -113,7 +113,7 @@ public class WithdrawalRequestController {
             // Store all withdrawal requests in the list
             allWithdrawalRequests.addAll(withdrawalMap.values());
 
-            System.out.println("Successfully loaded " + withdrawalMap.size() + " withdrawal requests.");
+            // System.out.println("Successfully loaded " + withdrawalMap.size() + " withdrawal requests.");
         } catch (Exception e) {
             System.out.println("Error loading withdrawal requests: " + e.getMessage());
             e.printStackTrace();

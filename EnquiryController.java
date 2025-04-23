@@ -67,7 +67,7 @@ public class EnquiryController {
                 }
             }
 
-            System.out.println("Successfully loaded " + enquiryMap.size() + " enquiries.");
+            // System.out.println("Successfully loaded " + enquiryMap.size() + " enquiries.");
         } catch (Exception e) {
             System.out.println("Error loading enquiries: " + e.getMessage());
             e.printStackTrace();
