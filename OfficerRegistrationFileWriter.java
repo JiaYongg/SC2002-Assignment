@@ -1,4 +1,6 @@
 import java.util.Map;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 
 public class OfficerRegistrationFileWriter extends FileWriter<OfficerRegistration> {
@@ -9,6 +11,15 @@ public class OfficerRegistrationFileWriter extends FileWriter<OfficerRegistratio
     @Override
     public void writeToFile(Map<String, OfficerRegistration> officerRegistrations) {
         writeCSV(officerRegistrations);
+    }
+
+    public void appendRegistration(OfficerRegistration reg) {
+    try (PrintWriter writer = new PrintWriter(new FileOutputStream("OfficerRegistration.csv", true))) {
+        writer.println(formatLine(reg));
+    } catch (Exception e) {
+        System.out.println("Error appending to OfficerRegistration.csv");
+        e.printStackTrace();
+    }
     }
 
     @Override

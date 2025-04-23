@@ -1,6 +1,8 @@
 import java.util.Map;
 import java.util.Date;
+import java.io.BufferedReader;
 import java.text.SimpleDateFormat;
+
 
 public class OfficerRegistrationFileReader extends FileReader<OfficerRegistration> {
     private Map<String, Project> projects;
@@ -16,6 +18,26 @@ public class OfficerRegistrationFileReader extends FileReader<OfficerRegistratio
     public Map<String, OfficerRegistration> readFromFile() {
         return readCSV();
     }
+
+    public static int getLastUsedRegistrationId(String filename) {
+    int lastId = 0;
+    try (BufferedReader br = new BufferedReader(new java.io.FileReader(filename))) {
+        String line;
+        br.readLine(); // skip header
+        while ((line = br.readLine()) != null) {
+            String[] parts = line.split(",");
+            if (parts.length >= 1) {
+                int id = Integer.parseInt(parts[0].trim());
+                if (id > lastId) {
+                    lastId = id;
+                }
+            }
+        }
+    } catch (Exception e) {
+        System.out.println("Error reading OfficerRegistration.csv for ID tracking.");
+    }
+    return lastId;
+}
 
     @Override
     protected void processLine(String line, Map<String, OfficerRegistration> officerRegistrations) {
