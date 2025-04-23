@@ -19,7 +19,7 @@ public class ApplicationFileWriter extends FileWriter<Application> {
     
     @Override
     protected String formatLine(Application application) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         String dateAppliedStr = application.getDateApplied() != null ? sdf.format(application.getDateApplied()) : "";
         String dateBookedStr = application.getDateBooked() != null ? sdf.format(application.getDateBooked()) : "";
         
