@@ -60,8 +60,8 @@ public class HDBOfficerView {
                         processFlatBooking();
                         break;
                     case 0:
-                        logout = true;
-                        System.out.println("Logging out...");
+                        exitProgram = true;
+                        System.out.println("Exiting program...");
                         break;
                     default:
                         System.out.println("Invalid option. Please try again.");
@@ -260,12 +260,6 @@ public class HDBOfficerView {
     
     public void closeScanner() {
         scanner.close();
-    }
-
-    private void displayAppliedProject(Project project, FlatType flatType, ApplicationStatus status) {
-        System.out.println("Applied Project: " + project.getProjectName());
-        System.out.println("Flat Type: " + flatType.getName());
-        System.out.println("Status: " + status);
     }
     
     private void viewAppliedProject() {
