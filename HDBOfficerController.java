@@ -12,6 +12,7 @@ public class HDBOfficerController {
     
     public HDBOfficerController(HDBOfficer currentOfficer){
         this.currentOfficer=currentOfficer;
+        this.allProjects= new ArrayList<>();
         // In a full implementation, you would load projects from a file
     }
     
@@ -130,6 +131,11 @@ public class HDBOfficerController {
             System.out.println("Application is closed for this project.");
             return;
         }
+        if (project.equals(currentOfficer.getAssignedProject())) {
+            System.out.println("You cannot apply for a project you're handling.");
+            return;
+        }
+    
 
         FlatType matchedFlatType = project.getFlatTypeByName(flatType.getName());
 

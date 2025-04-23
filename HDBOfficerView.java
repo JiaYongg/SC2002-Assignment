@@ -73,21 +73,61 @@ public class HDBOfficerView {
     
     private void viewAvailableProjects() {
         System.out.println("\n===== Available Projects =====");
-        System.out.println("This feature is not fully implemented in the minimal version.");
-        System.out.println("Press Enter to continue...");
+        List<Project> projects= controller.getVisibleProjects();
+        if(projects.isEmpty()){
+            System.out.println("No Projetcs available");
+        }else{
+            for (int i = 0; i < projects.size(); i++) {
+                Project p = projects.get(i);
+                System.out.printf("%d. %s (%s)\n", i + 1, p.getProjectName(), p.getNeighborhood());
+            }
+            }
+        System.out.println("Press enter to continue....");
         scanner.nextLine();
     }
+        
     
     private void viewMyApplications() {
         System.out.println("\n===== My Applications =====");
-        System.out.println("This feature is not fully implemented in the minimal version.");
+        List<Application> apps = controller.getCurrentOfficer().getApplication();
+        if (apps.isEmpty()) {
+            System.out.println("No applications found.");
+        } else {
+            for (Application app : apps) {
+                System.out.println("Project: " + app.getProject().getProjectName());
+                System.out.println("Flat Type: " + app.getFlatType().getName());
+                System.out.println("Status: " + app.getStatus());
+                System.out.println("-----");
+            }
+        }
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }
     
+    
     private void registerForProject() {
         System.out.println("\n===== Register for Project =====");
-        System.out.println("This feature is not fully implemented in the minimal version.");
+        List<Project> projects = controller.getAvailableProjectsForRegistration();
+        if (projects.isEmpty()) {
+            System.out.println("No projects available for registration.");
+        } else {
+            for (int i = 0; i < projects.size(); i++) {
+                Project p = projects.get(i);
+                System.out.printf("%d. %s (%s)\n", i + 1, p.getProjectName(), p.getNeighborhood());
+            }
+    
+            System.out.print("Select project number to register: ");
+            try {
+                int choice = Integer.parseInt(scanner.nextLine());
+                if (choice >= 1 && choice <= projects.size()) {
+                    controller.registerToHandleProject(projects.get(choice - 1));
+                } else {
+                    System.out.println("Invalid project number.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input.");
+            }
+        }
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }
@@ -142,17 +182,41 @@ public class HDBOfficerView {
     
     public void viewProjectEnquiries() {
         System.out.println("\n===== Project Enquiries =====");
-        System.out.println("This feature is not fully implemented in the minimal version.");
+        List<Enquiry> enquiries = controller.getProjectEnquiries();
+        if (enquiries.isEmpty()) {
+            System.out.println("No enquiries found.");
+        } else {
+            for (Enquiry e : enquiries) {
+                System.out.println("From: " + e.getApplicant().getName());
+                System.out.println("Content: " + e.getContent());
+                System.out.println("Response: " + (e.getResponse().isEmpty() ? "No response yet." : e.getResponse()));
+                System.out.println("------");
+            }
+        }
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }
     
     private void processFlatBooking() {
         System.out.println("\n===== Process Flat Booking =====");
-        System.out.println("This feature is not fully implemented in the minimal version.");
+        System.out.print("Enter applicant NRIC: ");
+        String nric = scanner.nextLine().trim();
+    
+        Application app = controller.getApplicationByNric(nric);
+        if (app == null) {
+            System.out.println("Application not found.");
+            return;
+        }
+    
+        controller.bookFlat(app);
+        Receipt receipt = controller.generateReceipt(app);
+        System.out.println(receipt.formatReceipt());
+    
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }
+    
+    
     
     public void closeScanner() {
         scanner.close();
