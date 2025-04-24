@@ -1,3 +1,8 @@
+/**
+ * Class responsible for reading application data from a CSV file and converting it into a map of applications.
+ * This class parses each line of the CSV to create `Application` objects.
+ */
+
 import java.util.Map;
 import java.util.Date;
 import java.text.SimpleDateFormat;
@@ -7,17 +12,34 @@ public class ApplicationFileReader extends FileReader<Application> {
     private Map<String, Project> projects;
     private Map<String, Applicant> applicants;
 
+    /**
+     * Constructor to initialize the ApplicationFileReader with project and applicant data.
+     *
+     * @param projects A map of all projects.
+     * @param applicants A map of all applicants.
+     */
     public ApplicationFileReader(Map<String, Project> projects, Map<String, Applicant> applicants) {
         super("Application.csv");
         this.projects = projects;
         this.applicants = applicants;
     }
 
+    /**
+     * Reads the application data from the CSV file and returns a map of applications.
+     *
+     * @return A map of applications where keys are application IDs and values are Application objects.
+     */
     @Override
     public Map<String, Application> readFromFile() {
         return readCSV();
     }
 
+    /**
+     * Processes a single line of the CSV file and creates an Application object.
+     *
+     * @param line The line from the CSV file.
+     * @param applications The map where the application will be added.
+     */
     @Override
     protected void processLine(String line, Map<String, Application> applications) {
         try {

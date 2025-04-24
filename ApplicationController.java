@@ -1,3 +1,8 @@
+/**
+ * Controller class responsible for handling application-related actions such as submitting applications,
+ * updating application statuses, and retrieving pending applications for a specific project or applicant.
+ */
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -10,6 +15,9 @@ public class ApplicationController {
     private Map<String, Project> projectMap;
     private Map<String, Applicant> applicantMap;
 
+    /**
+     * Initializes the ApplicationController with necessary data for managing applications.
+     */
     public ApplicationController() {
         this.allApplications = new ArrayList<>();
         this.applicationWriter = new ApplicationFileWriter();
@@ -45,6 +53,12 @@ public class ApplicationController {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Retrieves a list of all applications that are in the pending status.
+     *
+     * @return List of pending applications.
+     */
     public List<Application> getPendingApplications() {
         List<Application> pendingApplications = new ArrayList<>();
         for (Application app : allApplications) {
@@ -54,6 +68,12 @@ public class ApplicationController {
         }
         return pendingApplications;
     }
+    /**
+     * Retrieves pending applications for a specific project.
+     *
+     * @param project The project whose applications need to be fetched.
+     * @return List of pending applications for the project.
+     */
     public List<Application> getPendingApplicationsForProject(Project project) {
         List<Application> pendingApplications = new ArrayList<>();
         for (Application app : allApplications) {
@@ -63,6 +83,12 @@ public class ApplicationController {
         }
         return pendingApplications;
     }
+    /**
+     * Retrieves pending applications for a specific applicant.
+     *
+     * @param applicant The applicant whose pending applications are to be fetched.
+     * @return List of pending applications for the applicant.
+     */
     public List<Application> getPendingApplicationsForApplicant(Applicant applicant) {
         List<Application> pendingApplications = new ArrayList<>();
         for (Application app : allApplications) {
@@ -72,6 +98,13 @@ public class ApplicationController {
         }
         return pendingApplications;
     }
+    /**
+     * Updates the status of a given application.
+     *
+     * @param application The application to update.
+     * @param newStatus The new status to set for the application.
+     * @return True if the status was successfully updated, false otherwise.
+     */
     public boolean updateApplicationStatus(Application application, ApplicationStatus newStatus) {
         for (Application app : allApplications) {
             if (app.getApplicationID() == application.getApplicationID()) {
@@ -108,7 +141,14 @@ public class ApplicationController {
             e.printStackTrace();
         }
     }
-
+    /**
+     * Submits a new application for a project on behalf of an applicant.
+     *
+     * @param applicant The applicant submitting the application.
+     * @param project The project the application is for.
+     * @param flatType The flat type chosen by the applicant.
+     * @return True if the application was successfully submitted, false otherwise.
+     */
     public boolean applyForProject(Applicant applicant, Project project, FlatType flatType) {
         
         Map<String, Application> existingApps = new ApplicationFileReader(projectMap, applicantMap).readFromFile();
@@ -147,6 +187,12 @@ public class ApplicationController {
         return true;
     }
 
+    /**
+     * Withdraws the application of an applicant.
+     *
+     * @param applicant The applicant whose application needs to be withdrawn.
+     * @return True if the application was successfully withdrawn, false otherwise.
+     */
     public boolean withdrawApplication(Applicant applicant) {
         Application app = getApplicationByApplicant(applicant);
         if (app == null) {
@@ -172,7 +218,12 @@ public class ApplicationController {
             return false;
         }
     }
-
+    /**
+     * Retrieves the application status of a given applicant.
+     *
+     * @param applicant The applicant whose application status is to be retrieved.
+     * @return The status of the applicant's application.
+     */
     public ApplicationStatus getApplicationStatus(Applicant applicant) {
         Application app = getApplicationByApplicant(applicant);
         if (app != null) {

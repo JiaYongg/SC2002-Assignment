@@ -1,9 +1,10 @@
-import java.util.Date;
-
 /**
  * Controller class for Project operations in the BTO Management System.
  * Handles project-specific business logic including visibility rules.
  */
+import java.util.Date;
+
+
 public class ProjectController {
 
     public boolean updateProjectVisibility(Project project) {
