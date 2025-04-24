@@ -194,7 +194,7 @@ public class HDBOfficerView {
             // If a valid flat type is found, proceed to submit the application
             if (chosenFlatType != null) {
                 controller.submitApplicationAsOfficer(selectedProject, chosenFlatType);;
-                System.out.println("Application successfully submitted for " + selectedProject.getProjectName() + " - " + chosenFlatType.getName());
+                System.out.println("Current Applicantion Pending...");
             } else {
                 System.out.println("No eligible flat types available for this project.");
             }

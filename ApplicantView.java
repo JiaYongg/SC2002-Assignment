@@ -231,7 +231,7 @@ public class ApplicantView {
     
             // Submit the application using the selected flat type
             controller.submitApplication(controller.getApplicant(), selectedProject, chosenFlatType);
-            System.out.println("Application successfully submitted for " + selectedProject.getProjectName() + " - " + chosenFlatType.getName());
+            System.out.println("Current Applicantion Pending...");
     
         } catch (NumberFormatException e) {
             System.out.println("Invalid input. Please enter a valid number.");
