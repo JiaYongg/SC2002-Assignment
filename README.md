@@ -1,6 +1,6 @@
 # SC2002-Assignment (HDB BTO Management System)
 
-## Overview
+# Overview
 The HDB BTO Management System is designed to streamline and manage the entire lifecycle of the Build-To-Order (BTO) process in Singapore. The system allows for the management of various aspects of BTO flats, including project creation, applicant registration, flat bookings, officer registration, and handling of enquiries.
 
 # Features
@@ -24,7 +24,7 @@ The HDB BTO Management System is designed to streamline and manage the entire li
 - **Approve Applications**: Managers approve or reject BTO applications based on available units.
 - **Enquiries**: Managers can view and respond to enquiries from applicants.
 
-## Installation
+# Installation
 1. Download the project files or clone the repository.
 2. Ensure Java is installed on your system.
 3. Ensure you are in the root directory of the project
@@ -55,10 +55,10 @@ The system makes use of several data files (CSV format) to persist the following
 5. Use application as see fit and logout to change user or exit program to terminate program
 
 # Contributors
-- NICOLE YAP XIU EN
-- POH JIA YONG
-- SOH HAO MING
-- WAYNE CHUA ENG KIAT (CAI RONGJIE)
+- NICOLE YAP XIU EN - U2420768C
+- POH JIA YONG - U2323306C
+- SOH HAO MING - 
+- WAYNE CHUA ENG KIAT (CAI RONGJIE) - 
 
 # License
 For Academic use only
