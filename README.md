@@ -84,6 +84,16 @@ Enter your choice: 1
 Enter your choice:
 ```
 
+# Testing
+The HDB BTO Management System has been thoroughly tested with a wide range of test cases to ensure that the functionalities work as expected. These tests cover various user interactions such as:
+- Project Application
+- One Flat Booking per Successful Application
+- HDBOfficer Registration Eligibility
+- etc.
+
+Detailed test cases can be found in the [Testing Documentation](./TESTING.md) file.
+
+
 # Contributors
 - NICOLE YAP XIU EN - U2420768C
 - POH JIA YONG - U2323306C
