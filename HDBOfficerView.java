@@ -170,7 +170,7 @@ public class HDBOfficerView {
         System.out.println("------------------------------------------------------");
     
         // Prompt user to select a project by number
-        System.out.print("Select project number: ");
+        System.out.print("Select project number to book: ");
         try {
             int idx = Integer.parseInt(scanner.nextLine());
     
@@ -182,38 +182,63 @@ public class HDBOfficerView {
     
             Project selectedProject = eligible.get(idx - 1);
     
-            // Allow the user to select a flat type for the selected project
-            FlatType chosen = controller.selectFlatType(selectedProject);
-            if (chosen != null) {
-                controller.submitApplicationAsOfficer(selectedProject, chosen);
+            // Automatically select the eligible flat type for the selected project
+            FlatType chosenFlatType = null;
+            for (FlatType ft : selectedProject.getFlatTypes()) {
+                if (ft.getUnitCount() > 0 && controller.checkEligibility(controller.getCurrentOfficer(), selectedProject, ft)) {
+                    chosenFlatType = ft; // Automatically pick the first eligible flat type
+                    break;
+                }
             }
+    
+            // If a valid flat type is found, proceed to submit the application
+            if (chosenFlatType != null) {
+                controller.submitApplicationAsOfficer(selectedProject, chosenFlatType);;
+                System.out.println("Application successfully submitted for " + selectedProject.getProjectName() + " - " + chosenFlatType.getName());
+            } else {
+                System.out.println("No eligible flat types available for this project.");
+            }
+    
         } catch (NumberFormatException e) {
-            System.out.println("Invalid input.");
+            System.out.println("Invalid input. Please enter a valid project number.");
         }
     }
 
     private void registerForProject() {
         System.out.println("\n===== Register for Project =====");
         List<Project> projects = controller.getAvailableProjectsForRegistration();
+        
         if (projects.isEmpty()) {
             System.out.println("No projects available for registration.");
-        } else {
-            for (int i = 0; i < projects.size(); i++) {
-                Project p = projects.get(i);
-                System.out.printf("%d. %s (%s)\n", i + 1, p.getProjectName(), p.getNeighborhood());
+            return;
+        }
+    
+        // Header for the project table
+        System.out.println("------------------------------------------------------");
+        System.out.printf("%-5s %-20s %-15s\n", "No.", "Project Name", "Neighborhood");
+        System.out.println("------------------------------------------------------");
+    
+        // Display the available projects with a numbered list
+        for (int i = 0; i < projects.size(); i++) {
+            Project p = projects.get(i);
+            System.out.printf("%-5d %-20s %-15s\n", i + 1, p.getProjectName(), p.getNeighborhood());
+        }
+    
+        System.out.println("------------------------------------------------------");
+    
+        // Get the project selection from the user
+        System.out.print("Select project number to register: ");
+        try {
+            int choice = Integer.parseInt(scanner.nextLine());
+    
+            // Validate project selection
+            if (choice >= 1 && choice <= projects.size()) {
+                controller.registerToHandleProject(projects.get(choice - 1));
+            } else {
+                System.out.println("Invalid project number.");
             }
-
-            System.out.print("Select project number to register: ");
-            try {
-                int choice = Integer.parseInt(scanner.nextLine());
-                if (choice >= 1 && choice <= projects.size()) {
-                    controller.registerToHandleProject(projects.get(choice - 1));
-                } else {
-                    System.out.println("Invalid project number.");
-                }
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid input.");
-            }
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input.");
         }
     }
 

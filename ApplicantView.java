@@ -201,7 +201,7 @@ public class ApplicantView {
         System.out.println("------------------------------------------------------");
     
         // Prompt user to select a project by number
-        System.out.print("Select project number: ");
+        System.out.print("Select project number to book: ");
         try {
             int projectNum = Integer.parseInt(scanner.nextLine().trim());
     
@@ -213,7 +213,7 @@ public class ApplicantView {
     
             Project selectedProject = eligibleProjects.get(projectNum - 1);
     
-            // Display available flat types for the selected project
+            // Automatically select the eligible flat type for the selected project
             List<FlatType> availableFlatTypes = new ArrayList<>();
             for (FlatType ft : selectedProject.getFlatTypes()) {
                 if (ft.getUnitCount() > 0 && controller.checkEligibility(controller.getApplicant(), selectedProject, ft)) {
@@ -226,31 +226,17 @@ public class ApplicantView {
                 return;
             }
     
-            // Show available flat types with prices
-            System.out.println("\nAvailable Flat Types:");
-            int index = 1;
-            for (FlatType ft : availableFlatTypes) {
-                System.out.println(index + ". " + ft.getName() + " ($" + ft.getPrice() + ")");
-                index++;
-            }
+            // Automatically choose the first available eligible flat type
+            FlatType chosenFlatType = availableFlatTypes.get(0);
     
-            // Get flat type selection
-            System.out.print("Select flat type by number (1-" + availableFlatTypes.size() + "): ");
-            try {
-                int selectedNumber = Integer.parseInt(scanner.nextLine());
-                if (selectedNumber < 1 || selectedNumber > availableFlatTypes.size()) {
-                    System.out.println("Invalid selection.");
-                    return;
-                }
-                FlatType selectedFlatType = availableFlatTypes.get(selectedNumber - 1);
-                controller.submitApplication(controller.getApplicant(), selectedProject, selectedFlatType);
-            } catch (NumberFormatException e) {
-                System.out.println("Please enter a valid number.");
-            }
+            // Submit the application using the selected flat type
+            controller.submitApplication(controller.getApplicant(), selectedProject, chosenFlatType);
+            System.out.println("Application successfully submitted for " + selectedProject.getProjectName() + " - " + chosenFlatType.getName());
+    
         } catch (NumberFormatException e) {
             System.out.println("Invalid input. Please enter a valid number.");
         }
-    }
+    }    
 
     private void submitEnquiry() {
         System.out.println("\n===== Submit Enquiry =====");

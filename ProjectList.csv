@@ -1,7 +1,8 @@
 Project Name,Neighborhood,Type 1,Number of units for Type 1,Selling price for Type 1,Type 2,Number of units for Type 2,Selling price for Type 2,Application opening date,Application closing date,Manager,Officer Slot,Officer,Visibility
-MarinaBayRes,Marina Bay,2-ROOM,5,100000.0,3-ROOM,10,150000.0,22/04/2025,30/04/2025,Michael Tan,2,David Wong,false
-WoodlandsHills,Woodlands,2-ROOM,3,100000.0,3-ROOM,6,120000.0,23/04/2025,02/12/2025,Jessica Ng,2,Daniel Lee,true
-Micropolis,Micropolis,2-ROOM,2,200000.0,3-ROOM,4,300000.0,02/12/2022,02/12/2025,Michael Tan,2,Emily Tan,true
+project A,punggol,2-ROOM,5,100000.0,3-ROOM,10,150000.0,22/04/2025,30/04/2025,Michael,2,,true
 CentralPark,Orchard,2-ROOM,3,100000.0,3-ROOM,7,140000.0,10/04/2025,10/05/2025,Michael Tan,2,Daniel Lee,true
-EastGate,Suntec,2-ROOM,4,90000.0,3-ROOM,8,130000.0,15/04/2025,25/05/2025,Jessica Ng,2,Emily Tan,true
-project A,punggol,2-ROOM,5,100000,3-ROOM,10,150000,22/4/2025,30/4/2025,Michael,2,,TRUE
+EastGate,Suntec,2-ROOM,4,90000.0,3-ROOM,8,130000.0,15/04/2025,25/05/2025,Jessica Ng,2,Emily Tan;Daniel Lee,true
+Micropolis,Micropolis,2-ROOM,2,200000.0,3-ROOM,4,300000.0,02/12/2022,02/12/2025,Michael Tan,2,Emily Tan,true
+Punggol Wrestle,Punggol,2-ROOM,5,210215.0,3-ROOM,7,230215.0,14/04/2025,19/04/2025,Jerald Lim,5,,false
+WoodlandsHills,Woodlands,2-ROOM,3,100000.0,3-ROOM,6,120000.0,23/04/2025,02/12/2025,Jessica Ng,2,Daniel Lee,true
+MarinaBayRes,Marina Bay,2-ROOM,5,100000.0,3-ROOM,10,150000.0,22/04/2025,30/04/2025,Michael Tan,2,David Wong,false
