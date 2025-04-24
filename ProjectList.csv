@@ -1,4 +1,6 @@
 Project Name,Neighborhood,Type 1,Number of units for Type 1,Selling price for Type 1,Type 2,Number of units for Type 2,Selling price for Type 2,Application opening date,Application closing date,Manager,Officer Slot,Officer,Visibility
-project A,punggol,2-ROOM,5,100000.0,3-ROOM,10,150000.0,22/04/2025,30/04/2025,Michael,2,David,true
-test,test,2-ROOM,2,2.0,3-ROOM,23,3.0,23/04/2025,02/12/2025,Jessica,2,,true
-mic,mic,2-ROOM,2,2.0,3-ROOM,3,3.0,02/12/2002,02/12/2025,Michael,2,,true
+MarinaBayRes,Marina Bay,2-ROOM,5,100000.0,3-ROOM,10,150000.0,22/04/2025,30/04/2025,Michael Tan,2,David Wong,true
+WoodlandsHills,Woodlands,2-ROOM,3,100000.0,3-ROOM,6,120000.0,23/04/2025,02/12/2025,Jessica Ng,2,Daniel Lee,true
+Micropolis,Micropolis,2-ROOM,2,200000.0,3-ROOM,4,300000.0,02/12/2002,02/12/2025,Michael Tan,2,Emily Tan,true
+CentralPark,Orchard,2-ROOM,3,100000.0,3-ROOM,7,140000.0,01/05/2025,31/05/2025,Michael Tan,2,Daniel Lee,true
+EastGate,Suntec,2-ROOM,4,90000.0,3-ROOM,8,130000.0,15/05/2025,25/05/2025,Jessica Ng,2,Emily Tan,true
