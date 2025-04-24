@@ -15,7 +15,6 @@ public class HDBOfficerController {
 
     private EnquiryController enquiryController;
 
-
     public HDBOfficerController(HDBOfficer currentOfficer) {
         this.currentOfficer = currentOfficer;
         loadProjectsForOfficer();
@@ -53,7 +52,7 @@ public class HDBOfficerController {
         }
 
         OfficerRegistration registration = new OfficerRegistration(registrationIdCounter++, currentOfficer, project,
-        OfficerRegistrationStatus.pending, new Date());
+                OfficerRegistrationStatus.pending, new Date());
 
         currentOfficer.addRegistration(registration);
         project.addOfficerRegistration(registration);
@@ -176,6 +175,11 @@ public class HDBOfficerController {
 
     public void registerToHandleProject(Project project) {
         HDBOfficer officer = getCurrentOfficer();
+        Application existing = currentOfficer.getApplication();
+        if (existing != null && existing.getProject().getProjectName().equals(project.getProjectName())) {
+            System.out.println("You cannot register to handle a project you have applied for as an applicant.");
+            return;
+        }
 
         for (OfficerRegistration reg : officer.getRegistrations()) {
             if (reg.getProject().getProjectName().equals(project.getProjectName())) {
@@ -183,7 +187,6 @@ public class HDBOfficerController {
                 return;
             }
         }
-        
 
         if (project.getRemainingOfficerSlots() <= 0) {
             System.out.println("No officer slots available in this project.");
@@ -191,8 +194,7 @@ public class HDBOfficerController {
         }
 
         OfficerRegistration registration = new OfficerRegistration(registrationIdCounter++, officer, project,
-        OfficerRegistrationStatus.pending, new Date());
-
+                OfficerRegistrationStatus.pending, new Date());
 
         project.addOfficerRegistration(registration);
         officer.addRegistration(registration);
