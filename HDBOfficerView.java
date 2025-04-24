@@ -22,7 +22,7 @@ public class HDBOfficerView {
             System.out.println("1. View Available Projects");
             System.out.println("2. View Eligible Projects");
             System.out.println("3. Submit Application as Officer");
-            System.out.println("4. View Applied Project");
+            System.out.println("4. View Application Status");
             System.out.println("5. Register for Project");
             System.out.println("6. View Registration Status");
             System.out.println("7. View Assigned Project");
@@ -124,27 +124,68 @@ public class HDBOfficerView {
     private void submitApplicationMenu() {
         System.out.println("\n===== Submit Application =====");
         List<Project> eligible = controller.getEligibleProjectsToApply();
+    
         if (eligible.isEmpty()) {
             System.out.println("No eligible projects available.");
             return;
         }
-
-        for (int i = 0; i < eligible.size(); i++) {
-            Project p = eligible.get(i);
-            System.out.println((i + 1) + ". " + p.getProjectName());
+    
+        // Header for the project and flat type table
+        System.out.println("------------------------------------------------------");
+        System.out.printf("%-5s %-20s %-15s %-12s %-10s\n", "No.", "Project Name", "Flat Type", "Units Left", "Price (SGD)");
+        System.out.println("------------------------------------------------------");
+    
+        // Display the eligible projects with flat types and numbered list
+        int projectCounter = 1;
+        for (Project project : eligible) {
+            boolean hasEligibleFlatTypes = false;
+    
+            // Loop through all flat types for the current project
+            for (FlatType flatType : project.getFlatTypes()) {
+                if (flatType.getUnitCount() > 0 && controller.checkEligibility(controller.getCurrentOfficer(), project, flatType)) {
+                    // Display each flat type under its corresponding project with a number
+                    System.out.printf("%-5d %-20s %-15s %-12d $%-10.2f\n", 
+                            projectCounter,
+                            project.getProjectName(),
+                            flatType.getName(),
+                            flatType.getUnitCount(),
+                            flatType.getPrice());
+                    hasEligibleFlatTypes = true;
+                    projectCounter++;
+                }
+            }
+    
+            // If no eligible flat types are available for this project
+            if (!hasEligibleFlatTypes) {
+                System.out.printf("%-5d %-20s %-15s %-12s %-10s\n", 
+                        projectCounter,
+                        project.getProjectName(),
+                        "No eligible flat types available",
+                        "-",
+                        "-");
+                projectCounter++;
+            }
         }
-
+    
+        System.out.println("------------------------------------------------------");
+    
+        // Prompt user to select a project by number
         System.out.print("Select project number: ");
         try {
             int idx = Integer.parseInt(scanner.nextLine());
+    
+            // Validate project selection
             if (idx < 1 || idx > eligible.size()) {
                 System.out.println("Invalid selection.");
                 return;
             }
-            Project selected = eligible.get(idx - 1);
-            FlatType chosen = controller.selectFlatType(selected);
+    
+            Project selectedProject = eligible.get(idx - 1);
+    
+            // Allow the user to select a flat type for the selected project
+            FlatType chosen = controller.selectFlatType(selectedProject);
             if (chosen != null) {
-                controller.submitApplicationAsOfficer(selected, chosen);
+                controller.submitApplicationAsOfficer(selectedProject, chosen);
             }
         } catch (NumberFormatException e) {
             System.out.println("Invalid input.");

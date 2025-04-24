@@ -171,16 +171,33 @@ public class ApplicantController {
 
     public void withdraw(Application app) {
         if (app != null) {
-            app.setStatus(ApplicationStatus.PENDING);
-            WithdrawalRequestController contr = new WithdrawalRequestController();
-            boolean created = contr.createWithdrawalRequest(app);
-
-        if (created) {
-                System.out.println("Withdrawal request submitted. Pending approval.");
-        }
-        }   
-        else {
-            System.out.println("No application found.");
+            // Confirm withdrawal before processing
+            Scanner scanner = new Scanner(System.in);
+            System.out.println("\nAre you sure you want to withdraw your application for " + app.getProject().getProjectName() + " (Flat Type: " + app.getFlatType().getName() + ")?");
+            System.out.print("Type 'yes' to confirm or 'no' to cancel: ");
+            
+            String confirmation = scanner.nextLine().trim().toLowerCase();
+    
+            if (confirmation.equals("yes")) {
+                // Set application status to PENDING (or any other status indicating withdrawal)
+                app.setStatus(ApplicationStatus.PENDING); 
+    
+                // Create withdrawal request
+                WithdrawalRequestController contr = new WithdrawalRequestController();
+                boolean created = contr.createWithdrawalRequest(app);
+    
+                if (created) {
+                    System.out.println("Withdrawal request submitted. Pending approval.");
+                } else {
+                    System.out.println("Failed to submit withdrawal request.");
+                }
+            } else if (confirmation.equals("no")) {
+                System.out.println("Withdrawal cancelled.");
+            } else {
+                System.out.println("Invalid input. Withdrawal cancelled.");
+            }
+        } else {
+            System.out.println("No application found to withdraw.");
         }
     }
 

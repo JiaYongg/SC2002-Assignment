@@ -18,13 +18,12 @@ public class ApplicantView {
             System.out.println("\n===== Applicant Menu =====");
             System.out.println("1. View Eligible Projects");
             System.out.println("2. Submit Application");
-            System.out.println("3. View Applied Project");
-            System.out.println("4. View Application Status");
-            System.out.println("5. Withdraw Application");
-            System.out.println("6. Submit Enquiry");
-            System.out.println("7. View My Enquiries");
-            System.out.println("8. Edit Enquiry");
-            System.out.println("9. Delete Enquiry");
+            System.out.println("3. View Application Status");
+            System.out.println("4. Withdraw Application");
+            System.out.println("5. Submit Enquiry");
+            System.out.println("6. View My Enquiries");
+            System.out.println("7. Edit Enquiry");
+            System.out.println("8. Delete Enquiry");
             System.out.println("0. Logout");
 
             System.out.print("Enter your choice: ");
@@ -43,21 +42,18 @@ public class ApplicantView {
                         viewAppliedProject(controller.getApplicant());
                         break;
                     case 4:
-                        viewApplicationStatus(controller.getApplicant());
-                        break;
-                    case 5:
                         controller.withdraw(controller.getApplicant().getApplication());
                         break;
-                    case 6:
+                    case 5:
                         submitEnquiry();
                         break;
-                    case 7:
+                    case 6:
                         viewEnquiries();
                         break;
-                    case 8:
+                    case 7:
                         editEnquiry();
                         break;
-                    case 9:
+                    case 8:
                         deleteEnquiry();
                         break;
                     case 0:
@@ -128,13 +124,21 @@ public class ApplicantView {
 
     
     public void viewAppliedProject(Applicant applicant) {
+        System.out.println("\n===== Applied Project Details =====");
+    
         Application app = applicant.getApplication();
         if (app != null) {
-            displayAppliedProject(app.getProject(), app.getFlatType(), app.getStatus());
+            System.out.println("------------------------------------------------------");
+            System.out.printf("%-20s: %s\n", "Project Name", app.getProject().getProjectName());
+            System.out.printf("%-20s: %s\n", "Flat Type", app.getFlatType().getName());
+            System.out.printf("%-20s: %s\n", "Status", app.getStatus());
+            System.out.println("------------------------------------------------------");
         } else {
             System.out.println("No project applied yet.");
         }
     }
+    
+    
 
     public void viewApplicationStatus(Applicant applicant) {
         Application app = applicant.getApplication();
@@ -148,67 +152,103 @@ public class ApplicantView {
 
     private void submitApplicationMenu() {
         System.out.println("\n===== Submit Application =====");
-
+    
         // Get eligible projects first
         List<Project> eligibleProjects = controller.getEligibleProjects(controller.getApplicant());
-
+    
         if (eligibleProjects.isEmpty()) {
             System.out.println("No eligible projects available for application.");
             return;
         }
-
-        // Display eligible projects with IDs for selection
-        System.out.println("Eligible Projects:");
-        for (int i = 0; i < eligibleProjects.size(); i++) {
-            Project p = eligibleProjects.get(i);
-            System.out.println((i + 1) + ". " + p.getProjectName() + " - " + p.getNeighborhood());
-        }
-
-        // Get project selection
-        System.out.print("Select project number: ");
-        int projectNum = Integer.parseInt(scanner.nextLine().trim());
-
-        if (projectNum < 1 || projectNum > eligibleProjects.size()) {
-            System.out.println("Invalid project selection.");
-            return;
-        }
-
-        Project selectedProject = eligibleProjects.get(projectNum - 1);
-
-        // Display available flat types
-        List<FlatType> availableFlatTypes = new ArrayList<>();
-        
-        for (FlatType ft : selectedProject.getFlatTypes()) {
-            // Pass the selectedProject as the second parameter
-            if (ft.getUnitCount() > 0 && controller.checkEligibility(controller.getApplicant(), selectedProject, ft)) {
-                availableFlatTypes.add(ft);
+    
+        // Header for the project and flat type table
+        System.out.println("------------------------------------------------------");
+        System.out.printf("%-5s %-20s %-15s %-12s %-10s\n", "No.", "Project Name", "Flat Type", "Units Left", "Price (SGD)");
+        System.out.println("------------------------------------------------------");
+    
+        // Display eligible projects with flat types and numbered list
+        int projectCounter = 1;
+        for (Project project : eligibleProjects) {
+            boolean hasEligibleFlatTypes = false;
+    
+            // Loop through all flat types for the current project
+            for (FlatType flatType : project.getFlatTypes()) {
+                if (flatType.getUnitCount() > 0 && controller.checkEligibility(controller.getApplicant(), project, flatType)) {
+                    // Display each flat type under its corresponding project with a number
+                    System.out.printf("%-5d %-20s %-15s %-12d $%-10.2f\n", 
+                            projectCounter,
+                            project.getProjectName(),
+                            flatType.getName(),
+                            flatType.getUnitCount(),
+                            flatType.getPrice());
+                    hasEligibleFlatTypes = true;
+                    projectCounter++;
+                }
+            }
+    
+            // If no eligible flat types are available for this project
+            if (!hasEligibleFlatTypes) {
+                System.out.printf("%-5d %-20s %-15s %-12s %-10s\n", 
+                        projectCounter,
+                        project.getProjectName(),
+                        "No eligible flat types available",
+                        "-",
+                        "-");
+                projectCounter++;
             }
         }
-
-        if (availableFlatTypes.isEmpty()) {
-            System.out.println("No available flat types for this project.");
-            return;
-        }
-
-        System.out.println("\nAvailable Flat Types:");
-        int index = 1;
-        for (FlatType ft : availableFlatTypes) {
-            System.out.println(index + ". " + ft.getName() + " ($" + ft.getPrice() + ")");
-            index++;
-        }
-
-        // Get flat type selection
-        System.out.print("Select flat type by number (1-" + availableFlatTypes.size() + "): ");
+    
+        System.out.println("------------------------------------------------------");
+    
+        // Prompt user to select a project by number
+        System.out.print("Select project number: ");
         try {
-            int selectedNumber = Integer.parseInt(scanner.nextLine());
-            if (selectedNumber < 1 || selectedNumber > availableFlatTypes.size()) {
-                System.out.println("Invalid selection.");
+            int projectNum = Integer.parseInt(scanner.nextLine().trim());
+    
+            // Validate project selection
+            if (projectNum < 1 || projectNum > eligibleProjects.size()) {
+                System.out.println("Invalid project selection.");
                 return;
             }
-            FlatType selectedFlatType = availableFlatTypes.get(selectedNumber - 1);
-            controller.submitApplication(controller.getApplicant(), selectedProject, selectedFlatType);
+    
+            Project selectedProject = eligibleProjects.get(projectNum - 1);
+    
+            // Display available flat types for the selected project
+            List<FlatType> availableFlatTypes = new ArrayList<>();
+            for (FlatType ft : selectedProject.getFlatTypes()) {
+                if (ft.getUnitCount() > 0 && controller.checkEligibility(controller.getApplicant(), selectedProject, ft)) {
+                    availableFlatTypes.add(ft);
+                }
+            }
+    
+            if (availableFlatTypes.isEmpty()) {
+                System.out.println("No available flat types for this project.");
+                return;
+            }
+    
+            // Show available flat types with prices
+            System.out.println("\nAvailable Flat Types:");
+            int index = 1;
+            for (FlatType ft : availableFlatTypes) {
+                System.out.println(index + ". " + ft.getName() + " ($" + ft.getPrice() + ")");
+                index++;
+            }
+    
+            // Get flat type selection
+            System.out.print("Select flat type by number (1-" + availableFlatTypes.size() + "): ");
+            try {
+                int selectedNumber = Integer.parseInt(scanner.nextLine());
+                if (selectedNumber < 1 || selectedNumber > availableFlatTypes.size()) {
+                    System.out.println("Invalid selection.");
+                    return;
+                }
+                FlatType selectedFlatType = availableFlatTypes.get(selectedNumber - 1);
+                controller.submitApplication(controller.getApplicant(), selectedProject, selectedFlatType);
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a valid number.");
+            }
         } catch (NumberFormatException e) {
-            System.out.println("Please enter a valid number.");
+            System.out.println("Invalid input. Please enter a valid number.");
         }
     }
 
