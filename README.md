@@ -54,6 +54,36 @@ The system makes use of several data files (CSV format) to persist the following
 4. Input the respective number for action wish to be made
 5. Use application as see fit and logout to change user or exit program to terminate program
 
+## Example
+```
+Enter UserID (NRIC): T1234567J
+Enter Password: password
+Login successful!
+
+===== Welcome, James =====
+You are logged in as: APPLICANT
+
+Please select an option:
+1. Continue to APPLICANT Interface
+2. Change Password
+3. Logout
+
+Enter your choice: 1
+
+===== Applicant Menu =====
+1. View Eligible Projects
+2. Submit Application
+3. View Applied Project
+4. View Application Status
+5. Withdraw Application
+6. Submit Enquiry
+7. View My Enquiries
+8. Edit Enquiry
+9. Delete Enquiry
+0. Logout
+Enter your choice:
+```
+
 # Contributors
 - NICOLE YAP XIU EN - U2420768C
 - POH JIA YONG - U2323306C
