@@ -49,7 +49,7 @@ public class LoginView {
         System.out.print("Confirm new password: ");
         String confirmPassword = scanner.nextLine().trim();
         
-        // Check if passwords match
+        
         if (!newPassword.equals(confirmPassword)) {
             System.out.println("\nPassword change failed. New passwords do not match.");
             return false;
@@ -58,10 +58,10 @@ public class LoginView {
         boolean passwordChanged = loginController.changePassword(oldPassword, newPassword);
         if (passwordChanged) {
             System.out.println("\nPassword changed successfully! Please log in again.");
-            return true; // Password was changed
+            return true; 
         } else {
             System.out.println("\nPassword change failed. Please try again.");
-            return false; // Password was not changed
+            return false; 
         }
     }
     
@@ -83,17 +83,17 @@ public class LoginView {
             int choice = Integer.parseInt(scanner.nextLine().trim());
             switch (choice) {
                 case 1:
-                    return true; // Continue to role view
+                    return true; 
                 case 2:
-                    // If password was changed, return false to trigger re-login
+                    
                     if (changePasswordPrompt()) {
-                        return false; // Force logout and re-login
+                        return false; 
                     } else {
-                        // If password change failed, show menu again
+                        
                         return showIntermediateMenu();
                     }
                 case 3:
-                    return false; // Logout
+                    return false; 
                 default:
                     System.out.println("Invalid option. Continuing to " + userRole + " Interface.");
                     return true;

@@ -12,7 +12,7 @@ public class EnquiryView {
         this.applicant = applicant;
     }
 
-    // Applicant submits an enquiry on a project
+    
     public void showEnquiryForm() {
         List<Project> projects = controller.getAllProjects();
 
@@ -41,13 +41,13 @@ public class EnquiryView {
         controller.submitEnquiry(applicant, project, content);
     }
 
-    // View response to an enquiry
+    
     public void displayEnquiryResponse(String response) {
         System.out.println("===== Enquiry Response =====");
         System.out.println((response == null || response.isEmpty()) ? "No reply yet." : response);
     }
 
-    // Applicant can only manage their own enquiries
+    
     public void manageEnquiry(Scanner scanner) {
         if (applicant.getEnquiries().isEmpty()) {
             System.out.println("You have no enquiries.");
@@ -93,7 +93,7 @@ public class EnquiryView {
         }
     }
 
-    // Still allows manager to view all enquiries (unchanged)
+    
     public void viewEnquiries() {
         List<Project> projects = controller.getAllProjects();
         List<HDBManager> managers = new java.util.ArrayList<>();

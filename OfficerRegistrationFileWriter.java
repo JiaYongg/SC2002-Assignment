@@ -26,7 +26,7 @@ public class OfficerRegistrationFileWriter extends FileWriter<OfficerRegistratio
         OfficerRegistrationFileReader reader = new OfficerRegistrationFileReader(projectMap, officerMap);
         Map<String, OfficerRegistration> allRegs = reader.readFromFile();
 
-        allRegs.put(String.valueOf(updated.getRegistrationId()), updated); // Make sure getId() exists in your class
+        allRegs.put(String.valueOf(updated.getRegistrationId()), updated); 
         writeToFile(allRegs);
     }
 

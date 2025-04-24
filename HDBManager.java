@@ -10,7 +10,7 @@ public class HDBManager extends User {
         this.managedProjects = new ArrayList<>();
     }
     
-    // Project management methods
+    
     public List<Project> getManagedProjects() {
         return new ArrayList<>(managedProjects);
     }
@@ -23,10 +23,10 @@ public class HDBManager extends User {
         this.managedProjects.remove(project);
     }
     
-    // Method to check if manager can handle a project in the given period
+    
     public boolean canHandleProjectInPeriod(Date openDate, Date closeDate) {
         for (Project project : managedProjects) {
-            // Check for overlap using Date comparison
+            
             if (!(closeDate.before(project.getApplicationOpenDate()) || 
                   openDate.after(project.getApplicationCloseDate()))) {
                 return false;
@@ -37,7 +37,7 @@ public class HDBManager extends User {
     
     public void viewEnquiries() {
         System.out.println("Manager " + getName() + " is viewing enquiries...");
-        // Implementation for viewing enquiries
+        
     }
     
     public String getAccessLevel() {
@@ -46,6 +46,6 @@ public class HDBManager extends User {
     
     public void generateBookingReport() {
         System.out.println("Generating booking report for all projects managed by " + getName());
-        // Implementation for report generation
+        
     }
 }

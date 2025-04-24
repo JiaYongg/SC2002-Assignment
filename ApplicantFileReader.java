@@ -13,7 +13,7 @@ public class ApplicantFileReader extends FileReader<User> {
     @Override
     protected void processLine(String line, Map<String, User> users) {
         String[] data = line.split(",");
-        Applicant applicant = new Applicant(); // Create Applicant, not User
+        Applicant applicant = new Applicant(); 
         applicant.setName(data[0].trim());
         applicant.setNric(data[1].trim());
         applicant.setAge(Integer.parseInt(data[2].trim()));

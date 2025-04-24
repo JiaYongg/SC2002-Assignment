@@ -153,7 +153,7 @@ public class ApplicantView {
     private void submitApplicationMenu() {
         System.out.println("\n===== Submit Application =====");
     
-        // Get eligible projects first
+        
         List<Project> eligibleProjects = controller.getEligibleProjects(controller.getApplicant());
     
         if (eligibleProjects.isEmpty()) {
@@ -161,20 +161,20 @@ public class ApplicantView {
             return;
         }
     
-        // Header for the project and flat type table
+        
         System.out.println("------------------------------------------------------");
         System.out.printf("%-5s %-20s %-15s %-12s %-10s\n", "No.", "Project Name", "Flat Type", "Units Left", "Price (SGD)");
         System.out.println("------------------------------------------------------");
     
-        // Display eligible projects with flat types and numbered list
+        
         int projectCounter = 1;
         for (Project project : eligibleProjects) {
             boolean hasEligibleFlatTypes = false;
     
-            // Loop through all flat types for the current project
+            
             for (FlatType flatType : project.getFlatTypes()) {
                 if (flatType.getUnitCount() > 0 && controller.checkEligibility(controller.getApplicant(), project, flatType)) {
-                    // Display each flat type under its corresponding project with a number
+                    
                     System.out.printf("%-5d %-20s %-15s %-12d $%-10.2f\n", 
                             projectCounter,
                             project.getProjectName(),
@@ -186,7 +186,7 @@ public class ApplicantView {
                 }
             }
     
-            // If no eligible flat types are available for this project
+            
             if (!hasEligibleFlatTypes) {
                 System.out.printf("%-5d %-20s %-15s %-12s %-10s\n", 
                         projectCounter,
@@ -200,12 +200,12 @@ public class ApplicantView {
     
         System.out.println("------------------------------------------------------");
     
-        // Prompt user to select a project by number
+        
         System.out.print("Select project number to book: ");
         try {
             int projectNum = Integer.parseInt(scanner.nextLine().trim());
     
-            // Validate project selection
+            
             if (projectNum < 1 || projectNum > eligibleProjects.size()) {
                 System.out.println("Invalid project selection.");
                 return;
@@ -213,7 +213,7 @@ public class ApplicantView {
     
             Project selectedProject = eligibleProjects.get(projectNum - 1);
     
-            // Automatically select the eligible flat type for the selected project
+            
             List<FlatType> availableFlatTypes = new ArrayList<>();
             for (FlatType ft : selectedProject.getFlatTypes()) {
                 if (ft.getUnitCount() > 0 && controller.checkEligibility(controller.getApplicant(), selectedProject, ft)) {
@@ -226,10 +226,10 @@ public class ApplicantView {
                 return;
             }
     
-            // Automatically choose the first available eligible flat type
+            
             FlatType chosenFlatType = availableFlatTypes.get(0);
     
-            // Submit the application using the selected flat type
+            
             controller.submitApplication(controller.getApplicant(), selectedProject, chosenFlatType);
             System.out.println("Current Applicantion Pending...");
     
@@ -241,7 +241,7 @@ public class ApplicantView {
     private void submitEnquiry() {
         System.out.println("\n===== Submit Enquiry =====");
 
-        // Display all visible projects
+        
         List<Project> visibleProjects = controller.getVisibleProjects();
 
         if (visibleProjects.isEmpty()) {
@@ -251,7 +251,7 @@ public class ApplicantView {
             return;
         }
 
-        // Display project list
+        
         System.out.println("Available Projects:");
         System.out.println("ID | Project Name | Neighborhood");
         System.out.println("--------------------------------");
@@ -264,13 +264,13 @@ public class ApplicantView {
                     project.getNeighborhood());
         }
 
-        // Get project selection
+        
         System.out.print("\nEnter project ID to enquire about (0 to cancel): ");
         try {
             int projectId = Integer.parseInt(scanner.nextLine().trim());
 
             if (projectId == 0) {
-                return; // User canceled
+                return; 
             }
 
             if (projectId < 1 || projectId > visibleProjects.size()) {
@@ -280,10 +280,10 @@ public class ApplicantView {
                 return;
             }
 
-            // Get the selected project
+            
             Project selectedProject = visibleProjects.get(projectId - 1);
 
-            // Get enquiry content
+            
             System.out.println("\nEnter your enquiry about " + selectedProject.getProjectName() + ":");
             String content = scanner.nextLine().trim();
 
@@ -294,7 +294,7 @@ public class ApplicantView {
                 return;
             }
 
-            // Submit the enquiry
+            
             controller.submitEnquiry(selectedProject, content);
             System.out.println("Enquiry submitted successfully!");
 
@@ -331,16 +331,16 @@ public class ApplicantView {
                     responseStatus);
         }
 
-        // View detailed enquiry
+        
         System.out.print("\nEnter enquiry ID to view details (0 to cancel): ");
         try {
             int enquiryId = Integer.parseInt(scanner.nextLine().trim());
 
             if (enquiryId == 0) {
-                return; // User canceled
+                return; 
             }
 
-            // Find the enquiry with the given ID
+            
             Enquiry selectedEnquiry = null;
             for (Enquiry enquiry : enquiries) {
                 if (enquiry.getEnquiryID() == enquiryId) {
@@ -356,7 +356,7 @@ public class ApplicantView {
                 return;
             }
 
-            // Display full enquiry details
+            
             System.out.println("\n===== Enquiry Details =====");
             System.out.println("Enquiry ID: " + selectedEnquiry.getEnquiryID());
             System.out.println("Project: " + selectedEnquiry.getProject().getProjectName());
@@ -398,16 +398,16 @@ public class ApplicantView {
                     responseStatus);
         }
 
-        // Select enquiry to edit
+        
         System.out.print("\nEnter enquiry ID to edit (0 to cancel): ");
         try {
             int enquiryId = Integer.parseInt(scanner.nextLine().trim());
 
             if (enquiryId == 0) {
-                return; // User canceled
+                return; 
             }
 
-            // Find the enquiry with the given ID
+            
             Enquiry selectedEnquiry = null;
             for (Enquiry enquiry : enquiries) {
                 if (enquiry.getEnquiryID() == enquiryId) {
@@ -423,7 +423,7 @@ public class ApplicantView {
                 return;
             }
 
-            // Check if the enquiry has already been responded to
+            
             if (!selectedEnquiry.getResponse().isEmpty()) {
                 System.out.println("Cannot edit an enquiry that has already been responded to.");
                 System.out.println("Press Enter to continue...");
@@ -431,7 +431,7 @@ public class ApplicantView {
                 return;
             }
 
-            // Display current content and get new content
+            
             System.out.println("\nCurrent content: " + selectedEnquiry.getContent());
             System.out.print("Enter new content: ");
             String newContent = scanner.nextLine().trim();
@@ -443,7 +443,7 @@ public class ApplicantView {
                 return;
             }
 
-            // Update the enquiry
+            
             controller.editEnquiry(selectedEnquiry, newContent);
             System.out.println("Enquiry updated successfully!");
 
@@ -481,16 +481,16 @@ public class ApplicantView {
                     responseStatus);
         }
 
-        // Select enquiry to delete
+        
         System.out.print("\nEnter enquiry ID to delete (0 to cancel): ");
         try {
             int enquiryId = Integer.parseInt(scanner.nextLine().trim());
 
             if (enquiryId == 0) {
-                return; // User canceled
+                return; 
             }
 
-            // Find the enquiry with the given ID
+            
             Enquiry selectedEnquiry = null;
             for (Enquiry enquiry : enquiries) {
                 if (enquiry.getEnquiryID() == enquiryId) {
@@ -506,7 +506,7 @@ public class ApplicantView {
                 return;
             }
 
-            // Check if the enquiry has already been responded to
+            
             if (!selectedEnquiry.getResponse().isEmpty()) {
                 System.out.println("Cannot delete an enquiry that has already been responded to.");
                 System.out.println("Press Enter to continue...");
@@ -514,12 +514,12 @@ public class ApplicantView {
                 return;
             }
 
-            // Confirm deletion
+            
             System.out.print("\nAre you sure you want to delete this enquiry? (y/n): ");
             String confirmation = scanner.nextLine().trim().toLowerCase();
 
             if (confirmation.equals("y") || confirmation.equals("yes")) {
-                // Delete the enquiry
+                
                 controller.deleteEnquiry(selectedEnquiry);
                 System.out.println("Enquiry deleted successfully!");
             } else {

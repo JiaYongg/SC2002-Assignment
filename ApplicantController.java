@@ -10,8 +10,7 @@ public class ApplicantController {
     private List<Project> allProjects;
     private ProjectFileReader projectReader;
     private EnquiryController enquiryController;
-    private ApplicationFileWriter applicationWriter;
-    private ApplicationFileReader applicationReader;
+
 
     public ApplicantController(Applicant applicant) {
         this.applicant = applicant;
@@ -19,7 +18,6 @@ public class ApplicantController {
         this.allProjects = new ArrayList<>(projectReader.readFromFile().values());
         this.enquiryController = new EnquiryController(allProjects);
         this.enquiryController.linkEnquiriesTo(applicant);
-        this.applicationWriter = new ApplicationFileWriter();
 
         Map<String, Project> projectMap = new HashMap<>();
         for (Project p : allProjects) {
@@ -29,16 +27,14 @@ public class ApplicantController {
         Map<String, Applicant> applicantMap = new HashMap<>();
         applicantMap.put(applicant.getNric(), applicant);
 
-        // Load application and automatically set it into applicant
         ApplicationFileReader applicationReader = new ApplicationFileReader(projectMap, applicantMap);
-        applicationReader.readFromFile(); // This populates applicant.setApplication internally
+        applicationReader.readFromFile(); 
     }
 
     public Applicant getApplicant() {
         return applicant;
     }
 
-    // In your ApplicantController
     public void submitApplication(Applicant applicant, Project project, FlatType flatType) {
         ApplicationController applicationController = new ApplicationController();
         boolean success = applicationController.applyForProject(applicant, project, flatType);
@@ -83,7 +79,7 @@ public class ApplicantController {
         return eligibleDetails;
     }
 
-    // Helper class to hold project and flat type information together
+    
     public class ProjectFlatTypeInfo {
         private Project project;
         private FlatType flatType;
@@ -105,7 +101,7 @@ public class ApplicantController {
     public FlatType selectFlatType(Project project, Applicant applicant) {
         List<FlatType> eligibleFlatTypes = new ArrayList<>();
 
-        // Get all eligible flat types for this project and applicant
+        
         for (FlatType ft : project.getFlatTypes()) {
             if (ft.getUnitCount() > 0 && checkEligibility(applicant, project, ft)) {
                 eligibleFlatTypes.add(ft);
@@ -133,16 +129,16 @@ public class ApplicantController {
             }
             System.out.println("Invalid choice. Please select between 1 and " + eligibleFlatTypes.size());
         } catch (Exception e) {
-            scanner.nextLine(); // Clear the scanner buffer
+            scanner.nextLine(); 
             System.out.println("Invalid input. Please enter a number.");
-            return selectFlatType(project, applicant); // Recursive call for invalid input
+            return selectFlatType(project, applicant); 
         }
         System.out.println("Invalid selection.");
         return null;
     }
 
     public boolean checkEligibility(Applicant applicant, Project project, FlatType flatType) {
-        // Check if project is visible and within application period
+        
         Date currentDate = new Date();
         if (!project.isVisible() ||
                 currentDate.before(project.getApplicationOpenDate()) ||
@@ -150,12 +146,12 @@ public class ApplicantController {
             return false;
         }
 
-        // Check if flat type has available units
+        
         if (flatType.getUnitCount() <= 0) {
             return false;
         }
 
-        // Check applicant eligibility
+        
         int age = applicant.getAge();
         String maritalStatus = applicant.getMaritalStatus();
 
@@ -171,7 +167,7 @@ public class ApplicantController {
 
     public void withdraw(Application app) {
         if (app != null) {
-            // Confirm withdrawal before processing
+            
             Scanner scanner = new Scanner(System.in);
             System.out.println("\nAre you sure you want to withdraw your application for " + app.getProject().getProjectName() + " (Flat Type: " + app.getFlatType().getName() + ")?");
             System.out.print("Type 'yes' to confirm or 'no' to cancel: ");
@@ -179,10 +175,10 @@ public class ApplicantController {
             String confirmation = scanner.nextLine().trim().toLowerCase();
     
             if (confirmation.equals("yes")) {
-                // Set application status to PENDING (or any other status indicating withdrawal)
+                
                 app.setStatus(ApplicationStatus.PENDING); 
     
-                // Create withdrawal request
+                
                 WithdrawalRequestController contr = new WithdrawalRequestController();
                 boolean created = contr.createWithdrawalRequest(app);
     
@@ -231,7 +227,7 @@ public class ApplicantController {
     public void viewApplicationStatus(Applicant applicant) {
         Application app = applicant.getApplication();
         if (app != null) {
-            // Find the project in allProjects (bypassing visibility checks)
+            
             Project appliedProject = null;
             for (Project p : allProjects) {
                 if (p.getProjectName().equals(app.getProject().getProjectName())) {

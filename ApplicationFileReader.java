@@ -1,5 +1,4 @@
 import java.util.Map;
-import java.util.HashMap;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
@@ -40,7 +39,7 @@ public class ApplicationFileReader extends FileReader<Application> {
                     System.out.println("Error parsing date applied: " + dateAppliedStr + ". Using current date.");
                 }
             }
-            // Parse dateBooked if available (field at index 6)
+            
             Date dateBooked = null;
             if (data.length > 6 && !data[6].trim().isEmpty()) {
                 try {
@@ -51,7 +50,7 @@ public class ApplicationFileReader extends FileReader<Application> {
                 }
             }
 
-            // Look up the applicant, project, and flat type
+            
             Applicant applicant = applicants.get(applicantNRIC);
             Project project = projects.get(projectName);
             
@@ -59,7 +58,7 @@ public class ApplicationFileReader extends FileReader<Application> {
                 return;
             }
             
-            // Find the flat type within the project
+            
             FlatType flatType = null;
             for (FlatType ft : project.getFlatTypes()) {
                 if (ft.getName().equals(flatTypeName)) {
@@ -73,10 +72,10 @@ public class ApplicationFileReader extends FileReader<Application> {
                 return;
             }
 
-            // Parse the application status
+            
             ApplicationStatus status = ApplicationStatus.valueOf(statusStr);
             
-            // Create the application with all details
+            
             Application application = new Application(
                 applicationID, 
                 applicant, 
@@ -87,10 +86,10 @@ public class ApplicationFileReader extends FileReader<Application> {
                 dateBooked
             );
 
-            // Add to the map of applications
+            
             applications.put(String.valueOf(applicationID), application);
             
-            // Associate the application with the applicant
+            
             applicant.setApplication(application);
             
         } catch (Exception e) {

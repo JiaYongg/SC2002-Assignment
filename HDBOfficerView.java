@@ -130,20 +130,20 @@ public class HDBOfficerView {
             return;
         }
     
-        // Header for the project and flat type table
+        
         System.out.println("------------------------------------------------------");
         System.out.printf("%-5s %-20s %-15s %-12s %-10s\n", "No.", "Project Name", "Flat Type", "Units Left", "Price (SGD)");
         System.out.println("------------------------------------------------------");
     
-        // Display the eligible projects with flat types and numbered list
+        
         int projectCounter = 1;
         for (Project project : eligible) {
             boolean hasEligibleFlatTypes = false;
     
-            // Loop through all flat types for the current project
+            
             for (FlatType flatType : project.getFlatTypes()) {
                 if (flatType.getUnitCount() > 0 && controller.checkEligibility(controller.getCurrentOfficer(), project, flatType)) {
-                    // Display each flat type under its corresponding project with a number
+                    
                     System.out.printf("%-5d %-20s %-15s %-12d $%-10.2f\n", 
                             projectCounter,
                             project.getProjectName(),
@@ -155,7 +155,7 @@ public class HDBOfficerView {
                 }
             }
     
-            // If no eligible flat types are available for this project
+            
             if (!hasEligibleFlatTypes) {
                 System.out.printf("%-5d %-20s %-15s %-12s %-10s\n", 
                         projectCounter,
@@ -169,12 +169,12 @@ public class HDBOfficerView {
     
         System.out.println("------------------------------------------------------");
     
-        // Prompt user to select a project by number
+        
         System.out.print("Select project number to book: ");
         try {
             int idx = Integer.parseInt(scanner.nextLine());
     
-            // Validate project selection
+            
             if (idx < 1 || idx > eligible.size()) {
                 System.out.println("Invalid selection.");
                 return;
@@ -182,16 +182,16 @@ public class HDBOfficerView {
     
             Project selectedProject = eligible.get(idx - 1);
     
-            // Automatically select the eligible flat type for the selected project
+            
             FlatType chosenFlatType = null;
             for (FlatType ft : selectedProject.getFlatTypes()) {
                 if (ft.getUnitCount() > 0 && controller.checkEligibility(controller.getCurrentOfficer(), selectedProject, ft)) {
-                    chosenFlatType = ft; // Automatically pick the first eligible flat type
+                    chosenFlatType = ft; 
                     break;
                 }
             }
     
-            // If a valid flat type is found, proceed to submit the application
+            
             if (chosenFlatType != null) {
                 controller.submitApplicationAsOfficer(selectedProject, chosenFlatType);;
                 System.out.println("Current Applicantion Pending...");
@@ -213,12 +213,12 @@ public class HDBOfficerView {
             return;
         }
     
-        // Header for the project table
+        
         System.out.println("------------------------------------------------------");
         System.out.printf("%-5s %-20s %-15s\n", "No.", "Project Name", "Neighborhood");
         System.out.println("------------------------------------------------------");
     
-        // Display the available projects with a numbered list
+        
         for (int i = 0; i < projects.size(); i++) {
             Project p = projects.get(i);
             System.out.printf("%-5d %-20s %-15s\n", i + 1, p.getProjectName(), p.getNeighborhood());
@@ -226,12 +226,12 @@ public class HDBOfficerView {
     
         System.out.println("------------------------------------------------------");
     
-        // Get the project selection from the user
+        
         System.out.print("Select project number to register: ");
         try {
             int choice = Integer.parseInt(scanner.nextLine());
     
-            // Validate project selection
+            
             if (choice >= 1 && choice <= projects.size()) {
                 controller.registerToHandleProject(projects.get(choice - 1));
             } else {
@@ -262,7 +262,7 @@ public class HDBOfficerView {
     }
 
     public void viewAssignedProject() {
-        Project assignedProject = controller.getAssignedProject(currentOfficer); // ✅ always recheck
+        Project assignedProject = controller.getAssignedProject(currentOfficer); 
 
         System.out.println("\n===== Assigned Project =====");
         if (assignedProject != null) {
@@ -286,7 +286,7 @@ public class HDBOfficerView {
             return;
         }
 
-        // Display enquiries
+        
         for (int i = 0; i < enquiries.size(); i++) {
             Enquiry e = enquiries.get(i);
             String content = e.getContent().length() > 30 ? e.getContent().substring(0, 27) + "..." : e.getContent();

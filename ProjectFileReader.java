@@ -1,4 +1,3 @@
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -27,18 +26,18 @@ public class ProjectFileReader extends FileReader<Project> {
         }
 
         try {
-            // Parse basic fields
+            
             String projectName = data[0].trim();
             String neighborhood = data[1].trim();
 
             List<FlatType> flatTypes = new ArrayList<>();
 
-            // Type 1
+            
             if (!data[2].isEmpty()) {
                 flatTypes.add(new FlatType(data[2].trim(), Integer.parseInt(data[3].trim()), Double.parseDouble(data[4].trim())));
             }
 
-            // Type 2
+            
             if (!data[5].isEmpty()) {
                 flatTypes.add(new FlatType(data[5].trim(), Integer.parseInt(data[6].trim()), Double.parseDouble(data[7].trim())));
             }
@@ -64,7 +63,7 @@ public class ProjectFileReader extends FileReader<Project> {
                 }
             }
 
-            // Optional: auto-hide if outdated
+            
             new ProjectController().updateProjectVisibility(project);
 
             projects.put(projectName, project);
@@ -79,7 +78,7 @@ public class ProjectFileReader extends FileReader<Project> {
         HDBOfficer officer = new HDBOfficer();
         officer.setName(name);
         try {
-            // Assign a dummy NRIC (format valid but random)
+            
             officer.setNric("T" + (int)(Math.random() * 9000000 + 1000000) + "Z");
         } catch (IllegalArgumentException e) {
             System.out.println("Invalid NRIC generated for officer: " + name);
@@ -88,14 +87,14 @@ public class ProjectFileReader extends FileReader<Project> {
     }
 
     
-    // Helper method to find or create a Manager object
+    
     private HDBManager findOrCreateManager(String managerName) {
-        // In a real implementation, you would look up the manager in a repository
-        // For now, create a placeholder manager with a valid NRIC
+        
+        
         HDBManager manager = new HDBManager();
         manager.setName(managerName);
         
-        // Set a valid NRIC format to avoid validation errors
+        
         try {
             manager.setNric("S1234567A");
         } catch (IllegalArgumentException e) {

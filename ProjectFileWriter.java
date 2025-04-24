@@ -25,7 +25,7 @@ public class ProjectFileWriter extends FileWriter <Project> {
 
     public void appendProject(Project project) {
         try (PrintWriter writer = new PrintWriter(new FileOutputStream("ProjectList.csv", true))) {
-            writer.println(formatLine(project)); // Appends one project as a CSV row
+            writer.println(formatLine(project)); 
         } catch (Exception e) {
             System.out.println("Error appending to ProjectList.csv");
             e.printStackTrace();
@@ -54,14 +54,14 @@ public class ProjectFileWriter extends FileWriter <Project> {
     protected String formatLine(Project project) {
         StringBuilder sb = new StringBuilder();
         
-        // Project name and neighborhood
+        
         sb.append(project.getProjectName()).append(",");
         sb.append(project.getNeighborhood()).append(",");
         
-        // Flat types, units and prices
+        
         List<FlatType> flatTypes = project.getFlatTypes();
         
-        // Add Type 1 if it exists
+        
         if (flatTypes.size() > 0) {
             FlatType type1 = flatTypes.get(0);
             sb.append(type1.getName()).append(",");
@@ -71,7 +71,7 @@ public class ProjectFileWriter extends FileWriter <Project> {
             sb.append(",,,");
         }
         
-        // Add Type 2 if it exists
+        
         if (flatTypes.size() > 1) {
             FlatType type2 = flatTypes.get(1);
             sb.append(type2.getName()).append(",");
@@ -81,16 +81,16 @@ public class ProjectFileWriter extends FileWriter <Project> {
             sb.append(",,,");
         }
         
-        // Format and add dates
+        
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         sb.append(dateFormat.format(project.getApplicationOpenDate())).append(",");
         sb.append(dateFormat.format(project.getApplicationCloseDate())).append(",");
         
-        // Add manager and officer slots
+        
         sb.append(project.getManagerInCharge().getName()).append(",");
         sb.append(project.getOfficerSlots()).append(",");
         
-        // Add officers if any
+        
         List<HDBOfficer> officers = project.getAssignedOfficers();
         if (!officers.isEmpty()) {
             StringBuilder officerList = new StringBuilder();
@@ -98,7 +98,7 @@ public class ProjectFileWriter extends FileWriter <Project> {
                 if (i > 0) {
                     officerList.append(";");
                 }
-                officerList.append(officers.get(i).getName());  // <-- USE NAME
+                officerList.append(officers.get(i).getName());  
             }
             sb.append(officerList);
         }

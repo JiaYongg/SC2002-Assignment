@@ -23,7 +23,7 @@ public class OfficerRegistrationFileReader extends FileReader<OfficerRegistratio
     int lastId = 0;
     try (BufferedReader br = new BufferedReader(new java.io.FileReader(filename))) {
         String line;
-        br.readLine(); // skip header
+        br.readLine(); 
         while ((line = br.readLine()) != null) {
             String[] parts = line.split(",");
             if (parts.length >= 1) {
@@ -55,7 +55,7 @@ public class OfficerRegistrationFileReader extends FileReader<OfficerRegistratio
             String statusStr = data[3].trim();
             String dateAppliedStr = data[4].trim();
 
-            // Look up the project
+            
             Project project = projects.get(projectName);
             
             if (project == null) {
@@ -63,19 +63,19 @@ public class OfficerRegistrationFileReader extends FileReader<OfficerRegistratio
                 return;
             }
             
-            // Parse the officer registration status
+            
             OfficerRegistrationStatus status = OfficerRegistrationStatus.valueOf(statusStr);
             
-            // Parse the date applied
+            
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
             Date dateApplied = sdf.parse(dateAppliedStr);
 
             HDBOfficer officer = officers.get(nric);
 
-            // Create the officer registration with the specified ID
+            
             OfficerRegistration registration = new OfficerRegistration(officerRegistrationID, officer, project, status, dateApplied);
 
-            // Add to the map of officer registrations
+            
             officerRegistrations.put(String.valueOf(officerRegistrationID), registration);
             
         } catch (Exception e) {

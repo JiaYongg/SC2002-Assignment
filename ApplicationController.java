@@ -76,7 +76,7 @@ public class ApplicationController {
         for (Application app : allApplications) {
             if (app.getApplicationID() == application.getApplicationID()) {
     
-                // Prevent approval if no flats are left
+                
                 if (newStatus == ApplicationStatus.SUCCESSFUL) {
                     if (app.getFlatType().getUnitCount() <= 0) {
                         System.out.println("Error: No more units available for this flat type.");
@@ -87,7 +87,7 @@ public class ApplicationController {
                 app.setStatus(newStatus);
     
                 if (newStatus == ApplicationStatus.BOOKED) {
-                    app.setDateBooked(new Date()); // already handles decrement
+                    app.setDateBooked(new Date()); 
                 }
     
                 saveApplications();
@@ -110,37 +110,37 @@ public class ApplicationController {
     }
 
     public boolean applyForProject(Applicant applicant, Project project, FlatType flatType) {
-        //Load existing applications to prevent overwrite
+        
         Map<String, Application> existingApps = new ApplicationFileReader(projectMap, applicantMap).readFromFile();
         
-        //Eligibility check (unchanged)
+        
         if (!checkEligibility(applicant, project, flatType)) {
             System.out.println("Applicant is not eligible for this flat type in this project.");
             return false;
         }
         
-        //Duplicate check (now checks both memory and file data)
+        
         if (getApplicationByApplicant(applicant) != null) {
             System.out.println("Applicant already has an active application.");
             return false;
         }
         
-        //Fixed ID generation (handles new/existing applications)
+        
         int newId = existingApps.isEmpty() ? 1000 : 
                    existingApps.keySet().stream()
                               .mapToInt(Integer::parseInt)
                               .max().getAsInt() + 1;
         
-        //Create application with generated ID
+        
         Application app = new Application(newId, applicant, project, flatType);
         app.setStatus(ApplicationStatus.PENDING);
         
-        //Memory update (unchanged)
+        
         allApplications.add(app);
         applicant.setApplication(app);
         flatType.setUnitCount(flatType.getUnitCount() - 1);
         
-        //File writing (merges new app with existing ones)
+        
         existingApps.put(String.valueOf(newId), app);
         applicationWriter.writeToFile(existingApps);
         
@@ -154,13 +154,13 @@ public class ApplicationController {
             return false;
         }
         
-        // Check if application can be withdrawn
+        
         if (app.getStatus() == ApplicationStatus.BOOKED) {
             System.out.println("Cannot withdraw a booked application. Please contact HDB directly.");
             return false;
         }
         
-        // Create withdrawal request
+        
         WithdrawalRequestController withdrawalController = new WithdrawalRequestController();
         boolean success = withdrawalController.createWithdrawalRequest(app);
         
@@ -184,15 +184,15 @@ public class ApplicationController {
     }
 
     private Application getApplicationByApplicant(Applicant applicant) {
-        // First check if the applicant has a cached application
+        
         if (applicant.getApplication() != null) {
             return applicant.getApplication();
         }
         
-        // Otherwise search through all applications
+        
         for (Application app : allApplications) {
             if (app.getApplicant().getNric().equals(applicant.getNric())) {
-                // Cache the application with the applicant
+                
                 applicant.setApplication(app);
                 return app;
             }
@@ -201,7 +201,7 @@ public class ApplicationController {
     }
 
     private boolean checkEligibility(Applicant applicant, Project project, FlatType flatType) {
-        // Check if project is visible and within application period
+        
         Date currentDate = new Date();
         if (!project.isVisible() || 
             currentDate.before(project.getApplicationOpenDate()) || 
@@ -209,12 +209,12 @@ public class ApplicationController {
             return false;
         }
         
-        // Check if flat type has available units
+        
         if (flatType.getUnitCount() <= 0) {
             return false;
         }
         
-        // Check applicant eligibility
+        
         int age = applicant.getAge();
         String maritalStatus = applicant.getMaritalStatus();
         
@@ -228,7 +228,7 @@ public class ApplicationController {
         return false;
     }
 
-    // Additional methods for manager operations
+    
     
     public List<Application> getAllApplications() {
         return new ArrayList<>(allApplications);
@@ -238,7 +238,7 @@ public class ApplicationController {
     
 
     
-    // Helper methods for WithdrawalRequestController
+    
     
     public Map<String, Applicant> getApplicantMap() {
         return new HashMap<>(applicantMap);

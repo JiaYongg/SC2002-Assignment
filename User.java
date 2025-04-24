@@ -1,18 +1,18 @@
 import java.util.regex.Pattern;
 
 public class User {
-    private static int idCounter = 1; // Static counter for unique IDs
+    private static int idCounter = 1; 
     private int id;
     private int age;
     private String maritalStatus;
     private String name;
-    private String password = "password"; // Default password
+    private String password = "password"; 
 
     private String nric;
     private static final Pattern NRIC_PATTERN = Pattern.compile("^[SsTt]\\d{7}[A-Za-z]$");
 
 
-    // Constructor assigns a unique ID
+    
     public User() {
         this.id = idCounter++;
     }
@@ -53,10 +53,10 @@ public class User {
     }
     public void setPassword(String newPassword) {
         if (this.password.equals(newPassword)) {
-            return; // Prevent unnecessary updates
+            return; 
         }
         this.password = newPassword;
-        // System.out.println("Password updated successfully!");
+        
         
     
     }

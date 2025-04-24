@@ -8,16 +8,16 @@ public abstract class FileWriter <T>{
         this.filePath = filePath;
     }
     
-    // Abstract method to be implemented by child classes
+    
     public abstract void writeToFile(Map<String, T> items);
     
-    // Common method to write CSV files
+    
     protected void writeCSV(Map<String, T> items) {
         try (PrintWriter writer = new PrintWriter(new java.io.FileWriter(filePath))) {
-            // Write header
+            
             writer.println(getHeader());
             
-            // Write user data
+            
             for (T item : items.values()) {
                 writer.println(formatLine(item));
             }
@@ -26,7 +26,7 @@ public abstract class FileWriter <T>{
         }
     }
     
-    // Abstract methods for header and line formatting
+    
     protected abstract String getHeader();
     protected abstract String formatLine(T item);
 }

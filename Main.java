@@ -6,10 +6,10 @@ public class Main {
         boolean programRunning = true;
 
         while (programRunning) {
-            // Reset authentication status for each login attempt
+            
             boolean isAuthenticated = false;
 
-            // Loop login until successful
+            
             while (!isAuthenticated) {
                 isAuthenticated = loginView.showLoginPrompt();
 
@@ -18,10 +18,10 @@ public class Main {
             boolean continueToRoleView = loginView.showIntermediateMenu();
 
             if (!continueToRoleView) {
-                // User chose to logout after intermediate menu or changed password
+                
                 loginController.logout();
                 System.out.println("Logged out successfully. Returning to login screen...");
-                continue; // Skip to the next iteration of the outer loop
+                continue; 
             }
 
             String userRole = loginController.getUserRole();
@@ -29,7 +29,7 @@ public class Main {
 
             boolean exitProgram = false;
 
-            // Process based on user role
+            
             switch (userRole) {
                 case "MANAGER":
                     HDBManager manager = (HDBManager) currentUser;
@@ -54,19 +54,19 @@ public class Main {
                    break;
             }
 
-            // If user logged out (not staying logged in), reset the login controller
+            
             if (exitProgram) {
-                // User chose to logout, reset the login controller
+                
                 loginController.logout();
                 System.out.println("Logged out successfully. Returning to login screen...");
             } else {
-                // User chose to exit the program
+                
                 programRunning = false;
             }
 
         }
 
-        // Close resources
+        
         loginView.closeScanner();
         System.out.println("Program terminated. Goodbye!");
     }

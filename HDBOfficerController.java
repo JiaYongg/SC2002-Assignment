@@ -84,11 +84,11 @@ public class HDBOfficerController {
     }
 
     public List<Enquiry> getProjectEnquiries() {
-        // Step 1: Load projects
+        
         ProjectFileReader projectReader = new ProjectFileReader();
         Map<String, Project> projectMap = projectReader.readFromFile();
 
-        // Step 2: Load officers and registrations to get the assigned project
+        
         OfficerRegistrationFileReader regReader = new OfficerRegistrationFileReader(projectMap,
                 Map.of(currentOfficer.getNric(), currentOfficer));
         Map<String, OfficerRegistration> allRegs = regReader.readFromFile();
@@ -105,7 +105,7 @@ public class HDBOfficerController {
         if (assigned == null)
             return new ArrayList<>();
 
-        // Step 3: Load applicants (needed for EnquiryFileReader)
+        
         ApplicantFileReader applicantReader = new ApplicantFileReader();
         Map<String, User> userMap = applicantReader.readFromFile();
 
@@ -116,11 +116,11 @@ public class HDBOfficerController {
             }
         }
 
-        // Step 4: Load enquiries for the project
+        
         EnquiryFileReader enquiryReader = new EnquiryFileReader(applicantMap, projectMap);
-        enquiryReader.readFromFile(); // This populates project.getEnquiries()
+        enquiryReader.readFromFile(); 
 
-        return assigned.getEnquiries(); // Now properly populated
+        return assigned.getEnquiries(); 
     }
 
     public boolean replyToEnquiry(int enquiryId, String reply) {
@@ -132,7 +132,7 @@ public class HDBOfficerController {
 
         for (Enquiry enquiry : assigned.getEnquiries()) {
             if (enquiry.getEnquiryID() == enquiryId) {
-                enquiryController.replyToEnquiry(assigned, enquiryId, reply); //
+                enquiryController.replyToEnquiry(assigned, enquiryId, reply); 
                 return true;
             }
         }
@@ -233,23 +233,23 @@ public class HDBOfficerController {
             return;
         }
 
-        // Decrement the unit count for the flat type (the first time it works fine,
-        // make sure it works consistently)
+        
+        
         bookedType.decrementUnit();
-        application.setStatus(ApplicationStatus.BOOKED); // Set the booking status
+        application.setStatus(ApplicationStatus.BOOKED); 
 
-        // Persist updated project list with decremented unit
+        
         Map<String, Project> updatedProjects = new ProjectFileReader().readFromFile();
 
-        // Ensure the updated project is saved
+        
         updatedProjects.put(project.getProjectName(), project);
 
-        // Write the updated project data back to the file
+        
         new ProjectFileWriter().writeToFile(updatedProjects);
 
         System.out.println("Flat booked successfully for applicant: " + application.getApplicant().getName());
 
-        // Persist booking to Application.csv
+        
         Map<String, Project> projectMap = new ProjectFileReader().readFromFile();
 
         ApplicantFileReader applicantReader = new ApplicantFileReader();
@@ -266,11 +266,11 @@ public class HDBOfficerController {
         Map<String, Application> allApps = appReader.readFromFile();
         allApps.put(String.valueOf(application.getApplicationID()), application);
 
-        // Save the updated applications to Application.csv
+        
         new ApplicationFileWriter().writeToFile(allApps);
 
-        // Writing updated project data back to ProjectList.csv again (in case any
-        // changes were missed)
+        
+        
         updatedProjects.put(application.getProject().getProjectName(), application.getProject());
         new ProjectFileWriter().writeToFile(updatedProjects);
     }
@@ -300,13 +300,13 @@ public class HDBOfficerController {
     }
 
     private void loadProjectsForOfficer() {
-        // Load all projects
+        
         ProjectFileReader projectReader = new ProjectFileReader();
         Map<String, Project> projectMap = projectReader.readFromFile();
         this.allProjects = new ArrayList<>(projectMap.values());
 
-        // Prepare a single-officer map for filtering
-        // Load officers from file
+        
+        
         HDBOfficerFileReader officerReader = new HDBOfficerFileReader();
         Map<String, User> userMap = officerReader.readFromFile();
         Map<String, HDBOfficer> officerMap = new HashMap<>();
@@ -317,17 +317,17 @@ public class HDBOfficerController {
             }
         }
 
-        // Load registrations from file
+        
         OfficerRegistrationFileReader regReader = new OfficerRegistrationFileReader(projectMap, officerMap);
         Map<String, OfficerRegistration> allRegs = regReader.readFromFile();
 
-        // Check if any approved registration exists
+        
         for (OfficerRegistration reg : allRegs.values()) {
             if (reg.getOfficer().getNric().equals(currentOfficer.getNric()) &&
                     reg.getRegistrationStatus() == OfficerRegistrationStatus.approved) {
 
-                // Ensure we use the project instance from allProjects (for EnquiryController
-                // compatibility)
+                
+                
                 for (Project p : allProjects) {
                     if (p.getProjectName().equals(reg.getProject().getProjectName())) {
                         currentOfficer.setAssignedProject(p);
@@ -350,10 +350,10 @@ public class HDBOfficerController {
         ProjectFileReader projectReader = new ProjectFileReader();
         Map<String, Project> projectMap = projectReader.readFromFile();
 
-        HDBOfficerFileReader officerReader = new HDBOfficerFileReader(); // must return Map<String, User>
+        HDBOfficerFileReader officerReader = new HDBOfficerFileReader(); 
         Map<String, User> userMap = officerReader.readFromFile();
 
-        // Convert User map to HDBOfficer map
+        
         Map<String, HDBOfficer> officerMap = new HashMap<>();
         for (User user : userMap.values()) {
             if (user instanceof HDBOfficer officer) {
@@ -366,9 +366,9 @@ public class HDBOfficerController {
 
         for (OfficerRegistration reg : allRegs.values()) {
             if (reg.getOfficer() == null) {
-                // Log the problem where the officer is not set correctly
+                
                 System.out.println("Officer is null for registration: " + reg.getRegistrationId());
-                continue; // Skip this registration
+                continue; 
             }
             if (reg.getOfficer().getNric().equals(currentOfficer.getNric())) {
                 currentOfficer.addRegistration(reg);
@@ -383,27 +383,27 @@ public class HDBOfficerController {
         ProjectFileReader projectReader = new ProjectFileReader();
         Map<String, Project> projectMap = projectReader.readFromFile();
 
-        // Read officers into a map of Applicants
+        
         Map<String, Applicant> combined = new HashMap<>();
 
-        // Add this officer into the applicant map since officers can apply too
-        combined.put(currentOfficer.getNric(), currentOfficer); // key = NRIC, value = HDBOfficer as Applicant
+        
+        combined.put(currentOfficer.getNric(), currentOfficer); 
 
-        // Load applications (this will automatically link them via
-        // applicant.setApplication)
+        
+        
         ApplicationFileReader appReader = new ApplicationFileReader(projectMap, combined);
         appReader.readFromFile();
     }
 
     public void submitApplicationAsOfficer(Project project, FlatType flatType) {
-        // Disallow applying for a project that the officer is handling
+        
         if (currentOfficer.getAssignedProject() != null &&
                 currentOfficer.getAssignedProject().equals(project)) {
             System.out.println("You cannot apply for a project you are handling.");
             return;
         }
 
-        // Disallow applying if already registered to handle the project
+        
         for (OfficerRegistration reg : currentOfficer.getRegistrations()) {
             if (reg.getProject().equals(project)) {
                 System.out.println("You cannot apply for a project you have registered to handle.");
@@ -411,7 +411,7 @@ public class HDBOfficerController {
             }
         }
 
-        // Otherwise reuse applicant logic
+        
         ApplicationController appController = new ApplicationController();
         boolean success = appController.applyForProject(currentOfficer, project, flatType);
         if (!success) {
@@ -420,26 +420,26 @@ public class HDBOfficerController {
     }
 
     public boolean canOfficerApply(Project p) {
-        // Allow the officer to apply if they are no longer assigned or previously
-        // applied
+        
+        
         if (currentOfficer.getAssignedProject() != null && currentOfficer.getAssignedProject().equals(p)) {
             return false;
         }
 
-        // Check if the officer previously applied for the project (removal condition)
+        
         for (OfficerRegistration reg : currentOfficer.getRegistrations()) {
             if (reg.getProject().equals(p) && reg.getRegistrationStatus() == OfficerRegistrationStatus.approved) {
-                return false; // Already registered to handle the project
+                return false; 
             }
         }
 
-        // Additional check if officer was previously assigned and removed
+        
         Application existing = currentOfficer.getApplication();
         if (existing != null && existing.getProject().equals(p)) {
-            return false; // Already applied for this project
+            return false; 
         }
 
-        return true; // Officer is eligible to apply for the project
+        return true; 
     }
 
     public List<Project> getEligibleProjectsToApply() {
@@ -471,7 +471,7 @@ public class HDBOfficerController {
             return false;
         }
 
-        // Officer can't apply for a project they are handling or have registered for
+        
         if (officer.getAssignedProject() != null &&
                 officer.getAssignedProject().getProjectName().equals(project.getProjectName())) {
             return false;
@@ -536,10 +536,10 @@ public class HDBOfficerController {
         if (currentOfficer.getAssignedProject() == null)
             return successful;
 
-        // Load applications
+        
         Project project = currentOfficer.getAssignedProject();
 
-        // You'll need a combined applicant map again
+        
         ApplicantFileReader reader = new ApplicantFileReader();
         Map<String, User> userMap = reader.readFromFile();
         Map<String, Applicant> applicantMap = new HashMap<>();

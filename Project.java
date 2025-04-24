@@ -150,7 +150,7 @@ public class Project {
         }
     }
     public boolean isOverlappingWith(Date startDate, Date endDate) {
-        // Check if either of the date ranges is completely before or after the other
+        
         return !(applicationCloseDate.before(startDate) || applicationOpenDate.after(endDate));
     }
     public boolean isOverlappingWith(Project otherProject) {

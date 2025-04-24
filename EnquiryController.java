@@ -6,21 +6,18 @@ import java.util.Map;
 public class EnquiryController {
     private List<Applicant> allApplicants;
     private List<Project> allProjects;
-    private ProjectFileReader projectReader;
     private ApplicantFileReader applicantReader;
     private EnquiryFileWriter enquiryWriter;
     private List<Enquiry> allEnquiries;
 
     public EnquiryController(List<Project> projects) {
-        // Initialize readers
-        this.projectReader = new ProjectFileReader();
         this.applicantReader = new ApplicantFileReader();
         this.enquiryWriter = new EnquiryFileWriter();
 
-        // Load projects first
+        
         this.allProjects = projects;
 
-        // Load applicants second
+        
         this.allApplicants = new ArrayList<>();
         for (User user : applicantReader.readFromFile().values()) {
             if (user instanceof Applicant) {
@@ -28,16 +25,16 @@ public class EnquiryController {
             }
         }
 
-        // Initialize enquiries list
+        
         this.allEnquiries = new ArrayList<>();
 
-        // Load enquiries last (after applicants and projects are loaded)
+        
         loadEnquiries();
     }
 
     private void loadEnquiries() {
         try {
-            // Create maps of applicants and projects for the reader
+            
             Map<String, Applicant> applicantMap = new HashMap<>();
             for (Applicant applicant : allApplicants) {
                 applicantMap.put(applicant.getNric(), applicant);
@@ -48,11 +45,11 @@ public class EnquiryController {
                 projectMap.put(project.getProjectName(), project);
             }
 
-            // Read enquiries from file
+            
             EnquiryFileReader reader = new EnquiryFileReader(applicantMap, projectMap);
             Map<String, Enquiry> enquiryMap = reader.readFromFile();
 
-            // Add all enquiries to the list
+            
             for (Enquiry enquiry : enquiryMap.values()) {
                 allEnquiries.add(enquiry);
 
@@ -67,7 +64,7 @@ public class EnquiryController {
                 }
             }
 
-            // System.out.println("Successfully loaded " + enquiryMap.size() + " enquiries.");
+            
         } catch (Exception e) {
             System.out.println("Error loading enquiries: " + e.getMessage());
             e.printStackTrace();
@@ -75,13 +72,13 @@ public class EnquiryController {
     }
 
     private void saveEnquiries() {
-        // Create a map of all enquiries
+        
         Map<String, Enquiry> enquiryMap = new HashMap<>();
         for (Enquiry enquiry : allEnquiries) {
             enquiryMap.put(String.valueOf(enquiry.getEnquiryID()), enquiry);
         }
 
-        // Write to file
+        
         enquiryWriter.writeToFile(enquiryMap);
     }
 
@@ -93,7 +90,7 @@ public class EnquiryController {
 
         System.out.println("Enquiry submitted with ID: " + enq.getEnquiryID());
 
-        // Save the updated enquiries immediately
+        
         saveEnquiries();
     }
 
@@ -143,7 +140,7 @@ public class EnquiryController {
             project.getEnquiries().remove(target);
             allEnquiries.remove(target);
 
-            // Save once after all removals
+            
             saveEnquiries();
             ;
 
@@ -229,15 +226,15 @@ public class EnquiryController {
                 List<Enquiry> loaded = loadedApplicant.getEnquiries();
                 List<Enquiry> actual = activeApplicant.getEnquiries();
 
-                actual.clear(); // Clear existing list
-                actual.addAll(loaded); // Copy over loaded enquiries
+                actual.clear(); 
+                actual.addAll(loaded); 
                 break;
             }
         }
     }
 
     private void updateAllEnquiryReferences(Enquiry updatedEnquiry) {
-        // Update in applicant's list
+        
         updatedEnquiry.getApplicant().getEnquiries().stream()
                 .filter(e -> e.getEnquiryID() == updatedEnquiry.getEnquiryID())
                 .findFirst()
@@ -246,7 +243,7 @@ public class EnquiryController {
                     e.setResponse(updatedEnquiry.getResponse());
                 });
 
-        // Update in project's list
+        
         updatedEnquiry.getProject().getEnquiries().stream()
                 .filter(e -> e.getEnquiryID() == updatedEnquiry.getEnquiryID())
                 .findFirst()

@@ -7,7 +7,7 @@ import java.util.Date;
 public class ProjectController {
 
     public boolean updateProjectVisibility(Project project) {
-        // Skip if project is already hidden
+        
         if (!project.isVisible()) {
             return false;
         }
@@ -15,12 +15,12 @@ public class ProjectController {
         Date currentDate = new Date();
         boolean shouldBeVisible = true;
         
-        // Check if application period has ended
+        
         if (currentDate.after(project.getApplicationCloseDate())) {
             shouldBeVisible = false;
         }
         
-        // Check if all flats are allocated
+        
         boolean hasAvailableFlats = false;
         for (FlatType flatType : project.getFlatTypes()) {
             if (flatType.getUnitCount() > 0) {
@@ -33,7 +33,7 @@ public class ProjectController {
             shouldBeVisible = false;
         }
         
-        // Update visibility if needed
+        
         if (!shouldBeVisible) {
             project.setVisibility(false);
             return true;
@@ -52,14 +52,14 @@ public class ProjectController {
     public VisibilityCheckResult canMakeVisible(Project project) {
         Date currentDate = new Date();
 
-        // Check if application period has ended
+        
         if (currentDate.after(project.getApplicationCloseDate())) {
             return new VisibilityCheckResult(false,
                     "Cannot make project visible because the application period has ended. " +
                             "You must extend the application closing date before making the project visible.");
         }
 
-        // Check if all flats are allocated
+        
         if (!hasAvailableFlats(project)) {
             return new VisibilityCheckResult(false,
                     "Cannot make project visible because there are no available flats. " +
@@ -97,8 +97,8 @@ public class ProjectController {
         boolean hasFlats = hasAvailableFlats(project);
         boolean isVisible = project.isVisible();
 
-        // A project is only OPEN if dates are valid, flats are available, AND it's
-        // visible
+        
+        
         boolean isOpen = datesAreValid && hasFlats && isVisible;
 
         if (!isOpen) {
@@ -179,9 +179,9 @@ public class ProjectController {
         boolean closeDatePassed = currentDate.after(project.getApplicationCloseDate());
         boolean isHidden = !project.isVisible();
 
-        // Project is active if either:
-        // - Close date has not passed, OR
-        // - Project is still visible
+        
+        
+        
         return !closeDatePassed || !isHidden;
     }
 }

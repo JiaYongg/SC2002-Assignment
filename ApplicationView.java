@@ -1,8 +1,8 @@
 public class ApplicationView {
-    private ApplicationController controller;
+    
 
     public ApplicationView(ApplicationController controller) {
-        this.controller = controller;
+        
     }
 
     public void promptProjectApplication() {

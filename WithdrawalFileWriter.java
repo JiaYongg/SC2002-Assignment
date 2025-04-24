@@ -19,7 +19,7 @@ public class WithdrawalFileWriter extends FileWriter<WithdrawalRequest> {
     @Override
     protected String formatLine(WithdrawalRequest request) {
         return String.format("%s,%s,%s,%s,%s,%s",
-                String.valueOf(request.getRequestId()), // ensure string format
+                String.valueOf(request.getRequestId()),
                 request.getApplication().getApplicant().getNric(),
                 request.getApplication().getProject().getProjectName(),
                 request.getApplication().getFlatType().getName(),

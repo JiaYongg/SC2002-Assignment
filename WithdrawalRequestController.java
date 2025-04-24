@@ -14,12 +14,6 @@ public class WithdrawalRequestController {
         loadWithdrawalRequests();
     }
 
-    // In HDBManagerController.java
-
-    // In WithdrawalRequestController.java
-
-    // This method doesn't need the isProjectManagedBy helper since the filtering
-    // will be done in HDBManagerController
     public List<WithdrawalRequest> getPendingRequests() {
         return allWithdrawalRequests.stream()
                 .filter(req -> req.getStatus() == WithdrawalStatus.PENDING)
@@ -28,16 +22,15 @@ public class WithdrawalRequestController {
 
     public boolean approveRequest(WithdrawalRequest request) {
         request.setStatus(WithdrawalStatus.APPROVED);
-    
+
         Application application = request.getApplication();
         application.setStatus(ApplicationStatus.UNSUCCESSFUL);
-    
-        saveApplicationUpdate(application);  // <-- this ensures it’s persisted
-    
+
+        saveApplicationUpdate(application);
+
         saveWithdrawalRequests();
         return true;
     }
-    
 
     private void saveApplicationUpdate(Application updatedApp) {
         try {
@@ -79,7 +72,6 @@ public class WithdrawalRequestController {
     public boolean rejectRequest(WithdrawalRequest request) {
         request.setStatus(WithdrawalStatus.REJECTED);
 
-        // Save changes to CSV
         saveWithdrawalRequests();
 
         System.out.println("Withdrawal request rejected for application: " +
@@ -87,10 +79,9 @@ public class WithdrawalRequestController {
         return true;
     }
 
-    // In WithdrawalRequestController.java
     private void loadWithdrawalRequests() {
         try {
-            // Get applicants directly from file
+
             ApplicantFileReader applicantReader = new ApplicantFileReader();
             Map<String, User> userMap = applicantReader.readFromFile();
             Map<String, Applicant> applicantMap = new HashMap<>();
@@ -102,18 +93,14 @@ public class WithdrawalRequestController {
                 }
             }
 
-            // Get projects directly from file
             ProjectFileReader projectReader = new ProjectFileReader();
             Map<String, Project> projectMap = projectReader.readFromFile();
 
-            // Read withdrawal requests from file
             WithdrawalFileReader reader = new WithdrawalFileReader(applicantMap, projectMap);
             Map<String, WithdrawalRequest> withdrawalMap = reader.readFromFile();
 
-            // Store all withdrawal requests in the list
             allWithdrawalRequests.addAll(withdrawalMap.values());
 
-            // System.out.println("Successfully loaded " + withdrawalMap.size() + " withdrawal requests.");
         } catch (Exception e) {
             System.out.println("Error loading withdrawal requests: " + e.getMessage());
             e.printStackTrace();
@@ -122,13 +109,12 @@ public class WithdrawalRequestController {
 
     private void saveWithdrawalRequests() {
         try {
-            // Create a map of all withdrawal requests
+
             Map<String, WithdrawalRequest> withdrawalMap = new HashMap<>();
             for (WithdrawalRequest withdrawal : allWithdrawalRequests) {
                 withdrawalMap.put(String.valueOf(withdrawal.getRequestId()), withdrawal);
             }
 
-            // Write to file
             withdrawalWriter.writeToFile(withdrawalMap);
 
             System.out.println("Successfully saved " + withdrawalMap.size() + " withdrawal requests.");
@@ -139,7 +125,7 @@ public class WithdrawalRequestController {
     }
 
     public boolean createWithdrawalRequest(Application application) {
-        // Check if a withdrawal request already exists for this application
+
         for (WithdrawalRequest existingRequest : allWithdrawalRequests) {
             if (existingRequest.getApplication().equals(application) &&
                     existingRequest.getStatus() == WithdrawalStatus.PENDING) {
@@ -148,7 +134,6 @@ public class WithdrawalRequestController {
             }
         }
 
-        // Create new request if no pending request exists
         WithdrawalRequest request = new WithdrawalRequest(application);
         allWithdrawalRequests.add(request);
         saveWithdrawalRequests();
@@ -158,5 +143,4 @@ public class WithdrawalRequestController {
         return true;
     }
 
-    // Rest of the methods remain the same
 }

@@ -4,22 +4,22 @@ import java.util.Map;
 public class LoginController implements iAuthService {
     private Map<String, User> users = new HashMap<>();
     private User loggedInUser;
-    private HDBManagerFileWriter managerFileWriter; // Fix variable name
-    private HDBOfficerFileWriter officerFileWriter; // Fix variable name
+    private HDBManagerFileWriter managerFileWriter; 
+    private HDBOfficerFileWriter officerFileWriter; 
     private ApplicantFileWriter applicantFileWriter;
 
     public LoginController() {
-        // Initialize file writers
+        
         managerFileWriter = new HDBManagerFileWriter();
         officerFileWriter = new HDBOfficerFileWriter();
         applicantFileWriter = new ApplicantFileWriter();
 
-        // Load all users from files
+        
         loadUsers();
     }
 
     private void loadUsers() {
-        // Read managers
+        
         HDBManagerFileReader managerReader = new HDBManagerFileReader();
         Map<String, User> managers = managerReader.readFromFile();
         managers.values().forEach(this::addUser);
@@ -44,7 +44,7 @@ public class LoginController implements iAuthService {
         }
     }
 
-    // Add user to the system
+    
     public void addUser(User user) {
         users.put(user.getNric(), user);
     }
@@ -74,7 +74,7 @@ public class LoginController implements iAuthService {
 
     private void updateUserFile() {
         if (loggedInUser instanceof HDBManager) {
-            // Filter only Manager users
+            
             Map<String, User> managers = new HashMap<>();
             for (User user : users.values()) {
                 if (user instanceof HDBManager) {
@@ -83,7 +83,7 @@ public class LoginController implements iAuthService {
             }
             managerFileWriter.writeToFile(managers);
         } else if (loggedInUser instanceof HDBOfficer) {
-            // Filter only Officer users
+            
             Map<String, User> officers = new HashMap<>();
             for (User user : users.values()) {
                 if (user instanceof HDBOfficer) {
@@ -92,7 +92,7 @@ public class LoginController implements iAuthService {
             }
             officerFileWriter.writeToFile(officers);
         } else if (loggedInUser instanceof Applicant) {
-            // Filter only Applicant users (excluding HDBOfficers)
+            
             Map<String, User> applicants = new HashMap<>();
             for (User user : users.values()) {
                 if (user instanceof Applicant && !(user instanceof HDBOfficer)) {

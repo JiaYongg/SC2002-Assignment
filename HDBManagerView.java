@@ -69,10 +69,10 @@ public class HDBManagerView {
         System.out.print("Enter your choice: ");
     }
 
-    // Menu methods for each operation
+    
     private void createProjectMenu() {
-        // Check if current manager already has a project he's handling
-        // Check if manager already has active projects
+        
+        
         if (!controller.canCreateNewProject()) {
             System.out.println("You already have an active project. Cannot create another.");
             System.out.println("A project is considered inactive when its application period has ended");
@@ -82,20 +82,20 @@ public class HDBManagerView {
             return;
         }
 
-        // If we get here, the manager can create a new project
+        
         System.out.println("\n===== Create New Project =====");
 
-        // Collect project information
+        
         System.out.print("Enter project name: ");
         String name = scanner.nextLine().trim();
 
         System.out.print("Enter neighborhood: ");
         String neighborhood = scanner.nextLine().trim();
 
-        // Create flat types list
+        
         List<FlatType> flatTypes = new ArrayList<>();
 
-        // Get 2-ROOM flat type details (always included)
+        
         System.out.println("\n----- 2-ROOM Flat Type -----");
         System.out.print("Enter number of units for 2-ROOM: ");
         int units2Room = Integer.parseInt(scanner.nextLine().trim());
@@ -103,7 +103,7 @@ public class HDBManagerView {
         double price2Room = Double.parseDouble(scanner.nextLine().trim());
         flatTypes.add(new FlatType("2-ROOM", units2Room, price2Room));
 
-        // Get 3-ROOM flat type details (always included)
+        
         System.out.println("\n----- 3-ROOM Flat Type -----");
         System.out.print("Enter number of units for 3-ROOM: ");
         int units3Room = Integer.parseInt(scanner.nextLine().trim());
@@ -111,7 +111,7 @@ public class HDBManagerView {
         double price3Room = Double.parseDouble(scanner.nextLine().trim());
         flatTypes.add(new FlatType("3-ROOM", units3Room, price3Room));
 
-        // Get dates
+        
         System.out.print("\nEnter application opening date (dd/MM/yyyy): ");
         String openDateStr = scanner.nextLine().trim();
 
@@ -124,7 +124,7 @@ public class HDBManagerView {
             officerSlots = 10;
         }
 
-        // Pass all collected information to the controller
+        
         try {
             Project project = controller.createProject(name, neighborhood, flatTypes, openDateStr, closeDateStr,
                     officerSlots);
@@ -220,7 +220,7 @@ public class HDBManagerView {
         System.out.println(
                 "Assigned Officers: " + project.getAssignedOfficers().size() + "/" + project.getOfficerSlots());
 
-        // Display flat types
+        
         System.out.println("\nFlat Types:");
         System.out.println("Type | Units | Price");
         System.out.println("------------------------");
@@ -232,7 +232,7 @@ public class HDBManagerView {
                     flatType.getPrice());
         }
 
-        // Get project status from ProjectController
+        
         ProjectController.ProjectStatus status = projectController.getProjectStatus(project);
         System.out.println("\nStatus: " + status.getStatusMessage());
     }
@@ -291,7 +291,7 @@ public class HDBManagerView {
         }
     }
 
-    // Helper method to toggle visibility from the project list
+    
     private void toggleProjectFromList(List<Project> projects) {
         System.out.print("\nEnter project number to toggle visibility: ");
         try {
@@ -644,7 +644,7 @@ public class HDBManagerView {
         OfficerRegistration selected = pending.get(choice - 1);
 
         if (selected.getProject().getRemainingOfficerSlots() <= 0) {
-            selected.reject(); // Automatically reject
+            selected.reject(); 
             OfficerRegistrationFileWriter writer = new OfficerRegistrationFileWriter();
             writer.updateRegistration(selected);
             System.out.println("Registration automatically rejected due to full officer slots.");
@@ -729,7 +729,7 @@ public class HDBManagerView {
             return;
         }
 
-        displayEnquiries(managerEnquiries, true); // Display with reply option
+        displayEnquiries(managerEnquiries, true); 
 
         System.out.println("\nOptions:");
         System.out.println("1. Reply to an Enquiry");
