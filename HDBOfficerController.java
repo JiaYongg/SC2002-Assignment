@@ -10,12 +10,11 @@ public class HDBOfficerController {
     private List<Project> allProjects;
     private HDBOfficerView view;
     private static int receiptIdCounter = 1;
-    private static int registrationid;
+    private static int registrationIdCounter = OfficerRegistrationFileReader
+            .getLastUsedRegistrationId("OfficerRegistration.csv") + 1;
+
     private EnquiryController enquiryController;
 
-    static {
-        registrationid = OfficerRegistrationFileReader.getLastUsedRegistrationId("OfficerRegistration.csv") + 1;
-    }
 
     public HDBOfficerController(HDBOfficer currentOfficer) {
         this.currentOfficer = currentOfficer;
@@ -53,8 +52,9 @@ public class HDBOfficerController {
             return false;
         }
 
-        OfficerRegistration registration = new OfficerRegistration(registrationid, currentOfficer, project,
-                OfficerRegistrationStatus.pending, new Date());
+        OfficerRegistration registration = new OfficerRegistration(registrationIdCounter++, currentOfficer, project,
+        OfficerRegistrationStatus.pending, new Date());
+
         currentOfficer.addRegistration(registration);
         project.addOfficerRegistration(registration);
         return true;
@@ -133,7 +133,7 @@ public class HDBOfficerController {
 
         for (Enquiry enquiry : assigned.getEnquiries()) {
             if (enquiry.getEnquiryID() == enquiryId) {
-                enquiryController.replyToEnquiry(assigned, enquiryId, reply); // 
+                enquiryController.replyToEnquiry(assigned, enquiryId, reply); //
                 return true;
             }
         }
@@ -177,18 +177,22 @@ public class HDBOfficerController {
     public void registerToHandleProject(Project project) {
         HDBOfficer officer = getCurrentOfficer();
 
-        if (project.getRegistrationByOfficer(officer) != null) {
-            System.out.println("You have already registered for this project.");
-            return;
+        for (OfficerRegistration reg : officer.getRegistrations()) {
+            if (reg.getProject().getProjectName().equals(project.getProjectName())) {
+                System.out.println("You have already registered for this project.");
+                return;
+            }
         }
+        
 
         if (project.getRemainingOfficerSlots() <= 0) {
             System.out.println("No officer slots available in this project.");
             return;
         }
 
-        OfficerRegistration registration = new OfficerRegistration(registrationid, officer, project,
-                OfficerRegistrationStatus.pending, new Date());
+        OfficerRegistration registration = new OfficerRegistration(registrationIdCounter++, officer, project,
+        OfficerRegistrationStatus.pending, new Date());
+
 
         project.addOfficerRegistration(registration);
         officer.addRegistration(registration);
