@@ -3,7 +3,7 @@
 ## Overview
 The HDB BTO Management System is designed to streamline and manage the entire lifecycle of the Build-To-Order (BTO) process in Singapore. The system allows for the management of various aspects of BTO flats, including project creation, applicant registration, flat bookings, officer registration, and handling of enquiries.
 
-## Features
+# Features
 ## Applicant
 - **View Eligible Projects**: Applicants can view projects that are open to them based on their marital status (Single or Married).
 - **Apply for Projects (Submit Application)**: Applicants can apply for projects. Single applicants can apply for 2-Room flats (if they are 35 years and above). Married applicants can apply for 2-Room or 3-Room flats (if they are 21 years and above).
@@ -35,7 +35,7 @@ javac Main.java  # Compile
 java Main        # Run
 ```
 
-## Data Files
+# Data Files
 The system makes use of several data files (CSV format) to persist the following information:
 - **Projects (ProjectList.csv)**: Details of available BTO projects, including unit count, prices, and dates.
 - **Applicants (ApplicantList.csv)**: Contains applicant details such as NRIC, age, marital status, and password.
@@ -44,21 +44,21 @@ The system makes use of several data files (CSV format) to persist the following
 - **Enquiries (Enquiries.csv)**: Logs enquiries made by applicants for each project.
 
 
-## Usage 
+# Usage 
 1. Run Main.java to execute program
 2. Input credentials to log in (NRIC and password)
 3. Different Menus will be presented based on the type of user that is logged in
-- **Applicants**: Apply for projects, track application status, withdraw applications, and manage enquiries.
-- **Officers**: Manage successful applications, handle bookings, respond to enquiries, and register to handle projects.
-- **Managers**: Create and manage projects, approve officer registrations, manage applications, and respond to enquiries.
+  - **Applicants**: Apply for projects, track application status, withdraw applications, and manage enquiries.
+  - **Officers**: Manage successful applications, handle bookings, respond to enquiries, and register to handle projects.
+  - **Managers**: Create and manage projects, approve officer registrations, manage applications, and respond to enquiries.
 4. Input the respective number for action wish to be made
 5. Use application as see fit and logout to change user or exit program to terminate program
 
-## Contributors
+# Contributors
 - NICOLE YAP XIU EN
 - POH JIA YONG
 - SOH HAO MING
 - WAYNE CHUA ENG KIAT (CAI RONGJIE)
 
-## License
+# License
 For Academic use only
