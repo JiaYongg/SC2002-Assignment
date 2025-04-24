@@ -49,8 +49,8 @@ The system makes use of several data files (CSV format) to persist the following
 2. Input credentials to log in (NRIC and password)
 3. Different Menus will be presented based on the type of user that is logged in
    - **Applicants**: Apply for projects, track application status, withdraw applications, and manage enquiries.
-   - **Officers**: Manage successful applications, handle bookings, respond to enquiries, and register to handle projects.
-   - **Managers**: Create and manage projects, approve officer registrations, manage applications, and respond to enquiries.
+   - **HDB Officers**: Manage successful applications, handle bookings, respond to enquiries, and register to handle projects.
+   - **HDB Managers**: Create and manage projects, approve officer registrations, manage applications, and respond to enquiries.
 4. Input the respective number for action wish to be made
 5. Use application as see fit and logout to change user or exit program to terminate program
 
