@@ -10,9 +10,20 @@ public class LoginView {
         this.scanner = new Scanner(System.in);
     }
 
+    private boolean isValidNric(String nric) {
+        String regex = "^[ST]\\d{7}[A-Z]$";
+        return nric.matches(regex);
+    }
+
+
     public boolean showLoginPrompt() {
         System.out.print("Enter UserID (NRIC): ");
         String enteredNric = scanner.nextLine().trim();
+
+        if (!isValidNric(enteredNric)) {
+            System.out.println("Invalid NRIC format. Please enter a valid NRIC.");
+            return false;
+        }
 
         System.out.print("Enter Password: ");
         String enteredPassword = scanner.nextLine().trim();
