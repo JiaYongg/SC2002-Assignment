@@ -98,7 +98,7 @@ Detailed test cases can be found in the [Testing Documentation](./TESTING.md) fi
 - NICOLE YAP XIU EN - U2420768C
 - POH JIA YONG - U2323306C
 - SOH HAO MING - 
-- WAYNE CHUA ENG KIAT (CAI RONGJIE) - 
+- WAYNE CHUA ENG KIAT (CAI RONGJIE) - U2423760G
 
 # License
 For Academic use only
