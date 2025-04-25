@@ -1,4 +1,4 @@
 Project Name,Neighborhood,Type 1,Number of units for Type 1,Selling price for Type 1,Type 2,Number of units for Type 2,Selling price for Type 2,Application opening date,Application closing date,Manager,Officer Slot,Officer,Visibility
-CentralPark,Orchard,2-ROOM,1,100000.0,3-ROOM,7,140000.0,10/04/2025,10/05/2025,Michael Tan,4,Emily Tan,true
+CentralPark,Orchard,2-ROOM,1,100000.0,3-ROOM,7,140000.0,10/04/2025,10/05/2025,Michael Tan,4,,true
 Punggol Wrestle,Punggol,2-ROOM,5,210215.0,3-ROOM,7,230215.0,14/04/2025,19/04/2025,Jerald Lim,10,David Wong,false
 WoodlandsHills,Woodlands,2-ROOM,3,100000.0,3-ROOM,6,120000.0,23/04/2025,02/12/2025,Jessica Ng,5,Daniel Lee;Emily Tan;David Wong,true

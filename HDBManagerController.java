@@ -36,10 +36,8 @@ public class HDBManagerController {
     private void loadProjects() {
         this.projectMap = projectReader.readFromFile();
 
-        
         this.allProjects = new ArrayList<>(projectMap.values());
 
-        
         for (Project project : allProjects) {
             if (project.getManagerInCharge() != null &&
                     project.getManagerInCharge().getName().equals(currentManager.getName())) {
@@ -47,7 +45,6 @@ public class HDBManagerController {
             }
         }
 
-        
         System.out.println("Loaded " + projectMap.size() + " total projects");
         System.out.println("Current manager: " + currentManager.getName());
         System.out.println("Manager's projects: " + currentManager.getManagedProjects().size());
@@ -67,18 +64,16 @@ public class HDBManagerController {
     public Project createProject(String name, String neighborhood, List<FlatType> flatTypes,
             String openDateStr, String closeDateStr, int officerSlots) {
         try {
-            
+
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
             Date openDate = dateFormat.parse(openDateStr);
             Date closeDate = dateFormat.parse(closeDateStr);
 
-            
             if (openDate.after(closeDate)) {
                 System.out.println("Error: Opening date must be before closing date.");
                 return null;
             }
 
-            
             for (Project existingProject : allProjects) {
                 if (existingProject.getProjectName().equals(name)) {
                     System.out.println("Error: A project with this name already exists.");
@@ -86,34 +81,29 @@ public class HDBManagerController {
                 }
             }
 
-            
             if (!canHandleProjectInPeriod(openDate, closeDate)) {
                 System.out.println("Error: Manager already has a project during this period.");
                 return null;
             }
 
-            
             if (officerSlots <= 0 || officerSlots > 10) {
                 System.out.println("Error: Officer slots must be between 1 and 10.");
                 return null;
             }
 
-            
             Project project = new Project(
                     name,
                     neighborhood,
                     openDate,
                     closeDate,
-                    false, 
+                    false,
                     flatTypes,
                     currentManager,
                     officerSlots);
 
-            
             allProjects.add(project);
             currentManager.addManagedProject(project);
 
-            
             saveProjects();
 
             return project;
@@ -131,11 +121,11 @@ public class HDBManagerController {
             List<FlatType> newFlatTypes, String newOpenDateStr,
             String newCloseDateStr, int newOfficerSlots) {
         try {
-            
+
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
             Date newOpenDate = dateFormat.parse(newOpenDateStr);
             Date newCloseDate = dateFormat.parse(newCloseDateStr);
-            
+
             project.setProjectName(newName);
             project.setNeighborhood(newNeighborhood);
             project.setFlatTypes(newFlatTypes);
@@ -143,7 +133,6 @@ public class HDBManagerController {
             project.setApplicationCloseDate(newCloseDate);
             project.setOfficerSlots(newOfficerSlots);
 
-            
             saveProjects();
 
             return true;
@@ -158,23 +147,20 @@ public class HDBManagerController {
     }
 
     public boolean deleteProject(Project project) {
-        
+
         if (!isProjectManagedByCurrentManager(project)) {
             System.out.println("Error: You can only delete projects you manage.");
             return false;
         }
 
-        
         if (!project.getAssignedOfficers().isEmpty()) {
             System.out.println("Error: Cannot delete project with assigned officers.");
             return false;
         }
 
-        
         allProjects.remove(project);
         currentManager.removeManagedProject(project);
 
-        
         saveProjects();
 
         return true;
@@ -199,44 +185,37 @@ public class HDBManagerController {
         return currentManager.getManagedProjects();
     }
 
-
     public List<Application> getBookedApplications(String flatTypeFilter, String maritalStatusFilter) {
-        
+
         ApplicantFileReader applicantReader = new ApplicantFileReader();
         Map<String, User> userMap = applicantReader.readFromFile();
-    
-        
+
         Map<String, Applicant> applicantMap = new HashMap<>();
         for (User u : userMap.values()) {
             if (u instanceof Applicant) {
                 applicantMap.put(u.getNric(), (Applicant) u);
             }
         }
-    
-        
+
         ProjectFileReader projectReader = new ProjectFileReader();
         Map<String, Project> projectMap = projectReader.readFromFile();
-    
-        
+
         ApplicationFileReader applicationReader = new ApplicationFileReader(projectMap, applicantMap);
         Map<String, Application> appMap = applicationReader.readFromFile();
-    
-        
+
         return appMap.values().stream()
-            .filter(app -> app.getStatus() == ApplicationStatus.BOOKED)
-            .filter(app -> flatTypeFilter == null || app.getFlatType().getName().equalsIgnoreCase(flatTypeFilter))
-            .filter(app -> maritalStatusFilter == null || 
-                app.getApplicant().getMaritalStatus().equalsIgnoreCase(maritalStatusFilter))
-            .collect(Collectors.toList());
+                .filter(app -> app.getStatus() == ApplicationStatus.BOOKED)
+                .filter(app -> flatTypeFilter == null || app.getFlatType().getName().equalsIgnoreCase(flatTypeFilter))
+                .filter(app -> maritalStatusFilter == null ||
+                        app.getApplicant().getMaritalStatus().equalsIgnoreCase(maritalStatusFilter))
+                .collect(Collectors.toList());
     }
-    
 
     private boolean isProjectManagedByCurrentManager(Project project) {
         if (project == null || project.getManagerInCharge() == null) {
             return false;
         }
 
-        
         return project.getManagerInCharge().getName().equals(currentManager.getName());
     }
 
@@ -253,17 +232,16 @@ public class HDBManagerController {
         List<Project> ownProjects = viewOwnProjects();
 
         if (ownProjects.isEmpty()) {
-            return true; 
+            return true;
         }
 
-        
         for (Project project : ownProjects) {
             if (projectController.isProjectActive(project)) {
-                return false; 
+                return false;
             }
         }
 
-        return true; 
+        return true;
     }
 
     public List<WithdrawalRequest> getPendingWithdrawalsForMyProjects() {
@@ -282,8 +260,31 @@ public class HDBManagerController {
     }
 
     public boolean approveWithdrawal(WithdrawalRequest req) {
-        return withdrawalController.approveRequest(req);
+        boolean success = withdrawalController.approveRequest(req);
+        if (success) {
+            Application app = req.getApplication();
+            String projectName = app.getProject().getProjectName();
+            String flatTypeName = app.getFlatType().getName();
+    
+            // Find the matching project in your loaded list
+            for (Project project : allProjects) {
+                if (project.getProjectName().equals(projectName)) {
+                    // Find the matching flat type by name
+                    for (FlatType flat : project.getFlatTypes()) {
+                        if (flat.getName().equals(flatTypeName)) {
+                            flat.incrementUnit(); // safely increment here
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+    
+            saveProjects(); // now this correctly persists the incremented unit
+        }
+        return success;
     }
+    
 
     public boolean rejectWithdrawal(WithdrawalRequest req) {
         return withdrawalController.rejectRequest(req);
@@ -320,7 +321,7 @@ public class HDBManagerController {
     }
 
     public boolean replyToEnquiry(int enquiryId, String reply) {
-        
+
         for (Project project : currentManager.getManagedProjects()) {
             if (project.getEnquiries() == null)
                 continue;
@@ -351,16 +352,16 @@ public class HDBManagerController {
                 officerMap.put(o.getNric(), o);
             }
         }
-        
-        OfficerRegistrationFileReader reader = new OfficerRegistrationFileReader(projectMap, officerMap); 
+
+        OfficerRegistrationFileReader reader = new OfficerRegistrationFileReader(projectMap, officerMap);
         Map<String, OfficerRegistration> allRegistrations = reader.readFromFile();
-    
+
         List<OfficerRegistration> pending = new ArrayList<>();
         for (OfficerRegistration reg : allRegistrations.values()) {
             Project project = reg.getProject();
             if (reg.getRegistrationStatus() == OfficerRegistrationStatus.pending &&
-                project.getManagerInCharge() != null &&
-                project.getManagerInCharge().getName().equals(currentManager.getName())) {
+                    project.getManagerInCharge() != null &&
+                    project.getManagerInCharge().getName().equals(currentManager.getName())) {
                 pending.add(reg);
             }
         }
@@ -370,9 +371,11 @@ public class HDBManagerController {
     public boolean approveOfficerRegistration(OfficerRegistration registration) {
         Project project = registration.getProject();
         OfficerRegistrationFileWriter writer = new OfficerRegistrationFileWriter();
-        if (!isProjectManagedByCurrentManager(project)) return false;
-        if (project.getRemainingOfficerSlots() <= 0) return false;
-    
+        if (!isProjectManagedByCurrentManager(project))
+            return false;
+        if (project.getRemainingOfficerSlots() <= 0)
+            return false;
+
         if (project.getRemainingOfficerSlots() <= 0) {
             registration.reject();
             writer.updateRegistration(registration);
@@ -382,16 +385,16 @@ public class HDBManagerController {
 
         registration.approve();
         project.assignOfficer(registration.getOfficer());
-    
-        
+
         writer.updateRegistration(registration);
-        saveProjects(); 
+        saveProjects();
         return true;
     }
-    
+
     public boolean rejectOfficerRegistration(OfficerRegistration registration) {
-        if (!isProjectManagedByCurrentManager(registration.getProject())) return false;
-    
+        if (!isProjectManagedByCurrentManager(registration.getProject()))
+            return false;
+
         registration.reject();
         OfficerRegistrationFileWriter writer = new OfficerRegistrationFileWriter();
         writer.updateRegistration(registration);
