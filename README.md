@@ -97,7 +97,7 @@ Detailed test cases can be found in the [Testing Documentation](./TESTING.md) fi
 # Contributors
 - NICOLE YAP XIU EN - U2420768C
 - POH JIA YONG - U2323306C
-- SOH HAO MING - 
+- SOH HAO MING - U2422386B
 - WAYNE CHUA ENG KIAT (CAI RONGJIE) - U2423760G
 
 # License
